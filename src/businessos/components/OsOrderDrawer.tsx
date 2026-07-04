@@ -92,6 +92,8 @@ export default function OsOrderDrawer({
 }) {
   const [order, setOrder] = useState<Order | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [portalOwner, setPortalOwner] = useState<PortalOwner | null>(null);
+  const [ownerOrderCount, setOwnerOrderCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
@@ -108,9 +110,25 @@ export default function OsOrderDrawer({
     ]);
     setLoading(false);
     if (oErr) { toast.error(oErr.message); return; }
-    setOrder(o as Order | null);
-    setNotes((o as Order | null)?.notes || "");
+    const orderRow = o as Order | null;
+    setOrder(orderRow);
+    setNotes(orderRow?.notes || "");
     setInvoices((invs || []) as Invoice[]);
+
+    // Resolve portal owner (B2B) — the DigiFormation client that placed this
+    // order from their own portal, if any.
+    const ownerId = orderRow?.placed_by_user_id;
+    if (ownerId && ownerId !== orderRow?.user_id) {
+      const [{ data: prof }, { count }] = await Promise.all([
+        supabase.from("profiles").select("user_id, full_name, email, company_name").eq("user_id", ownerId).maybeSingle(),
+        supabase.from("client_orders").select("id", { count: "exact", head: true }).eq("placed_by_user_id", ownerId),
+      ]);
+      setPortalOwner((prof as PortalOwner | null) ?? { user_id: ownerId, full_name: null, email: null, company_name: null });
+      setOwnerOrderCount(count ?? null);
+    } else {
+      setPortalOwner(null);
+      setOwnerOrderCount(null);
+    }
   };
 
   useEffect(() => {
@@ -127,10 +145,14 @@ export default function OsOrderDrawer({
       setOrder(null);
       setInvoices([]);
       setNotes("");
+      setPortalOwner(null);
+      setOwnerOrderCount(null);
     }
   }, [open, orderId]);
 
   const isGuest = useMemo(() => !!order && !order.user_id, [order]);
+  const isB2B = !!portalOwner;
+
 
   const updateStatus = async (newStatus: string) => {
     if (!order || order.status === newStatus) return;
