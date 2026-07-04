@@ -433,7 +433,7 @@ const Dashboard = () => {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
                   { label: "Address", value: String(subscriptions.length || 0), icon: CalendarDays, id: "addresses" as SectionId },
-                  { label: "Orders", value: String(orders.length), icon: ShoppingBag, id: "orders" as SectionId },
+                  { label: "My orders", value: String(directOrders.length), icon: ShoppingBag, id: "orders" as SectionId },
                   { label: "Wallet", value: formatGBP(walletBalance), icon: Wallet, id: "wallet" as SectionId },
                   { label: "Tickets", value: String(tickets.length), icon: Ticket, id: "tickets" as SectionId },
                 ].map((s) => {
@@ -452,20 +452,37 @@ const Dashboard = () => {
                 })}
               </div>
 
+              {b2bOrders.length > 0 && (
+                <button
+                  onClick={() => setActive("myClients")}
+                  className="w-full glass rounded-2xl p-5 text-left hover:shadow-glow transition flex items-center justify-between gap-3 ring-1 ring-primary/25"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <UserCircle2 className="w-6 h-6 opacity-80 shrink-0" />
+                    <div className="min-w-0">
+                      <div className="text-[11px] uppercase tracking-widest opacity-70">B2B / My clients</div>
+                      <div className="text-sm mt-0.5 truncate">
+                        {b2bOrders.length} order{b2bOrders.length === 1 ? "" : "s"} placed for your clients — tracked separately from your own orders.
+                      </div>
+                    </div>
+                  </div>
+                  <ArrowUpRight className="w-4 h-4 opacity-70 shrink-0" />
+                </button>
+              )}
 
-              {orders.length > 0 && (
+              {directOrders.length > 0 && (
                 <div className="glass rounded-2xl p-5 sm:p-6">
                   <div className="flex items-center justify-between mb-3">
                     <div>
-                      <h3 className="font-semibold">Recent orders</h3>
-                      <p className="text-xs opacity-60 mt-0.5">Your latest {Math.min(orders.length, 5)} of {orders.length} order{orders.length === 1 ? "" : "s"}.</p>
+                      <h3 className="font-semibold">Recent orders <span className="text-xs font-normal opacity-60">(your own)</span></h3>
+                      <p className="text-xs opacity-60 mt-0.5">Your latest {Math.min(directOrders.length, 5)} of {directOrders.length} direct order{directOrders.length === 1 ? "" : "s"}.</p>
                     </div>
                     <button onClick={() => setActive("orders")} className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1">
                       View all <ArrowUpRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                   <div className="space-y-2">
-                    {orders.slice(0, 5).map((o) => (
+                    {directOrders.slice(0, 5).map((o) => (
                       <button
                         key={o.id}
                         onClick={() => setActive("orders")}
@@ -482,6 +499,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               )}
+
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <button onClick={() => setActive("newServices")} className="glass rounded-2xl p-6 text-left hover:shadow-glow transition">
