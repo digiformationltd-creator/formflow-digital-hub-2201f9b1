@@ -103,6 +103,7 @@ const Checkout = () => {
     // Any service with a tailored requirements form only needs basic contact
     // info — hide the default DOB / address / business-activity sections.
     const minimalContact = !!extraSection;
+    const isAddressService = catalogEntry.category === "UK Address";
 
     return (
       <Layout>
@@ -121,6 +122,9 @@ const Checkout = () => {
           showDateOfBirth={!minimalContact}
           hideBusinessActivity={minimalContact}
           hideAddress={minimalContact}
+          showCompanyName={isAddressService || undefined}
+          strictCompanyName={isAddressService || undefined}
+          addressVerificationLink={isAddressService ? "https://verify.didit.me/u/LGgiVLwzSbGmvipLTgim-A" : undefined}
         />
       </Layout>
     );
