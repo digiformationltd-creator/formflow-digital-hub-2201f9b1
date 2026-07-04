@@ -478,6 +478,7 @@ const CheckoutFlow = ({
           ? form.business_other.trim().length >= 10
           : form.business_subcategory.trim().length > 0)) &&
         (!(idVerificationActive && liveSelfieLink) || verificationLinkRequested) &&
+        (!addressVerificationLink || addressVerificationRequested) &&
         (!(showServiceMode && serviceMode === "ltd-only") || form.personal_code.trim().length >= 8) &&
         (!showDateOfBirth || form.date_of_birth.trim().length >= 8) &&
         (!showWebsite || form.website.trim().length >= 3)
