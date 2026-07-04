@@ -119,15 +119,26 @@ const DATE_RANGES = [
 export default function OsOrders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [portalOwners, setPortalOwners] = useState<Record<string, PortalOwnerLite>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [paymentFilter, setPaymentFilter] = useState<string>("all");
   const [dateRange, setDateRange] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | "direct" | "b2b">("all");
+  const [ownerFilter, setOwnerFilter] = useState<string>("all"); // portal owner user_id
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [openOrderId, setOpenOrderId] = useState<string | null>(null);
   const [openInvoiceId, setOpenInvoiceId] = useState<string | null>(null);
+
+  // A B2B order = placed by a portal-owning DigiFormation client for their own
+  // customer. Detected via managed_client_id or a placed_by_user_id that
+  // differs from the row's own user_id.
+  const isB2BOrder = (o: OrderRow) =>
+    !!o.managed_client_id ||
+    (!!o.placed_by_user_id && o.placed_by_user_id !== o.user_id);
+
 
   /**
    * Inline status mutation. Mirrors Legacy Admin: update client_orders.status,
