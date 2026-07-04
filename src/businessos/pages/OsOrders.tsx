@@ -406,8 +406,23 @@ export default function OsOrders() {
         <StatCard label="Total Orders"   value={String(orders.length)}              icon={ShoppingBag} glow="blue" />
         <StatCard label="Pending Value"  value={fmtGBP(pendingValue)}               icon={Hourglass}   glow="purple" />
         <StatCard label="Filtered Rev."  value={fmtGBP(totalRevenue)}               icon={PoundSterling} glow="green" />
-        <StatCard label="Completed"      value={String(counts["Completed"] || 0)}   icon={CheckCircle2} glow="cyan" />
+        <button
+          type="button"
+          onClick={() => setTypeFilter(typeFilter === "b2b" ? "all" : "b2b")}
+          className="text-left"
+          title="Filter to B2B orders placed by portal-owning clients"
+        >
+          <div className={`os-glass ${typeFilter === "b2b" ? "os-glow-purple ring-1 ring-fuchsia-400/40" : "os-glow-cyan"} p-4`}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[11px] uppercase tracking-widest text-white/50">B2B Orders</div>
+              <Building2 className="w-4 h-4 text-fuchsia-300/80" />
+            </div>
+            <div className="text-xl sm:text-2xl font-bold truncate">{b2bCount}</div>
+            <div className="text-[10px] text-white/40 mt-0.5">{typeFilter === "b2b" ? "Filter on — click to clear" : "Placed by portal clients"}</div>
+          </div>
+        </button>
       </div>
+
 
       {/* Toolbar */}
       <div className="os-glass p-3 sm:p-4 flex flex-col gap-3">
