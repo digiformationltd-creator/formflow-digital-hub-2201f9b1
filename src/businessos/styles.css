@@ -180,16 +180,14 @@
 }
 
 /* ── Global overflow safety for admin pages ──────────────────────── */
-/* Prevent grid/flex children from forcing horizontal overflow of the page. */
-.businessos main > * { min-width: 0; }
-.businessos main .grid { min-width: 0; }
-.businessos main .grid > * { min-width: 0; }
-.businessos main .flex > * { min-width: 0; }
-/* Opt-out helper for children that legitimately need intrinsic width
-   (e.g. kanban columns, drag overlays). */
-.businessos .os-keep-width, .businessos .os-keep-width > * { min-width: revert; }
+/* Prevent grid/flex children from forcing horizontal overflow of the page.
+   Excludes horizontal scroll rails (kanban, tab strips) which need their
+   children to keep intrinsic width. */
+.businessos main > *:not(.overflow-x-auto) { min-width: 0; }
+.businessos main .grid:not(.overflow-x-auto) > *:not(.overflow-x-auto) { min-width: 0; }
 /* Cards / glass panels should never spill their border past the wrapper. */
 .businessos .os-glass { max-width: 100%; }
+
 
 @media (max-width: 767px) {
   .businessos main { padding-bottom: 5rem; }
