@@ -459,6 +459,7 @@ const CheckoutFlow = ({
       }
       return (
         (!showCompanyName || companyNameOptional || form.company_name.trim().length >= 2) &&
+        (!showCompanyName || companyNameOptional || !strictCompanyName || !isPlaceholderCompanyName(form.company_name)) &&
         (!showRole || form.role.trim().length > 0) &&
         form.first_name.trim().length >= 2 &&
         form.last_name.trim().length >= 2 &&
