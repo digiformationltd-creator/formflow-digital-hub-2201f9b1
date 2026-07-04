@@ -1308,12 +1308,25 @@ const MyClientsSection = ({ rows, ownerEmail, ownerUserId, managedClients, focus
               <h3 className="text-lg font-semibold truncate">{selected.name || selected.email}</h3>
               <div className="text-sm opacity-70 truncate">{selected.email}</div>
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs opacity-70">
+                {selected.company && <span>🏢 {selected.company}</span>}
                 {selected.phone && <span>📞 {selected.phone}</span>}
                 {selected.country && <span>🌍 {selected.country}</span>}
                 {latest && <span>Last order: {latest.order_date || (latest.created_at ? new Date(latest.created_at).toLocaleDateString() : "—")}</span>}
               </div>
+              {selected.notes && <div className="mt-2 text-xs opacity-70 italic">"{selected.notes}"</div>}
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <Button size="sm" variant="outline" className="rounded-full" onClick={() => openEdit(selected)}>
+                <Pencil className="w-3.5 h-3.5" /> Edit
+              </Button>
+              {selected.id && clients.filter((c) => c.id && c.id !== selected.id).length > 0 && (
+                <Button size="sm" variant="ghost" className="rounded-full" onClick={() => openMerge(selected)}>
+                  <Combine className="w-3.5 h-3.5" /> Merge
+                </Button>
+              )}
             </div>
           </div>
+
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
             <div className="rounded-xl bg-muted/20 p-3">
