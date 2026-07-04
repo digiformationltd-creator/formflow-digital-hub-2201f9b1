@@ -1433,7 +1433,10 @@ const MyClientsSection = ({ rows, ownerEmail, ownerUserId, managedClients, focus
           </div>
         </div>
       </div>
+      {dialogs}
+      </>
     );
+
   }
 
   // ---- List view: search + sort + filter ----
