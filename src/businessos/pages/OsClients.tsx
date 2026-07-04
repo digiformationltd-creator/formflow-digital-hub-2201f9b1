@@ -334,7 +334,7 @@ export default function OsClients() {
                     </div>
                   )}
                   <div className="text-[10px] text-white/40 mt-1.5 uppercase tracking-wider">
-                    Joined {fmtDate(c.created_at)} · {c.order_count || 0} orders
+                    Joined {fmtDate(c.created_at)} · {(c.direct_order_count || 0) + (c.b2b_order_count || 0)} total{(c.b2b_order_count || 0) > 0 ? ` · ${c.b2b_order_count} B2B` : ""}
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-white/40 mt-1 shrink-0" />
