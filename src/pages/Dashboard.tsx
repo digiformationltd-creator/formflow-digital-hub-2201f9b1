@@ -194,7 +194,21 @@ const Dashboard = () => {
     };
   }, [navigate]);
 
+  const reloadManagedClients = async () => {
+    if (!user) return;
+    const { data } = await (supabase as any).from("managed_clients").select("*").eq("portal_owner_user_id", user.id).order("created_at", { ascending: false });
+    setManagedClients(data || []);
+  };
+  const reloadOrders = async () => {
+    if (!user) return;
+    const { data } = await supabase.from("client_orders").select("*")
+      .or(`user_id.eq.${user.id},placed_by_user_id.eq.${user.id}`)
+      .order("order_date", { ascending: false });
+    if (data) setOrders(data);
+  };
+
   useEffect(() => {
+
     if (!user) return;
     let cancelled = false;
     (async () => {
