@@ -1066,9 +1066,15 @@ const buildManagedClients = (rows: any[], ownerEmail: string): ManagedClient[] =
   return Array.from(map.values()).sort((a, b) => (b.lastDate || "").localeCompare(a.lastDate || ""));
 };
 
+type ClientSort = "recent" | "orders" | "spend" | "name";
+type ClientStatusFilter = "all" | "pending" | "inProgress" | "completed";
+
 const MyClientsSection = ({ rows, ownerEmail }: { rows: any[]; ownerEmail: string }) => {
   const clients = buildManagedClients(rows, ownerEmail);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<ClientSort>("recent");
+  const [statusFilter, setStatusFilter] = useState<ClientStatusFilter>("all");
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
 
   if (clients.length === 0) {
@@ -1076,41 +1082,153 @@ const MyClientsSection = ({ rows, ownerEmail }: { rows: any[]; ownerEmail: strin
       <EmptyState
         icon={UserCircle2}
         title="No B2B clients yet"
-        description="When you place an order for someone else (a different customer email/name than your own account), that end client will appear here with their own order history."
+        description="When you place an order for someone else (a different customer email/name than your own account), that end client will appear here with their own order history, invoices and status tracking."
       />
     );
   }
 
   const selected = selectedKey ? clients.find((c) => c.key === selectedKey) : null;
 
+  // ---- Client detail workspace ----
   if (selected) {
+    const sortedOrders = [...selected.orders].sort(
+      (a, b) => new Date(b.order_date || b.created_at || 0).getTime() - new Date(a.order_date || a.created_at || 0).getTime(),
+    );
+    const activeCount = selected.statuses.pending + selected.statuses.inProgress;
+    const invoicedOrders = sortedOrders.filter((o) => o.__invoice_pdf);
+    const latest = sortedOrders[0];
+
+    const openInvoice = async (path: string) => {
+      const { data, error } = await supabase.storage.from("invoices").createSignedUrl(path, 60 * 60);
+      if (error || !data?.signedUrl) return toast.error("Could not open invoice — please try again.");
+      window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    };
+
     return (
-      <div className="space-y-4">
+      <div className="space-y-5">
         <button onClick={() => setSelectedKey(null)} className="inline-flex items-center gap-1.5 text-sm opacity-80 hover:opacity-100">
           <ArrowLeft className="w-4 h-4" /> Back to My Clients
         </button>
+
+        {/* Client summary */}
         <div className="glass rounded-2xl p-5 sm:p-6">
-          <div className="flex items-start justify-between gap-3 flex-wrap">
-            <div>
-              <h3 className="text-lg font-semibold">{selected.name || selected.email}</h3>
-              <div className="text-sm opacity-70 mt-0.5">{selected.email}</div>
-              {selected.phone && <div className="text-xs opacity-60 mt-0.5">{selected.phone}</div>}
+          <div className="flex items-start gap-4 flex-wrap">
+            <div className="w-14 h-14 rounded-full bg-gradient-brand grid place-items-center font-semibold text-base shadow-glow shrink-0">
+              {(selected.name || selected.email || "?").slice(0, 2).toUpperCase()}
             </div>
-            <div className="text-right">
-              <div className="text-[11px] uppercase tracking-widest opacity-60">Total billed</div>
-              <div className="text-lg font-semibold">{fmt(selected.totalGbp)}</div>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-lg font-semibold truncate">{selected.name || selected.email}</h3>
+              <div className="text-sm opacity-70 truncate">{selected.email}</div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs opacity-70">
+                {selected.phone && <span>📞 {selected.phone}</span>}
+                {selected.country && <span>🌍 {selected.country}</span>}
+                {latest && <span>Last order: {latest.order_date || (latest.created_at ? new Date(latest.created_at).toLocaleDateString() : "—")}</span>}
+              </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 mt-3">
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+            <div className="rounded-xl bg-muted/20 p-3">
+              <div className="text-[10px] uppercase tracking-widest opacity-60">Total orders</div>
+              <div className="text-xl font-semibold mt-0.5">{selected.orders.length}</div>
+            </div>
+            <div className="rounded-xl bg-muted/20 p-3">
+              <div className="text-[10px] uppercase tracking-widest opacity-60">Active</div>
+              <div className="text-xl font-semibold mt-0.5">{activeCount}</div>
+            </div>
+            <div className="rounded-xl bg-muted/20 p-3">
+              <div className="text-[10px] uppercase tracking-widest opacity-60">Completed</div>
+              <div className="text-xl font-semibold mt-0.5">{selected.statuses.completed}</div>
+            </div>
+            <div className="rounded-xl bg-muted/20 p-3">
+              <div className="text-[10px] uppercase tracking-widest opacity-60">Total billed</div>
+              <div className="text-xl font-semibold mt-0.5">{fmt(selected.totalGbp)}</div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 mt-4">
             {selected.statuses.pending > 0 && <Badge variant="secondary">Pending: {selected.statuses.pending}</Badge>}
             {selected.statuses.inProgress > 0 && <Badge variant="outline">In Progress: {selected.statuses.inProgress}</Badge>}
             {selected.statuses.completed > 0 && <Badge>Completed: {selected.statuses.completed}</Badge>}
           </div>
         </div>
-        <ClientOrdersSection rows={selected.orders} ownerEmail={ownerEmail} onBrowse={() => {}} />
+
+        {/* Orders for this client */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-semibold text-sm">Orders for this client</h4>
+            <span className="text-xs opacity-60">{sortedOrders.length} total</span>
+          </div>
+          <ClientOrdersSection rows={sortedOrders} ownerEmail={ownerEmail} onBrowse={() => {}} />
+        </div>
+
+        {/* Deliverables / invoices */}
+        <div className="glass rounded-2xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="font-semibold text-sm">Deliverables & invoices</h4>
+            <span className="text-xs opacity-60">{invoicedOrders.length} file{invoicedOrders.length === 1 ? "" : "s"}</span>
+          </div>
+          {invoicedOrders.length === 0 ? (
+            <p className="text-xs opacity-60">No invoices or client-facing documents attached yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {invoicedOrders.map((o) => (
+                <div key={o.id} className="flex items-center justify-between gap-3 rounded-xl bg-muted/20 px-3 py-2.5">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">{o.__invoice_number || o.order_ref}</div>
+                    <div className="text-[11px] opacity-60 truncate">{o.service} • {fmt(Number(o.amount_gbp || 0))}</div>
+                  </div>
+                  <button onClick={() => openInvoice(o.__invoice_pdf)} className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline shrink-0">
+                    <Download className="w-3.5 h-3.5" /> Download
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Activity */}
+        <div className="glass rounded-2xl p-5">
+          <h4 className="font-semibold text-sm mb-3">Recent activity</h4>
+          <div className="space-y-2">
+            {sortedOrders.slice(0, 5).map((o) => (
+              <div key={o.id} className="flex items-center justify-between gap-3 text-sm">
+                <div className="min-w-0">
+                  <div className="font-mono text-xs text-primary truncate">{o.order_ref || "—"}</div>
+                  <div className="text-xs opacity-70 truncate">{o.service}</div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-[11px] opacity-60">{o.order_date || (o.created_at ? new Date(o.created_at).toLocaleDateString() : "")}</span>
+                  <StatusBadge status={o.status} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
+
+  // ---- List view: search + sort + filter ----
+  const q = search.toLowerCase().trim();
+  const filtered = clients
+    .filter((c) => {
+      if (statusFilter === "pending" && c.statuses.pending === 0) return false;
+      if (statusFilter === "inProgress" && c.statuses.inProgress === 0) return false;
+      if (statusFilter === "completed" && c.statuses.completed === 0) return false;
+      if (!q) return true;
+      return (
+        (c.name || "").toLowerCase().includes(q) ||
+        (c.email || "").toLowerCase().includes(q) ||
+        (c.phone || "").toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === "orders") return b.orders.length - a.orders.length;
+      if (sortBy === "spend") return b.totalGbp - a.totalGbp;
+      if (sortBy === "name") return (a.name || a.email || "").localeCompare(b.name || b.email || "");
+      return (b.lastDate || "").localeCompare(a.lastDate || "");
+    });
 
   return (
     <div className="space-y-4">
@@ -1118,40 +1236,82 @@ const MyClientsSection = ({ rows, ownerEmail }: { rows: any[]; ownerEmail: strin
         <h3 className="font-semibold">B2B / Managed Clients</h3>
         <p className="text-xs opacity-70 mt-1">
           Every order you place from your portal on behalf of another customer is grouped here.
-          You keep full tracking, status updates and invoices for each of your clients — all inside your own account.
+          Open a client to see their full profile, orders, invoices and status tracking — all inside your own account.
         </p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {clients.map((c) => (
-          <button
-            key={c.key}
-            onClick={() => setSelectedKey(c.key)}
-            className="glass rounded-2xl p-4 text-left hover:shadow-glow transition"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="font-semibold truncate">{c.name || c.email}</div>
-                <div className="text-xs opacity-70 truncate">{c.email}</div>
-                {c.phone && <div className="text-[11px] opacity-60 mt-0.5 truncate">{c.phone}</div>}
-              </div>
-              <ChevronRight className="w-4 h-4 opacity-50 shrink-0 mt-1" />
-            </div>
-            <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/40">
-              <div className="text-xs">
-                <span className="font-semibold">{c.orders.length}</span>
-                <span className="opacity-60"> order{c.orders.length === 1 ? "" : "s"}</span>
-                <span className="opacity-40"> • </span>
-                <span className="opacity-70">{fmt(c.totalGbp)}</span>
-              </div>
-              <div className="flex gap-1">
-                {c.statuses.pending > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300">{c.statuses.pending}P</span>}
-                {c.statuses.inProgress > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300">{c.statuses.inProgress}IP</span>}
-                {c.statuses.completed > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300">{c.statuses.completed}C</span>}
-              </div>
-            </div>
-          </button>
-        ))}
+
+      {/* Toolbar */}
+      <div className="glass rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row gap-3">
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name, email or phone…"
+          className="flex-1 rounded-xl"
+        />
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as ClientSort)}
+          className="rounded-xl bg-muted/30 border border-border/40 px-3 py-2 text-sm"
+        >
+          <option value="recent">Sort: Latest order</option>
+          <option value="orders">Sort: Most orders</option>
+          <option value="spend">Sort: Highest spend</option>
+          <option value="name">Sort: Name (A–Z)</option>
+        </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as ClientStatusFilter)}
+          className="rounded-xl bg-muted/30 border border-border/40 px-3 py-2 text-sm"
+        >
+          <option value="all">Status: All</option>
+          <option value="pending">Has pending</option>
+          <option value="inProgress">Has in progress</option>
+          <option value="completed">Has completed</option>
+        </select>
       </div>
+
+      <div className="text-xs opacity-60 px-1">
+        Showing <span className="font-semibold opacity-100">{filtered.length}</span> of {clients.length} client{clients.length === 1 ? "" : "s"}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="glass rounded-2xl p-8 text-center text-sm opacity-70">No clients match those filters.</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {filtered.map((c) => (
+            <button
+              key={c.key}
+              onClick={() => setSelectedKey(c.key)}
+              className="glass rounded-2xl p-4 text-left hover:shadow-glow transition"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-brand grid place-items-center font-semibold text-xs shadow-glow shrink-0">
+                  {(c.name || c.email || "?").slice(0, 2).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-semibold truncate">{c.name || c.email}</div>
+                  <div className="text-xs opacity-70 truncate">{c.email}</div>
+                  {c.phone && <div className="text-[11px] opacity-60 mt-0.5 truncate">{c.phone}</div>}
+                </div>
+                <ChevronRight className="w-4 h-4 opacity-50 shrink-0 mt-1" />
+              </div>
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/40">
+                <div className="text-xs">
+                  <span className="font-semibold">{c.orders.length}</span>
+                  <span className="opacity-60"> order{c.orders.length === 1 ? "" : "s"}</span>
+                  <span className="opacity-40"> • </span>
+                  <span className="opacity-70">{fmt(c.totalGbp)}</span>
+                </div>
+                <div className="flex gap-1">
+                  {c.statuses.pending > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300" title="Pending">{c.statuses.pending}P</span>}
+                  {c.statuses.inProgress > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300" title="In progress">{c.statuses.inProgress}IP</span>}
+                  {c.statuses.completed > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300" title="Completed">{c.statuses.completed}C</span>}
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
