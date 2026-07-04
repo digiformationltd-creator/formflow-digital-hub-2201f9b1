@@ -362,6 +362,7 @@ const CheckoutFlow = ({
   const [submitDocsManually, setSubmitDocsManually] = useState(false);
   const [showSicCodes, setShowSicCodes] = useState(false);
   const [verificationLinkRequested, setVerificationLinkRequested] = useState(false);
+  const [addressVerificationRequested, setAddressVerificationRequested] = useState(false);
   const [exampleOpen, setExampleOpen] = useState<null | { title: string; src: string }>(null);
   const [serviceMode, setServiceMode] = useState<"ltd-only" | "both">(draft?.serviceMode ?? "both");
   const [serviceModeOpen, setServiceModeOpen] = useState(true);
