@@ -1013,29 +1013,38 @@ const stageIndex = (status: string) => {
   return 0;
 };
 
-const ClientOrdersSection = ({ rows, onBrowse }: { rows: any[]; onBrowse: () => void }) => {
+const ClientOrdersSection = ({ rows, onBrowse, ownerEmail }: { rows: any[]; onBrowse: () => void; ownerEmail?: string }) => {
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
   const [selected, setSelected] = useState<any | null>(null);
   if (rows.length === 0) return <EmptyState icon={ShoppingBag} title="No orders yet" description="Your service orders will appear here automatically once placed." action={<Button variant="hero" className="rounded-full" onClick={onBrowse}>Place First Order</Button>} />;
   return (
     <div className="space-y-3">
       <p className="text-sm opacity-70">Tap an order to view its progress and details.</p>
-      {rows.map((o) => (
+      {rows.map((o) => {
+        const custEmail = (o.customer_email || "").toLowerCase();
+        const isB2B = !!ownerEmail && custEmail && custEmail !== ownerEmail;
+        return (
         <button
           key={o.id}
           type="button"
           onClick={() => setSelected(o)}
           className="w-full text-left glass rounded-xl p-4 flex items-center justify-between gap-3 flex-wrap hover:bg-white/5 transition"
         >
-          <div>
+          <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-wider opacity-50 mb-0.5">Order #</div>
             <div className="font-mono font-semibold text-primary">{o.order_ref || "Reference pending"}</div>
             <div className="text-sm">{o.service}</div>
             <div className="text-xs opacity-60">{o.order_date} • {fmt(Number(o.amount_gbp))}</div>
+            {isB2B && (
+              <div className="mt-1 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-primary/90 bg-primary/10 rounded-full px-2 py-0.5">
+                <UserCircle2 className="w-3 h-3" /> For client: {o.customer_name || o.customer_email}
+              </div>
+            )}
           </div>
           <StatusBadge status={o.status} />
         </button>
-      ))}
+        );
+      })}
       <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
         <DialogContent className="max-w-md">
           {selected && (() => {
