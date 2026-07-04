@@ -526,22 +526,54 @@ const Dashboard = () => {
           )}
 
           {active === "orders" && (
-            <ClientOrdersSection
-              rows={orders}
-              ownerEmail={(user.email || "").toLowerCase()}
-              onBrowse={() => setActive("newServices")}
-              onOpenClient={openManagedClient}
-            />
+            <div className="space-y-3">
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div>
+                  <h2 className="text-lg font-semibold">My orders</h2>
+                  <p className="text-xs opacity-60 mt-0.5">
+                    Orders you placed for yourself / your own business.
+                    {b2bOrders.length > 0 && (
+                      <> Orders you placed for your customers live in{" "}
+                        <button onClick={() => setActive("myClients")} className="text-primary hover:underline">B2B / My clients</button>.
+                      </>
+                    )}
+                  </p>
+                </div>
+                {b2bOrders.length > 0 && (
+                  <button
+                    onClick={() => setActive("myClients")}
+                    className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    View B2B orders ({b2bOrders.length}) <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <ClientOrdersSection
+                rows={directOrders}
+                ownerEmail={ownerEmailLc}
+                onBrowse={() => setActive("newServices")}
+              />
+            </div>
           )}
 
           {active === "myClients" && (
-            <MyClientsSection
-              rows={orders}
-              ownerEmail={(user.email || "").toLowerCase()}
-              focusedEmail={focusedClientEmail}
-              onFocusHandled={() => setFocusedClientEmail(null)}
-            />
+            <div className="space-y-3">
+              <div>
+                <h2 className="text-lg font-semibold">B2B / My clients</h2>
+                <p className="text-xs opacity-60 mt-0.5">
+                  Orders you placed for your own customers — grouped per client, tracked separately from{" "}
+                  <button onClick={() => setActive("orders")} className="text-primary hover:underline">your own orders</button>.
+                </p>
+              </div>
+              <MyClientsSection
+                rows={b2bOrders}
+                ownerEmail={ownerEmailLc}
+                focusedEmail={focusedClientEmail}
+                onFocusHandled={() => setFocusedClientEmail(null)}
+              />
+            </div>
           )}
+
 
           {active === "invoices" && (
             <ClientInvoicesSection userId={user.id} />
