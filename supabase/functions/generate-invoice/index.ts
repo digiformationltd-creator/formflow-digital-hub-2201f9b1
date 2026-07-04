@@ -731,11 +731,16 @@ Deno.serve(async (req) => {
     }
     // -------------------------------------------------------------------
 
-    // SECURITY: only attach an order to an existing user's account when the
-    // caller is authenticated AS that user. Unauthenticated/guest checkouts
-    // always get user_id = NULL — preventing account spoofing where an
-    // attacker would inject orders into a victim's portal by knowing their
-    // email address.
+    // Portal ownership vs end-customer identity (B2B split).
+    //   placed_by_user_id → the DigiFormation portal owner who submitted the
+    //     order. Set for any authenticated caller, regardless of the customer
+    //     email on the order — this is what makes B2B/reseller orders visible
+    //     in the placing owner's portal + "My Clients" section.
+    //   user_id          → the end-customer's own account link. Only set
+    //     when the checkout email matches the caller's authenticated email
+    //     (prevents account spoofing: an attacker cannot inject orders into
+    //     a victim's portal just by typing their email).
+    const placedByUserId: string | null = user?.id ?? null
     let orderUserId: string | null = null
     if (user?.id && user.email?.toLowerCase() === customerEmail) {
       orderUserId = user.id
