@@ -1111,22 +1111,31 @@ const CheckoutFlow = ({
                 )}
 
                 {showCompanyName && (
-                  <Field
-                    label={
-                      companyNameOptional
-                        ? "Company name (optional — if you've already registered)"
-                        : "Proposed company name (the company you want to register)"
-                    }
-                    value={form.company_name}
-                    onChange={(v) => setForm({ ...form, company_name: v })}
-                    required={!companyNameOptional}
-                    minLength={companyNameOptional ? 0 : 2}
-                    placeholder={
-                      companyNameOptional
-                        ? "e.g. Acme Trading Ltd"
-                        : "e.g. Acme Trading Ltd — add alternatives in Notes below"
-                    }
-                  />
+                  <div>
+                    <Field
+                      label={
+                        strictCompanyName
+                          ? "Registered company name (must be genuine)"
+                          : companyNameOptional
+                            ? "Company name (optional — if you've already registered)"
+                            : "Proposed company name (the company you want to register)"
+                      }
+                      value={form.company_name}
+                      onChange={(v) => setForm({ ...form, company_name: v })}
+                      required={!companyNameOptional}
+                      minLength={companyNameOptional ? 0 : 2}
+                      placeholder={
+                        strictCompanyName
+                          ? "e.g. Digiformation Ltd — enter your actual registered name"
+                          : companyNameOptional
+                            ? "e.g. Acme Trading Ltd"
+                            : "e.g. Acme Trading Ltd — add alternatives in Notes below"
+                      }
+                    />
+                    {strictCompanyName && !companyNameOptional && form.company_name.trim().length >= 2 && isPlaceholderCompanyName(form.company_name) && (
+                      <p className="text-xs text-destructive font-medium mt-1.5">{PLACEHOLDER_COMPANY_ERROR}</p>
+                    )}
+                  </div>
                 )}
                 {showRole && (() => {
                   const ROLES = ["Director", "PSC (Person with Significant Control)", "Shareholder", "Secretary"];
