@@ -460,6 +460,31 @@ export default function OsOrders() {
           >
             {DATE_RANGES.map(d => <option key={d.key} value={d.key} className="bg-slate-900">{d.label}</option>)}
           </select>
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value as "all" | "direct" | "b2b")}
+            className="h-11 px-3 rounded-xl text-sm os-glass bg-transparent"
+            title="Order type"
+          >
+            <option value="all" className="bg-slate-900">All orders</option>
+            <option value="direct" className="bg-slate-900">Direct only</option>
+            <option value="b2b" className="bg-slate-900">B2B only</option>
+          </select>
+          {ownerOptions.length > 0 && (
+            <select
+              value={ownerFilter}
+              onChange={(e) => setOwnerFilter(e.target.value)}
+              className="h-11 px-3 rounded-xl text-sm os-glass bg-transparent max-w-[220px]"
+              title="Filter by portal owner (DigiFormation client who placed the order)"
+            >
+              <option value="all" className="bg-slate-900">All portal owners</option>
+              {ownerOptions.map((o) => (
+                <option key={o.id} value={o.id} className="bg-slate-900">
+                  {o.label} ({o.count})
+                </option>
+              ))}
+            </select>
+          )}
           <button
             onClick={load}
             disabled={loading}
