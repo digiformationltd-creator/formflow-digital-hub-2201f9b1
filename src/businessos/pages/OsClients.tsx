@@ -15,8 +15,16 @@ interface ClientRow {
   phone: string | null;
   company_name: string | null;
   created_at: string;
-  order_count?: number;
+  // Direct orders the client placed for themselves (linked by user_id or
+  // guest-matched by email).
+  direct_order_count?: number;
+  // B2B orders this client placed from their portal for their own customers
+  // (placed_by_user_id = this client, distinct end customer).
+  b2b_order_count?: number;
+  // Distinct managed clients this portal owner has served.
+  managed_client_count?: number;
 }
+
 
 const initialsOf = (c: ClientRow) => {
   const src = c.full_name || c.email || "?";
@@ -44,21 +52,53 @@ export default function OsClients() {
     const baseClients: ClientRow[] = data?.clients || [];
     const { data: orders } = await supabase
       .from("client_orders")
-      .select("user_id, customer_email");
-    const counts = new Map<string, number>();
+      .select("user_id, customer_email, placed_by_user_id, managed_client_id");
+
     const emailToClient = new Map<string, string>();
     for (const client of baseClients) {
       if (client.email) emailToClient.set(client.email.toLowerCase(), client.user_id);
     }
+
+    const direct = new Map<string, number>();
+    const b2b = new Map<string, number>();
+    // Distinct managed-client identity per portal owner. Uses managed_client_id
+    // when present, otherwise falls back to the end-customer email so grouping
+    // still works for older rows.
+    const managed = new Map<string, Set<string>>();
+
     for (const order of orders || []) {
-      const clientId = order.user_id || (order.customer_email ? emailToClient.get(order.customer_email.toLowerCase()) : null);
-      if (clientId) counts.set(clientId, (counts.get(clientId) || 0) + 1);
+      const ownerId = order.placed_by_user_id || null;
+      const linkedId = order.user_id || (order.customer_email ? emailToClient.get(order.customer_email.toLowerCase()) : null);
+      const isB2B = !!ownerId && (
+        !!order.managed_client_id ||
+        (order.user_id && order.user_id !== ownerId) ||
+        (!order.user_id && (!linkedId || linkedId !== ownerId))
+      );
+
+      if (isB2B && ownerId) {
+        b2b.set(ownerId, (b2b.get(ownerId) || 0) + 1);
+        const key = order.managed_client_id || (order.customer_email || "").toLowerCase();
+        if (key) {
+          const set = managed.get(ownerId) || new Set<string>();
+          set.add(key);
+          managed.set(ownerId, set);
+        }
+      } else if (linkedId) {
+        direct.set(linkedId, (direct.get(linkedId) || 0) + 1);
+      }
     }
+
     const enriched = baseClients
-      .map((client) => ({ ...client, order_count: counts.get(client.user_id) || 0 }))
+      .map((client) => ({
+        ...client,
+        direct_order_count: direct.get(client.user_id) || 0,
+        b2b_order_count: b2b.get(client.user_id) || 0,
+        managed_client_count: managed.get(client.user_id)?.size || 0,
+      }))
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     setClients(enriched);
   };
+
 
   const loadManagedStats = async () => {
     const { data } = await supabase
@@ -95,7 +135,7 @@ export default function OsClients() {
 
   const total = clients.length;
   const withCompany = clients.filter(c => c.company_name).length;
-  const totalOrders = clients.reduce((sum, client) => sum + (client.order_count || 0), 0);
+  const totalOrders = clients.reduce((sum, client) => sum + (client.direct_order_count || 0) + (client.b2b_order_count || 0), 0);
   const newThisMonth = clients.filter(c => {
     const d = new Date(c.created_at);
     const n = new Date();
@@ -225,10 +265,29 @@ export default function OsClients() {
                     <td className="py-3 px-4 text-white/70">{c.email || "—"}</td>
                     <td className="py-3 px-4 text-white/70">{c.company_name || "—"}</td>
                     <td className="py-3 px-4">
-                      <button onClick={(e) => { e.stopPropagation(); openClient(c.user_id, "orders"); }} className="px-2.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.10] text-xs font-semibold text-white/80">
-                        {c.order_count || 0} orders
-                      </button>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openClient(c.user_id, "orders"); }}
+                          className="px-2.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.10] text-xs font-semibold text-white/80"
+                          title={`Total: ${(c.direct_order_count || 0) + (c.b2b_order_count || 0)} · Direct: ${c.direct_order_count || 0} · B2B: ${c.b2b_order_count || 0}`}
+                        >
+                          {(c.direct_order_count || 0) + (c.b2b_order_count || 0)} total
+                        </button>
+                        {(c.b2b_order_count || 0) > 0 && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); openClient(c.user_id, "orders"); }}
+                            className="px-2 py-0.5 rounded-full bg-fuchsia-500/15 hover:bg-fuchsia-500/25 ring-1 ring-fuchsia-400/30 text-[10px] font-bold text-fuchsia-100 uppercase tracking-wider"
+                            title={`${c.b2b_order_count} B2B orders across ${c.managed_client_count || 0} customer${(c.managed_client_count || 0) === 1 ? "" : "s"}`}
+                          >
+                            B2B {c.b2b_order_count}
+                          </button>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-white/40 mt-1">
+                        {c.direct_order_count || 0} direct{(c.b2b_order_count || 0) > 0 ? ` · ${c.managed_client_count || 0} client${(c.managed_client_count || 0) === 1 ? "" : "s"}` : ""}
+                      </div>
                     </td>
+
                     <td className="py-3 px-4 text-white/70">{c.phone || "—"}</td>
                     <td className="py-3 px-4 text-white/50 text-xs whitespace-nowrap">{fmtDate(c.created_at)}</td>
                     <td className="py-3 px-4 text-right">
@@ -275,7 +334,7 @@ export default function OsClients() {
                     </div>
                   )}
                   <div className="text-[10px] text-white/40 mt-1.5 uppercase tracking-wider">
-                    Joined {fmtDate(c.created_at)} · {c.order_count || 0} orders
+                    Joined {fmtDate(c.created_at)} · {(c.direct_order_count || 0) + (c.b2b_order_count || 0)} total{(c.b2b_order_count || 0) > 0 ? ` · ${c.b2b_order_count} B2B` : ""}
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-white/40 mt-1 shrink-0" />
