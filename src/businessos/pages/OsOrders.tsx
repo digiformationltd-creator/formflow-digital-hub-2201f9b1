@@ -524,9 +524,36 @@ export default function OsOrders() {
         </div>
       </div>
 
-      <div className="text-xs text-white/50 px-1">
-        Showing <span className="text-white/80 font-semibold">{filtered.length}</span> of {orders.length} orders
+      <div className="flex items-center gap-2 flex-wrap px-1">
+        <div className="text-xs text-white/50">
+          Showing <span className="text-white/80 font-semibold">{filtered.length}</span> of {orders.length} orders
+        </div>
+        {ownerFilter !== "all" && (() => {
+          const opt = ownerOptions.find((o) => o.id === ownerFilter);
+          const label = opt?.label || "portal owner";
+          return (
+            <button
+              onClick={() => setOwnerFilter("all")}
+              className="px-2 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1.5 bg-fuchsia-500/15 text-fuchsia-100 ring-1 ring-fuchsia-400/40 hover:bg-fuchsia-500/25"
+              title="Clear portal owner filter"
+            >
+              <Building2 className="w-3 h-3" />
+              Portal owner: {label}
+              <X className="w-3 h-3" />
+            </button>
+          );
+        })()}
+        {typeFilter !== "all" && (
+          <button
+            onClick={() => setTypeFilter("all")}
+            className="px-2 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1.5 bg-white/[0.06] text-white/80 ring-1 ring-white/15 hover:bg-white/[0.12]"
+          >
+            {typeFilter === "b2b" ? "B2B only" : "Direct only"}
+            <X className="w-3 h-3" />
+          </button>
+        )}
       </div>
+
 
       {/* Loading */}
       {loading && orders.length === 0 && (
