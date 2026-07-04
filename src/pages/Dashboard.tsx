@@ -1086,13 +1086,24 @@ const buildManagedClients = (rows: any[], ownerEmail: string): ManagedClient[] =
 type ClientSort = "recent" | "orders" | "spend" | "name";
 type ClientStatusFilter = "all" | "pending" | "inProgress" | "completed";
 
-const MyClientsSection = ({ rows, ownerEmail }: { rows: any[]; ownerEmail: string }) => {
+const MyClientsSection = ({ rows, ownerEmail, focusedEmail, onFocusHandled }: { rows: any[]; ownerEmail: string; focusedEmail?: string | null; onFocusHandled?: () => void }) => {
   const clients = buildManagedClients(rows, ownerEmail);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<ClientSort>("recent");
   const [statusFilter, setStatusFilter] = useState<ClientStatusFilter>("all");
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
+
+  // Deep-link: when the parent asks us to focus a specific client (e.g. from
+  // an "Open client" click in My Orders), jump straight into that workspace.
+  useEffect(() => {
+    if (!focusedEmail) return;
+    const key = focusedEmail.toLowerCase().trim();
+    if (clients.some((c) => c.key === key)) {
+      setSelectedKey(key);
+      onFocusHandled?.();
+    }
+  }, [focusedEmail, clients, onFocusHandled]);
 
   if (clients.length === 0) {
     return (
