@@ -967,6 +967,7 @@ Deno.serve(async (req) => {
 
     const { error: invErr } = await admin.from('invoices').insert({
       user_id: orderUserId,
+      placed_by_user_id: placedByUserId,
       order_id: order.id,
       invoice_number: invoiceNumber,
       service_description: body.packageName ? `${body.service} — ${body.packageName}` : body.service,
