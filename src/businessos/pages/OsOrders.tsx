@@ -330,20 +330,28 @@ export default function OsOrders() {
       if (statusFilter !== "all" && o.status !== statusFilter) return false;
       if (sourceFilter !== "all" && (o.source || "checkout") !== sourceFilter) return false;
       if (paymentFilter !== "all" && (o.payment_status || "unpaid") !== paymentFilter) return false;
+      const b2b = isB2BOrder(o);
+      if (typeFilter === "b2b" && !b2b) return false;
+      if (typeFilter === "direct" && b2b) return false;
+      if (ownerFilter !== "all" && o.placed_by_user_id !== ownerFilter) return false;
       if (cutoff) {
         const d = new Date(o.order_date || o.created_at);
         if (d < cutoff) return false;
       }
       if (!q) return true;
+      const owner = o.placed_by_user_id ? portalOwners[o.placed_by_user_id] : null;
       return (
         (o.order_ref || "").toLowerCase().includes(q) ||
         (o.service || "").toLowerCase().includes(q) ||
         (o.customer_name || "").toLowerCase().includes(q) ||
         (o.customer_email || "").toLowerCase().includes(q) ||
-        (o.invoice_number || "").toLowerCase().includes(q)
+        (o.invoice_number || "").toLowerCase().includes(q) ||
+        (owner?.full_name || "").toLowerCase().includes(q) ||
+        (owner?.email || "").toLowerCase().includes(q) ||
+        (owner?.company_name || "").toLowerCase().includes(q)
       );
     });
-  }, [orders, search, statusFilter, sourceFilter, paymentFilter, dateRange]);
+  }, [orders, search, statusFilter, sourceFilter, paymentFilter, dateRange, typeFilter, ownerFilter, portalOwners]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: orders.length };
@@ -351,6 +359,21 @@ export default function OsOrders() {
     for (const o of orders) c[o.status] = (c[o.status] || 0) + 1;
     return c;
   }, [orders]);
+
+  const b2bCount = useMemo(() => orders.filter(isB2BOrder).length, [orders]);
+  const ownerOptions = useMemo(() => {
+    const map = new Map<string, { id: string; label: string; count: number }>();
+    for (const o of orders) {
+      if (!o.placed_by_user_id || !isB2BOrder(o)) continue;
+      const p = portalOwners[o.placed_by_user_id];
+      const label = p?.full_name || p?.company_name || p?.email || o.placed_by_user_id.slice(0, 8);
+      const existing = map.get(o.placed_by_user_id);
+      if (existing) existing.count++;
+      else map.set(o.placed_by_user_id, { id: o.placed_by_user_id, label, count: 1 });
+    }
+    return Array.from(map.values()).sort((a, b) => b.count - a.count);
+  }, [orders, portalOwners]);
+
 
   const totalRevenue = useMemo(
     () => filtered.reduce((acc, o) => acc + (Number(o.amount_gbp) || 0), 0),
