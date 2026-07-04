@@ -204,17 +204,22 @@ const Dashboard = () => {
         supabase.from("profiles").select("full_name,email,phone,company_name,avatar_initials").eq("user_id", user.id).maybeSingle(),
         supabase.from("client_company_details").select("*").eq("user_id", user.id).order("created_at", { ascending: true }),
         supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle(),
-        // All orders directly linked to this account — no limit, all rows.
-        supabase.from("client_orders").select("*").eq("user_id", user.id).order("order_date", { ascending: false }),
-        // Legacy orphan-recovery: orders placed as guest with the same email
-        // (e.g. before signup). The checkout now hard-locks email to the
-        // authed account, so this is only for historical data.
-        supabase.from("client_orders").select("*").is("user_id", null).ilike("customer_email", emailLower).order("order_date", { ascending: false }),
+        // All orders directly linked to this account OR placed by this
+        // account on behalf of a B2B/managed end-client. `placed_by_user_id`
+        // is set by `generate-invoice` for every order submitted while the
+        // portal owner is authenticated, regardless of the customer email.
+        supabase.from("client_orders").select("*")
+          .or(`user_id.eq.${user.id},placed_by_user_id.eq.${user.id}`)
+          .order("order_date", { ascending: false }),
+        // Legacy orphan-recovery: guest orders that predate portal-owner
+        // tracking and happen to carry this account's own email.
+        supabase.from("client_orders").select("*").is("user_id", null).is("placed_by_user_id", null).ilike("customer_email", emailLower).order("order_date", { ascending: false }),
         supabase.from("client_subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
         supabase.from("client_wallet_transactions").select("*").eq("user_id", user.id).order("txn_date", { ascending: false }),
         supabase.from("client_tickets").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
-        supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status").eq("user_id", user.id),
-        supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status").is("user_id", null).ilike("bill_to_email", emailLower),
+        supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status")
+          .or(`user_id.eq.${user.id},placed_by_user_id.eq.${user.id}`),
+        supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status").is("user_id", null).is("placed_by_user_id", null).ilike("bill_to_email", emailLower),
       ]);
       if (cancelled) return;
       // De-dupe & merge orders (owned + email-matched orphans) so repeat
