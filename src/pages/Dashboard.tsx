@@ -409,6 +409,7 @@ const Dashboard = () => {
         </header>
 
         <div className="p-4 sm:p-8 max-w-6xl mx-auto">
+          {(() => { return null; })()}
           {active === "overview" && (
             <div className="space-y-6">
               <div className="glass rounded-2xl p-6 sm:p-8">
