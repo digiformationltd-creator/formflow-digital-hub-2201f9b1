@@ -27,6 +27,7 @@ import { COUNTRIES } from "@/lib/countries";
 import { normalizePhoneToE164 } from "@/lib/phone";
 import { recordLeadAttribution, type DeclaredSource } from "@/lib/attribution";
 import SourceHeardSelect from "@/components/attribution/SourceHeardSelect";
+import { isPlaceholderCompanyName, PLACEHOLDER_COMPANY_ERROR } from "@/lib/companyNameValidator";
 import { SearchableCountrySelect } from "./SearchableCountrySelect";
 import exampleHoldingSelfie from "@/assets/example-holding-selfie.jpg";
 import exampleIdFront from "@/assets/example-id-front.jpg";
@@ -121,6 +122,12 @@ export type CheckoutFlowProps = {
   showCompanyName?: boolean;
   /** When true, the company name field is shown but not required (used for IDV) */
   companyNameOptional?: boolean;
+  /** When true, reject obvious placeholder/fake company names (ABC, XYZ, Test, N/A, etc.).
+   *  Used by address-service checkouts where a genuine company name is required. */
+  strictCompanyName?: boolean;
+  /** When set, renders a mandatory "Address Verification" block at the end of the
+   *  details step (mirrors liveSelfieLink). User must open the link before Continue. */
+  addressVerificationLink?: string;
   /** Show the "what do you need?" service-mode picker at top of details (UK LTD) */
   showServiceMode?: boolean;
   /** Show a role picker (Director / PSC / Shareholder / Secretary) — used for IDV */
@@ -189,6 +196,8 @@ const CheckoutFlow = ({
   showBusinessType = false,
   showCompanyName = false,
   companyNameOptional = false,
+  strictCompanyName = false,
+  addressVerificationLink,
   showServiceMode = false,
   showRole = false,
   hideBusinessActivity = false,
@@ -353,6 +362,7 @@ const CheckoutFlow = ({
   const [submitDocsManually, setSubmitDocsManually] = useState(false);
   const [showSicCodes, setShowSicCodes] = useState(false);
   const [verificationLinkRequested, setVerificationLinkRequested] = useState(false);
+  const [addressVerificationRequested, setAddressVerificationRequested] = useState(false);
   const [exampleOpen, setExampleOpen] = useState<null | { title: string; src: string }>(null);
   const [serviceMode, setServiceMode] = useState<"ltd-only" | "both">(draft?.serviceMode ?? "both");
   const [serviceModeOpen, setServiceModeOpen] = useState(true);
@@ -449,6 +459,7 @@ const CheckoutFlow = ({
       }
       return (
         (!showCompanyName || companyNameOptional || form.company_name.trim().length >= 2) &&
+        (!showCompanyName || companyNameOptional || !strictCompanyName || !isPlaceholderCompanyName(form.company_name)) &&
         (!showRole || form.role.trim().length > 0) &&
         form.first_name.trim().length >= 2 &&
         form.last_name.trim().length >= 2 &&
@@ -467,6 +478,7 @@ const CheckoutFlow = ({
           ? form.business_other.trim().length >= 10
           : form.business_subcategory.trim().length > 0)) &&
         (!(idVerificationActive && liveSelfieLink) || verificationLinkRequested) &&
+        (!addressVerificationLink || addressVerificationRequested) &&
         (!(showServiceMode && serviceMode === "ltd-only") || form.personal_code.trim().length >= 8) &&
         (!showDateOfBirth || form.date_of_birth.trim().length >= 8) &&
         (!showWebsite || form.website.trim().length >= 3)
@@ -1099,22 +1111,31 @@ const CheckoutFlow = ({
                 )}
 
                 {showCompanyName && (
-                  <Field
-                    label={
-                      companyNameOptional
-                        ? "Company name (optional — if you've already registered)"
-                        : "Proposed company name (the company you want to register)"
-                    }
-                    value={form.company_name}
-                    onChange={(v) => setForm({ ...form, company_name: v })}
-                    required={!companyNameOptional}
-                    minLength={companyNameOptional ? 0 : 2}
-                    placeholder={
-                      companyNameOptional
-                        ? "e.g. Acme Trading Ltd"
-                        : "e.g. Acme Trading Ltd — add alternatives in Notes below"
-                    }
-                  />
+                  <div>
+                    <Field
+                      label={
+                        strictCompanyName
+                          ? "Registered company name (must be genuine)"
+                          : companyNameOptional
+                            ? "Company name (optional — if you've already registered)"
+                            : "Proposed company name (the company you want to register)"
+                      }
+                      value={form.company_name}
+                      onChange={(v) => setForm({ ...form, company_name: v })}
+                      required={!companyNameOptional}
+                      minLength={companyNameOptional ? 0 : 2}
+                      placeholder={
+                        strictCompanyName
+                          ? "e.g. Digiformation Ltd — enter your actual registered name"
+                          : companyNameOptional
+                            ? "e.g. Acme Trading Ltd"
+                            : "e.g. Acme Trading Ltd — add alternatives in Notes below"
+                      }
+                    />
+                    {strictCompanyName && !companyNameOptional && form.company_name.trim().length >= 2 && isPlaceholderCompanyName(form.company_name) && (
+                      <p className="text-xs text-destructive font-medium mt-1.5">{PLACEHOLDER_COMPANY_ERROR}</p>
+                    )}
+                  </div>
                 )}
                 {showRole && (() => {
                   const ROLES = ["Director", "PSC (Person with Significant Control)", "Shareholder", "Secretary"];
@@ -1446,6 +1467,66 @@ const CheckoutFlow = ({
                             type="button"
                             onClick={() => window.open(liveSelfieLink, "_blank", "noopener,noreferrer")}
                             className="text-xs font-semibold text-primary hover:underline"
+                          >
+                            Open verification link again →
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {addressVerificationLink && (
+                    <div className="rounded-2xl bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-background border-2 border-blue-500/40 p-5 space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-blue-500 text-white grid place-items-center flex-shrink-0">
+                          <ShieldCheck className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-base">Address Verification <span className="text-destructive">*</span></h4>
+                          <p className="text-xs opacity-75 mt-0.5">Required for all address-service orders — takes about 2 minutes.</p>
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl bg-background/60 border border-border/40 p-4 space-y-2.5">
+                        <p className="text-xs font-semibold uppercase tracking-wider opacity-70">What you'll do on the link:</p>
+                        <ol className="space-y-1.5 text-sm">
+                          <li className="flex gap-2.5"><span className="font-bold text-blue-500">1.</span><span><strong>Verify your identity</strong> — quick selfie + ID scan on your phone</span></li>
+                          <li className="flex gap-2.5"><span className="font-bold text-blue-500">2.</span><span><strong>Proof of residential address</strong> — upload a recent utility bill / bank statement</span></li>
+                        </ol>
+                      </div>
+
+                      {!addressVerificationRequested ? (
+                        <>
+                          <button
+                            type="button"
+                            disabled={!/\S+@\S+\.\S+/.test(form.email)}
+                            onClick={() => {
+                              if (!/\S+@\S+\.\S+/.test(form.email)) {
+                                toast({ title: "Enter your email first", description: "We need your email to send the verification link.", variant: "destructive" });
+                                return;
+                              }
+                              window.open(addressVerificationLink, "_blank", "noopener,noreferrer");
+                              setAddressVerificationRequested(true);
+                              toast({ title: "Address verification opened", description: "Complete the verification, then come back to continue your order." });
+                            }}
+                            className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-blue-500 text-white font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          >
+                            <Send className="w-4 h-4" /> Open Address Verification
+                          </button>
+                          <p className="text-xs text-center opacity-70">👆 Click here, then continue to the next step</p>
+                        </>
+                      ) : (
+                        <div className="rounded-xl bg-blue-500/15 border border-blue-500/40 p-4 space-y-2">
+                          <div className="flex items-center gap-2 text-blue-500 font-semibold text-sm">
+                            <CheckCircle2 className="w-5 h-5" /> Address verification opened
+                          </div>
+                          <p className="text-xs opacity-85 leading-relaxed">
+                            Complete the verification steps on the link (ID + proof of address). Once done, the <span className="font-semibold">Continue</span> button below will be enabled.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => window.open(addressVerificationLink, "_blank", "noopener,noreferrer")}
+                            className="text-xs font-semibold text-blue-500 hover:underline"
                           >
                             Open verification link again →
                           </button>

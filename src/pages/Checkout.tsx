@@ -103,6 +103,7 @@ const Checkout = () => {
     // Any service with a tailored requirements form only needs basic contact
     // info — hide the default DOB / address / business-activity sections.
     const minimalContact = !!extraSection;
+    const isAddressService = catalogEntry.category === "UK Address";
 
     return (
       <Layout>
@@ -121,6 +122,9 @@ const Checkout = () => {
           showDateOfBirth={!minimalContact}
           hideBusinessActivity={minimalContact}
           hideAddress={minimalContact}
+          showCompanyName={isAddressService || undefined}
+          strictCompanyName={isAddressService || undefined}
+          addressVerificationLink={isAddressService ? "https://verify.didit.me/u/LGgiVLwzSbGmvipLTgim-A" : undefined}
         />
       </Layout>
     );
@@ -155,6 +159,8 @@ const Checkout = () => {
       }));
   }, [activeGroup]);
 
+  const isAddressGroup = activeGroup.key === "uk-address";
+
   return (
     <Layout>
       <CheckoutFlow
@@ -168,6 +174,9 @@ const Checkout = () => {
         eyebrow={`${activeGroup.categoryLabel} · Secure checkout`}
         notesPlaceholder="Share company name, registration number, or any details we'll need..."
         extraSections={extraSections}
+        showCompanyName={isAddressGroup || undefined}
+        strictCompanyName={isAddressGroup || undefined}
+        addressVerificationLink={isAddressGroup ? "https://verify.didit.me/u/LGgiVLwzSbGmvipLTgim-A" : undefined}
       />
     </Layout>
   );
