@@ -288,6 +288,17 @@ const Dashboard = () => {
   const walletBalance = walletRows.reduce((sum, row) => sum + (row.txn_type === "Debit" ? -Number(row.amount_gbp || 0) : Number(row.amount_gbp || 0)), 0);
   const formatGBP = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
 
+  // Split orders into portal-owner's own direct orders vs B2B orders placed
+  // for end customers. B2B = customer_email differs from the owner's email.
+  const ownerEmailLc = (user.email || "").toLowerCase().trim();
+  const isB2BRow = (o: any) => {
+    const ce = (o.customer_email || "").toLowerCase().trim();
+    return !!ce && !!ownerEmailLc && ce !== ownerEmailLc;
+  };
+  const directOrders = orders.filter((o) => !isB2BRow(o));
+  const b2bOrders = orders.filter(isB2BRow);
+
+
   return (
     <div className="min-h-screen bg-gradient-hero grid-pattern">
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
