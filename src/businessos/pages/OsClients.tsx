@@ -265,10 +265,29 @@ export default function OsClients() {
                     <td className="py-3 px-4 text-white/70">{c.email || "—"}</td>
                     <td className="py-3 px-4 text-white/70">{c.company_name || "—"}</td>
                     <td className="py-3 px-4">
-                      <button onClick={(e) => { e.stopPropagation(); openClient(c.user_id, "orders"); }} className="px-2.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.10] text-xs font-semibold text-white/80">
-                        {c.order_count || 0} orders
-                      </button>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openClient(c.user_id, "orders"); }}
+                          className="px-2.5 py-1 rounded-full bg-white/[0.06] hover:bg-white/[0.10] text-xs font-semibold text-white/80"
+                          title={`Total: ${(c.direct_order_count || 0) + (c.b2b_order_count || 0)} · Direct: ${c.direct_order_count || 0} · B2B: ${c.b2b_order_count || 0}`}
+                        >
+                          {(c.direct_order_count || 0) + (c.b2b_order_count || 0)} total
+                        </button>
+                        {(c.b2b_order_count || 0) > 0 && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); openClient(c.user_id, "orders"); }}
+                            className="px-2 py-0.5 rounded-full bg-fuchsia-500/15 hover:bg-fuchsia-500/25 ring-1 ring-fuchsia-400/30 text-[10px] font-bold text-fuchsia-100 uppercase tracking-wider"
+                            title={`${c.b2b_order_count} B2B orders across ${c.managed_client_count || 0} customer${(c.managed_client_count || 0) === 1 ? "" : "s"}`}
+                          >
+                            B2B {c.b2b_order_count}
+                          </button>
+                        )}
+                      </div>
+                      <div className="text-[10px] text-white/40 mt-1">
+                        {c.direct_order_count || 0} direct{(c.b2b_order_count || 0) > 0 ? ` · ${c.managed_client_count || 0} client${(c.managed_client_count || 0) === 1 ? "" : "s"}` : ""}
+                      </div>
                     </td>
+
                     <td className="py-3 px-4 text-white/70">{c.phone || "—"}</td>
                     <td className="py-3 px-4 text-white/50 text-xs whitespace-nowrap">{fmtDate(c.created_at)}</td>
                     <td className="py-3 px-4 text-right">
