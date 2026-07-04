@@ -497,11 +497,21 @@ const Dashboard = () => {
           )}
 
           {active === "orders" && (
-            <ClientOrdersSection rows={orders} ownerEmail={(user.email || "").toLowerCase()} onBrowse={() => setActive("newServices")} />
+            <ClientOrdersSection
+              rows={orders}
+              ownerEmail={(user.email || "").toLowerCase()}
+              onBrowse={() => setActive("newServices")}
+              onOpenClient={openManagedClient}
+            />
           )}
 
           {active === "myClients" && (
-            <MyClientsSection rows={orders} ownerEmail={(user.email || "").toLowerCase()} />
+            <MyClientsSection
+              rows={orders}
+              ownerEmail={(user.email || "").toLowerCase()}
+              focusedEmail={focusedClientEmail}
+              onFocusHandled={() => setFocusedClientEmail(null)}
+            />
           )}
 
           {active === "invoices" && (
