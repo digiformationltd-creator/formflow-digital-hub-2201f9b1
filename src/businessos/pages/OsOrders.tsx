@@ -10,6 +10,7 @@ import {
   Search, RefreshCw, Loader2, ChevronRight, ShoppingBag,
   ExternalLink, Filter, CheckCircle2, Clock, Truck, RotateCcw, XCircle, Hourglass,
   FileText, Mail, User, PoundSterling, Play, Ban, Send, FilePlus, MessageSquare, Wallet,
+  Building2, Users, X,
 } from "lucide-react";
 
 interface OrderRow {
@@ -30,7 +31,17 @@ interface OrderRow {
   inquiry_id?: string | null;
   invoice_number?: string | null;
   invoice_status?: string | null;
+  placed_by_user_id?: string | null;
+  managed_client_id?: string | null;
 }
+
+interface PortalOwnerLite {
+  user_id: string;
+  full_name: string | null;
+  email: string | null;
+  company_name: string | null;
+}
+
 
 const STATUSES = [
   { key: "all",         label: "All",         icon: Filter,        color: "text-white/70" },
@@ -109,15 +120,26 @@ const DATE_RANGES = [
 export default function OsOrders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<OrderRow[]>([]);
+  const [portalOwners, setPortalOwners] = useState<Record<string, PortalOwnerLite>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [paymentFilter, setPaymentFilter] = useState<string>("all");
   const [dateRange, setDateRange] = useState<string>("all");
+  const [typeFilter, setTypeFilter] = useState<"all" | "direct" | "b2b">("all");
+  const [ownerFilter, setOwnerFilter] = useState<string>("all"); // portal owner user_id
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [openOrderId, setOpenOrderId] = useState<string | null>(null);
   const [openInvoiceId, setOpenInvoiceId] = useState<string | null>(null);
+
+  // A B2B order = placed by a portal-owning DigiFormation client for their own
+  // customer. Detected via managed_client_id or a placed_by_user_id that
+  // differs from the row's own user_id.
+  const isB2BOrder = (o: OrderRow) =>
+    !!o.managed_client_id ||
+    (!!o.placed_by_user_id && o.placed_by_user_id !== o.user_id);
+
 
   /**
    * Inline status mutation. Mirrors Legacy Admin: update client_orders.status,
@@ -257,9 +279,32 @@ export default function OsOrders() {
       invoice_number: invMap.get(o.id)?.invoice_number ?? null,
       invoice_status: invMap.get(o.id)?.status ?? null,
     }));
+
+    // Resolve portal owners (placed_by_user_id) → profile info, so admins can
+    // see at a glance which DigiFormation client placed each B2B order.
+    const ownerIds = Array.from(
+      new Set(
+        merged
+          .map((o) => o.placed_by_user_id)
+          .filter((v): v is string => !!v),
+      ),
+    );
+    if (ownerIds.length) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, email, company_name")
+        .in("user_id", ownerIds);
+      const map: Record<string, PortalOwnerLite> = {};
+      for (const p of profs || []) map[p.user_id] = p as PortalOwnerLite;
+      setPortalOwners(map);
+    } else {
+      setPortalOwners({});
+    }
+
     setOrders(merged);
     setLoading(false);
   };
+
 
   useEffect(() => {
     load();
@@ -286,20 +331,28 @@ export default function OsOrders() {
       if (statusFilter !== "all" && o.status !== statusFilter) return false;
       if (sourceFilter !== "all" && (o.source || "checkout") !== sourceFilter) return false;
       if (paymentFilter !== "all" && (o.payment_status || "unpaid") !== paymentFilter) return false;
+      const b2b = isB2BOrder(o);
+      if (typeFilter === "b2b" && !b2b) return false;
+      if (typeFilter === "direct" && b2b) return false;
+      if (ownerFilter !== "all" && o.placed_by_user_id !== ownerFilter) return false;
       if (cutoff) {
         const d = new Date(o.order_date || o.created_at);
         if (d < cutoff) return false;
       }
       if (!q) return true;
+      const owner = o.placed_by_user_id ? portalOwners[o.placed_by_user_id] : null;
       return (
         (o.order_ref || "").toLowerCase().includes(q) ||
         (o.service || "").toLowerCase().includes(q) ||
         (o.customer_name || "").toLowerCase().includes(q) ||
         (o.customer_email || "").toLowerCase().includes(q) ||
-        (o.invoice_number || "").toLowerCase().includes(q)
+        (o.invoice_number || "").toLowerCase().includes(q) ||
+        (owner?.full_name || "").toLowerCase().includes(q) ||
+        (owner?.email || "").toLowerCase().includes(q) ||
+        (owner?.company_name || "").toLowerCase().includes(q)
       );
     });
-  }, [orders, search, statusFilter, sourceFilter, paymentFilter, dateRange]);
+  }, [orders, search, statusFilter, sourceFilter, paymentFilter, dateRange, typeFilter, ownerFilter, portalOwners]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: orders.length };
@@ -307,6 +360,21 @@ export default function OsOrders() {
     for (const o of orders) c[o.status] = (c[o.status] || 0) + 1;
     return c;
   }, [orders]);
+
+  const b2bCount = useMemo(() => orders.filter(isB2BOrder).length, [orders]);
+  const ownerOptions = useMemo(() => {
+    const map = new Map<string, { id: string; label: string; count: number }>();
+    for (const o of orders) {
+      if (!o.placed_by_user_id || !isB2BOrder(o)) continue;
+      const p = portalOwners[o.placed_by_user_id];
+      const label = p?.full_name || p?.company_name || p?.email || o.placed_by_user_id.slice(0, 8);
+      const existing = map.get(o.placed_by_user_id);
+      if (existing) existing.count++;
+      else map.set(o.placed_by_user_id, { id: o.placed_by_user_id, label, count: 1 });
+    }
+    return Array.from(map.values()).sort((a, b) => b.count - a.count);
+  }, [orders, portalOwners]);
+
 
   const totalRevenue = useMemo(
     () => filtered.reduce((acc, o) => acc + (Number(o.amount_gbp) || 0), 0),
@@ -339,8 +407,23 @@ export default function OsOrders() {
         <StatCard label="Total Orders"   value={String(orders.length)}              icon={ShoppingBag} glow="blue" />
         <StatCard label="Pending Value"  value={fmtGBP(pendingValue)}               icon={Hourglass}   glow="purple" />
         <StatCard label="Filtered Rev."  value={fmtGBP(totalRevenue)}               icon={PoundSterling} glow="green" />
-        <StatCard label="Completed"      value={String(counts["Completed"] || 0)}   icon={CheckCircle2} glow="cyan" />
+        <button
+          type="button"
+          onClick={() => setTypeFilter(typeFilter === "b2b" ? "all" : "b2b")}
+          className="text-left"
+          title="Filter to B2B orders placed by portal-owning clients"
+        >
+          <div className={`os-glass ${typeFilter === "b2b" ? "os-glow-purple ring-1 ring-fuchsia-400/40" : "os-glow-cyan"} p-4`}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[11px] uppercase tracking-widest text-white/50">B2B Orders</div>
+              <Building2 className="w-4 h-4 text-fuchsia-300/80" />
+            </div>
+            <div className="text-xl sm:text-2xl font-bold truncate">{b2bCount}</div>
+            <div className="text-[10px] text-white/40 mt-0.5">{typeFilter === "b2b" ? "Filter on — click to clear" : "Placed by portal clients"}</div>
+          </div>
+        </button>
       </div>
+
 
       {/* Toolbar */}
       <div className="os-glass p-3 sm:p-4 flex flex-col gap-3">
@@ -377,6 +460,31 @@ export default function OsOrders() {
           >
             {DATE_RANGES.map(d => <option key={d.key} value={d.key} className="bg-slate-900">{d.label}</option>)}
           </select>
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value as "all" | "direct" | "b2b")}
+            className="h-11 px-3 rounded-xl text-sm os-glass bg-transparent"
+            title="Order type"
+          >
+            <option value="all" className="bg-slate-900">All orders</option>
+            <option value="direct" className="bg-slate-900">Direct only</option>
+            <option value="b2b" className="bg-slate-900">B2B only</option>
+          </select>
+          {ownerOptions.length > 0 && (
+            <select
+              value={ownerFilter}
+              onChange={(e) => setOwnerFilter(e.target.value)}
+              className="h-11 px-3 rounded-xl text-sm os-glass bg-transparent max-w-[220px]"
+              title="Filter by portal owner (DigiFormation client who placed the order)"
+            >
+              <option value="all" className="bg-slate-900">All portal owners</option>
+              {ownerOptions.map((o) => (
+                <option key={o.id} value={o.id} className="bg-slate-900">
+                  {o.label} ({o.count})
+                </option>
+              ))}
+            </select>
+          )}
           <button
             onClick={load}
             disabled={loading}
@@ -416,9 +524,36 @@ export default function OsOrders() {
         </div>
       </div>
 
-      <div className="text-xs text-white/50 px-1">
-        Showing <span className="text-white/80 font-semibold">{filtered.length}</span> of {orders.length} orders
+      <div className="flex items-center gap-2 flex-wrap px-1">
+        <div className="text-xs text-white/50">
+          Showing <span className="text-white/80 font-semibold">{filtered.length}</span> of {orders.length} orders
+        </div>
+        {ownerFilter !== "all" && (() => {
+          const opt = ownerOptions.find((o) => o.id === ownerFilter);
+          const label = opt?.label || "portal owner";
+          return (
+            <button
+              onClick={() => setOwnerFilter("all")}
+              className="px-2 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1.5 bg-fuchsia-500/15 text-fuchsia-100 ring-1 ring-fuchsia-400/40 hover:bg-fuchsia-500/25"
+              title="Clear portal owner filter"
+            >
+              <Building2 className="w-3 h-3" />
+              Portal owner: {label}
+              <X className="w-3 h-3" />
+            </button>
+          );
+        })()}
+        {typeFilter !== "all" && (
+          <button
+            onClick={() => setTypeFilter("all")}
+            className="px-2 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1.5 bg-white/[0.06] text-white/80 ring-1 ring-white/15 hover:bg-white/[0.12]"
+          >
+            {typeFilter === "b2b" ? "B2B only" : "Direct only"}
+            <X className="w-3 h-3" />
+          </button>
+        )}
       </div>
+
 
       {/* Loading */}
       {loading && orders.length === 0 && (
@@ -457,20 +592,33 @@ export default function OsOrders() {
               <tbody>
                 {filtered.map((o) => {
                   const cancelled = o.status === "Cancelled";
+                  const b2b = isB2BOrder(o);
+                  const owner = o.placed_by_user_id ? portalOwners[o.placed_by_user_id] : null;
+                  const ownerLabel = owner?.full_name || owner?.company_name || owner?.email || (o.placed_by_user_id ? o.placed_by_user_id.slice(0, 8) : "");
                   return (
                   <tr
                     key={o.id}
                     onClick={() => openOrder(o)}
                     className={`border-b border-white/5 last:border-0 hover:bg-white/[0.03] transition cursor-pointer ${
-                      cancelled ? "bg-rose-500/[0.04] border-l-2 border-l-rose-400/60 opacity-70" : ""
+                      cancelled ? "bg-rose-500/[0.04] border-l-2 border-l-rose-400/60 opacity-70" :
+                      b2b ? "border-l-2 border-l-fuchsia-400/50" : ""
                     }`}
                   >
                     <td className="py-3 px-4">
                       <div className={`font-mono text-xs ${cancelled ? "line-through text-white/50" : "text-white/80"}`}>{o.order_ref}</div>
-                      <div className="mt-1 flex items-center gap-1">
+                      <div className="mt-1 flex items-center gap-1 flex-wrap">
                         <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider ${sourceChip(o.source)}`}>
                           {sourceLabel(o.source)}
                         </span>
+                        {b2b && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); if (o.placed_by_user_id) setOwnerFilter(o.placed_by_user_id); }}
+                            className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-fuchsia-500/20 text-fuchsia-100 ring-1 ring-fuchsia-400/40 inline-flex items-center gap-1 hover:bg-fuchsia-500/30"
+                            title={`B2B order placed by ${ownerLabel} — click to filter`}
+                          >
+                            <Building2 className="w-2.5 h-2.5" /> B2B
+                          </button>
+                        )}
                         {cancelled && (
                           <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-200 ring-1 ring-rose-400/40">
                             Cancelled
@@ -490,6 +638,17 @@ export default function OsOrders() {
                     <td className="py-3 px-4">
                       <div className={`font-semibold truncate max-w-[180px] ${cancelled ? "line-through text-white/50" : ""}`}>{o.customer_name || "(guest)"}</div>
                       {o.customer_email && <div className="text-[11px] text-white/40 truncate max-w-[180px]">{o.customer_email}</div>}
+                      {b2b && ownerLabel && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); if (o.placed_by_user_id) setOwnerFilter(o.placed_by_user_id); }}
+                          className="mt-1 text-[10px] text-fuchsia-200/90 hover:text-fuchsia-100 inline-flex items-center gap-1 truncate max-w-[180px]"
+                          title={`Placed by ${ownerLabel}${owner?.email ? ` · ${owner.email}` : ""}`}
+                        >
+                          <Users className="w-2.5 h-2.5 shrink-0" />
+                          <span className="truncate">via {ownerLabel}</span>
+                        </button>
+                      )}
+
                     </td>
                     <td className={`py-3 px-4 truncate max-w-[200px] ${cancelled ? "line-through text-white/40" : "text-white/70"}`}>{o.service}</td>
                     <td className="py-3 px-4">
@@ -585,6 +744,9 @@ export default function OsOrders() {
         <div className="md:hidden space-y-3">
           {filtered.map((o) => {
             const cancelled = o.status === "Cancelled";
+            const b2b = isB2BOrder(o);
+            const owner = o.placed_by_user_id ? portalOwners[o.placed_by_user_id] : null;
+            const ownerLabel = owner?.full_name || owner?.company_name || owner?.email || (o.placed_by_user_id ? o.placed_by_user_id.slice(0, 8) : "");
             return (
             <div
               key={o.id}
@@ -592,7 +754,8 @@ export default function OsOrders() {
               role="button"
               tabIndex={0}
               className={`os-glass p-4 w-full text-left active:scale-[0.99] transition cursor-pointer ${
-                cancelled ? "border-l-2 border-l-rose-400/60 bg-rose-500/[0.04] opacity-75" : ""
+                cancelled ? "border-l-2 border-l-rose-400/60 bg-rose-500/[0.04] opacity-75" :
+                b2b ? "border-l-2 border-l-fuchsia-400/50" : ""
               }`}
             >
               <div className="flex items-start justify-between gap-3">
@@ -605,6 +768,11 @@ export default function OsOrders() {
                     <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider ${sourceChip(o.source)}`}>
                       {sourceLabel(o.source)}
                     </span>
+                    {b2b && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-fuchsia-500/20 text-fuchsia-100 ring-1 ring-fuchsia-400/40 inline-flex items-center gap-1">
+                        <Building2 className="w-2.5 h-2.5" /> B2B
+                      </span>
+                    )}
                   </div>
                   <div className={`font-semibold truncate ${cancelled ? "line-through text-white/50" : ""}`}>{o.service}</div>
                   <div className="flex items-center gap-1.5 text-xs text-white/60 mt-1 truncate">
@@ -616,6 +784,12 @@ export default function OsOrders() {
                       <Mail className="w-3 h-3 shrink-0" /><span className="truncate">{o.customer_email}</span>
                     </div>
                   )}
+                  {b2b && ownerLabel && (
+                    <div className="flex items-center gap-1.5 text-[11px] text-fuchsia-200/90 mt-0.5 truncate">
+                      <Users className="w-3 h-3 shrink-0" /><span className="truncate">via {ownerLabel}</span>
+                    </div>
+                  )}
+
                 </div>
                 <div className="text-right shrink-0">
                   <div className="font-bold text-base">{fmtGBP(Number(o.amount_gbp))}</div>

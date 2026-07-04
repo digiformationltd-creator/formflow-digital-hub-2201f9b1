@@ -32,7 +32,17 @@ type Order = {
   order_date: string;
   created_at: string;
   notes: string | null;
+  placed_by_user_id?: string | null;
+  managed_client_id?: string | null;
 };
+
+type PortalOwner = {
+  user_id: string;
+  full_name: string | null;
+  email: string | null;
+  company_name: string | null;
+};
+
 
 type Invoice = {
   id: string;
@@ -82,6 +92,8 @@ export default function OsOrderDrawer({
 }) {
   const [order, setOrder] = useState<Order | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [portalOwner, setPortalOwner] = useState<PortalOwner | null>(null);
+  const [ownerOrderCount, setOwnerOrderCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [savingNotes, setSavingNotes] = useState(false);
   const [statusBusy, setStatusBusy] = useState(false);
@@ -98,9 +110,25 @@ export default function OsOrderDrawer({
     ]);
     setLoading(false);
     if (oErr) { toast.error(oErr.message); return; }
-    setOrder(o as Order | null);
-    setNotes((o as Order | null)?.notes || "");
+    const orderRow = o as Order | null;
+    setOrder(orderRow);
+    setNotes(orderRow?.notes || "");
     setInvoices((invs || []) as Invoice[]);
+
+    // Resolve portal owner (B2B) — the DigiFormation client that placed this
+    // order from their own portal, if any.
+    const ownerId = orderRow?.placed_by_user_id;
+    if (ownerId && ownerId !== orderRow?.user_id) {
+      const [{ data: prof }, { count }] = await Promise.all([
+        supabase.from("profiles").select("user_id, full_name, email, company_name").eq("user_id", ownerId).maybeSingle(),
+        supabase.from("client_orders").select("id", { count: "exact", head: true }).eq("placed_by_user_id", ownerId),
+      ]);
+      setPortalOwner((prof as PortalOwner | null) ?? { user_id: ownerId, full_name: null, email: null, company_name: null });
+      setOwnerOrderCount(count ?? null);
+    } else {
+      setPortalOwner(null);
+      setOwnerOrderCount(null);
+    }
   };
 
   useEffect(() => {
@@ -117,10 +145,14 @@ export default function OsOrderDrawer({
       setOrder(null);
       setInvoices([]);
       setNotes("");
+      setPortalOwner(null);
+      setOwnerOrderCount(null);
     }
   }, [open, orderId]);
 
   const isGuest = useMemo(() => !!order && !order.user_id, [order]);
+  const isB2B = !!portalOwner;
+
 
   const updateStatus = async (newStatus: string) => {
     if (!order || order.status === newStatus) return;
@@ -244,6 +276,39 @@ export default function OsOrderDrawer({
                 <Row icon={Calendar} label={`Order date · ${order.order_date}`} />
               </div>
             </div>
+
+            {/* B2B — Placed by a DigiFormation portal owner */}
+            {isB2B && portalOwner && (
+              <div className="os-glass p-4 space-y-3 border border-fuchsia-400/30 bg-fuchsia-500/[0.04]">
+                <div className="flex items-center gap-2">
+                  <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-fuchsia-500/25 text-fuchsia-100 ring-1 ring-fuchsia-400/40 inline-flex items-center gap-1">
+                    <Building2 className="w-2.5 h-2.5" /> B2B order
+                  </span>
+                  <div className="text-[11px] uppercase tracking-widest text-fuchsia-100/80 font-semibold">Placed via portal</div>
+                </div>
+                <div className="text-sm text-white/90">
+                  Placed by <span className="font-semibold">{portalOwner.full_name || portalOwner.company_name || portalOwner.email || "Portal client"}</span>
+                  {portalOwner.company_name && portalOwner.full_name && (
+                    <span className="text-white/60"> · {portalOwner.company_name}</span>
+                  )}
+                </div>
+                {portalOwner.email && (
+                  <div className="text-[11px] text-white/60 flex items-center gap-1.5">
+                    <Mail className="w-3 h-3" /> {portalOwner.email}
+                  </div>
+                )}
+                <div className="text-[11px] text-white/50">
+                  End customer: <span className="text-white/80">{order.customer_name || "(no name)"}</span>
+                  {order.customer_email && <span className="text-white/50"> · {order.customer_email}</span>}
+                </div>
+                {ownerOrderCount !== null && (
+                  <div className="text-[11px] text-fuchsia-200/90">
+                    This portal owner has placed {ownerOrderCount} order{ownerOrderCount === 1 ? "" : "s"} in total.
+                  </div>
+                )}
+              </div>
+            )}
+
 
             {/* Status */}
             <div className="os-glass p-4 space-y-3">
