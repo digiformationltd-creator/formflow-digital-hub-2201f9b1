@@ -373,6 +373,7 @@ export type Database = {
           declared_source_label: string | null
           id: string
           inquiry_id: string | null
+          managed_client_id: string | null
           notes: string | null
           order_date: string
           order_ref: string
@@ -402,6 +403,7 @@ export type Database = {
           declared_source_label?: string | null
           id?: string
           inquiry_id?: string | null
+          managed_client_id?: string | null
           notes?: string | null
           order_date?: string
           order_ref: string
@@ -431,6 +433,7 @@ export type Database = {
           declared_source_label?: string | null
           id?: string
           inquiry_id?: string | null
+          managed_client_id?: string | null
           notes?: string | null
           order_date?: string
           order_ref?: string
@@ -457,6 +460,13 @@ export type Database = {
             columns: ["inquiry_id"]
             isOneToOne: false
             referencedRelation: "contact_submissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_orders_managed_client_id_fkey"
+            columns: ["managed_client_id"]
+            isOneToOne: false
+            referencedRelation: "managed_clients"
             referencedColumns: ["id"]
           },
         ]
@@ -1435,6 +1445,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      managed_clients: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          notes: string | null
+          phone: string | null
+          portal_owner_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          portal_owner_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          notes?: string | null
+          phone?: string | null
+          portal_owner_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       managed_companies: {
         Row: {
@@ -2659,6 +2705,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      merge_managed_clients: {
+        Args: { _source: string; _target: string }
+        Returns: Json
       }
       move_to_dlq: {
         Args: {

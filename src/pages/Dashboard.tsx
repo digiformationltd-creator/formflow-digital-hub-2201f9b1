@@ -15,7 +15,7 @@ import {
   MapPin, ShoppingCart, Ticket, LifeBuoy, LogOut, UserCircle2,
   ChevronRight, Loader2, Inbox, Download, ArrowUpRight,
   LayoutDashboard,
-  Menu, ShieldCheck, Save, Trash2, ChevronDown, ArrowLeft, Home,
+  Menu, ShieldCheck, Save, Trash2, ChevronDown, ArrowLeft, Home, Plus, Pencil, Combine,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -114,7 +114,9 @@ const Dashboard = () => {
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [walletRows, setWalletRows] = useState<any[]>([]);
   const [tickets, setTickets] = useState<any[]>([]);
+  const [managedClients, setManagedClients] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+
   const [active, setActive] = useState<SectionId>("overview");
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -192,7 +194,21 @@ const Dashboard = () => {
     };
   }, [navigate]);
 
+  const reloadManagedClients = async () => {
+    if (!user) return;
+    const { data } = await (supabase as any).from("managed_clients").select("*").eq("portal_owner_user_id", user.id).order("created_at", { ascending: false });
+    setManagedClients(data || []);
+  };
+  const reloadOrders = async () => {
+    if (!user) return;
+    const { data } = await supabase.from("client_orders").select("*")
+      .or(`user_id.eq.${user.id},placed_by_user_id.eq.${user.id}`)
+      .order("order_date", { ascending: false });
+    if (data) setOrders(data);
+  };
+
   useEffect(() => {
+
     if (!user) return;
     let cancelled = false;
     (async () => {
@@ -208,6 +224,7 @@ const Dashboard = () => {
         { data: ticketRows },
         { data: invRowsOwn },
         { data: invRowsOrphan },
+        { data: managedRows },
       ] = await Promise.all([
         supabase.from("profiles").select("full_name,email,phone,company_name,avatar_initials").eq("user_id", user.id).maybeSingle(),
         supabase.from("client_company_details").select("*").eq("user_id", user.id).order("created_at", { ascending: true }),
@@ -228,7 +245,9 @@ const Dashboard = () => {
         supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status")
           .or(`user_id.eq.${user.id},placed_by_user_id.eq.${user.id}`),
         supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status").is("user_id", null).is("placed_by_user_id", null).ilike("bill_to_email", emailLower),
+        (supabase as any).from("managed_clients").select("*").eq("portal_owner_user_id", user.id).order("created_at", { ascending: false }),
       ]);
+
       if (cancelled) return;
       // De-dupe & merge orders (owned + email-matched orphans) so repeat
       // purchases of the same service ALL appear as separate rows.
@@ -263,6 +282,8 @@ const Dashboard = () => {
       setSubscriptions(subRows || []);
       setWalletRows(walletData || []);
       setTickets(ticketRows || []);
+      setManagedClients((managedRows as any[]) || []);
+
       setIsAdmin(user.email?.toLowerCase() === "info@digiformation.uk" || !!role);
       setLoading(false);
     })();
@@ -568,9 +589,13 @@ const Dashboard = () => {
               <MyClientsSection
                 rows={b2bOrders}
                 ownerEmail={ownerEmailLc}
+                ownerUserId={user.id}
+                managedClients={managedClients}
                 focusedEmail={focusedClientEmail}
                 onFocusHandled={() => setFocusedClientEmail(null)}
+                onReload={async () => { await reloadManagedClients(); await reloadOrders(); }}
               />
+
             </div>
           )}
 
@@ -1098,10 +1123,13 @@ const stageIndex = (status: string) => {
  * invoice download.
  */
 interface ManagedClient {
-  key: string;              // customer_email (lowercased) or fallback
+  key: string;              // managed_client_id when available, else lower(email)
+  id: string | null;        // managed_clients.id (null for orphan email-only groups)
   email: string | null;
   name: string | null;
   phone: string | null;
+  company: string | null;
+  notes: string | null;
   country: string | null;
   orders: any[];
   totalGbp: number;
@@ -1109,27 +1137,69 @@ interface ManagedClient {
   statuses: { pending: number; inProgress: number; completed: number };
 }
 
-const buildManagedClients = (rows: any[], ownerEmail: string): ManagedClient[] => {
+const buildManagedClients = (
+  rows: any[],
+  ownerEmail: string,
+  managedClients: any[] = [],
+): ManagedClient[] => {
+  const byId = new Map<string, ManagedClient>();
+  const byEmail = new Map<string, ManagedClient>();
   const map = new Map<string, ManagedClient>();
+
+  // Seed with persistent managed_clients so empty clients still appear
+  for (const mc of managedClients) {
+    const emailLc = (mc.email || "").toLowerCase().trim();
+    const client: ManagedClient = {
+      key: `mc:${mc.id}`,
+      id: mc.id,
+      email: mc.email || null,
+      name: mc.name || null,
+      phone: mc.phone || null,
+      company: mc.company || null,
+      notes: mc.notes || null,
+      country: null,
+      orders: [],
+      totalGbp: 0,
+      lastDate: mc.updated_at || mc.created_at || "",
+      statuses: { pending: 0, inProgress: 0, completed: 0 },
+    };
+    map.set(client.key, client);
+    byId.set(mc.id, client);
+    if (emailLc) byEmail.set(emailLc, client);
+  }
+
   for (const o of rows) {
     const email = (o.customer_email || "").toLowerCase().trim();
     if (!email || email === ownerEmail) continue; // skip self-orders
-    const key = email;
-    let c = map.get(key);
-    if (!c) {
-      c = {
-        key,
-        email: o.customer_email || null,
-        name: o.customer_name || null,
-        phone: o.customer_whatsapp || o.customer_phone_e164 || null,
-        country: o.country_code || null,
-        orders: [],
-        totalGbp: 0,
-        lastDate: o.order_date || o.created_at || "",
-        statuses: { pending: 0, inProgress: 0, completed: 0 },
-      };
-      map.set(key, c);
+    let c: ManagedClient | undefined;
+    if (o.managed_client_id && byId.has(o.managed_client_id)) {
+      c = byId.get(o.managed_client_id);
+    } else if (byEmail.has(email)) {
+      c = byEmail.get(email);
+    } else {
+      // Orphan email group (no managed_clients row yet)
+      const key = `em:${email}`;
+      c = map.get(key);
+      if (!c) {
+        c = {
+          key,
+          id: null,
+          email: o.customer_email || null,
+          name: o.customer_name || null,
+          phone: o.customer_whatsapp || o.customer_phone_e164 || null,
+          company: null,
+          notes: null,
+          country: o.country_code || null,
+          orders: [],
+          totalGbp: 0,
+          lastDate: o.order_date || o.created_at || "",
+          statuses: { pending: 0, inProgress: 0, completed: 0 },
+        };
+        map.set(key, c);
+        byEmail.set(email, c);
+      }
     }
+    if (!c) continue;
     c.orders.push(o);
     c.totalGbp += Number(o.amount_gbp || 0);
     const d = o.order_date || o.created_at || "";
@@ -1140,6 +1210,7 @@ const buildManagedClients = (rows: any[], ownerEmail: string): ManagedClient[] =
     else c.statuses.pending++;
     if (!c.name && o.customer_name) c.name = o.customer_name;
     if (!c.phone && (o.customer_whatsapp || o.customer_phone_e164)) c.phone = o.customer_whatsapp || o.customer_phone_e164;
+    if (!c.country && o.country_code) c.country = o.country_code;
   }
   return Array.from(map.values()).sort((a, b) => (b.lastDate || "").localeCompare(a.lastDate || ""));
 };
@@ -1147,36 +1218,88 @@ const buildManagedClients = (rows: any[], ownerEmail: string): ManagedClient[] =
 type ClientSort = "recent" | "orders" | "spend" | "name";
 type ClientStatusFilter = "all" | "pending" | "inProgress" | "completed";
 
-const MyClientsSection = ({ rows, ownerEmail, focusedEmail, onFocusHandled }: { rows: any[]; ownerEmail: string; focusedEmail?: string | null; onFocusHandled?: () => void }) => {
-  const clients = buildManagedClients(rows, ownerEmail);
+interface MyClientsSectionProps {
+  rows: any[];
+  ownerEmail: string;
+  ownerUserId: string;
+  managedClients: any[];
+  focusedEmail?: string | null;
+  onFocusHandled?: () => void;
+  onReload: () => Promise<void>;
+}
+
+const MyClientsSection = ({ rows, ownerEmail, ownerUserId, managedClients, focusedEmail, onFocusHandled, onReload }: MyClientsSectionProps) => {
+  const clients = buildManagedClients(rows, ownerEmail, managedClients);
+
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<ClientSort>("recent");
   const [statusFilter, setStatusFilter] = useState<ClientStatusFilter>("all");
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorClient, setEditorClient] = useState<ManagedClient | null>(null); // null = create
+  const [mergeOpen, setMergeOpen] = useState(false);
+  const [mergeSourceId, setMergeSourceId] = useState<string | null>(null);
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
 
-  // Deep-link: when the parent asks us to focus a specific client (e.g. from
-  // an "Open client" click in My Orders), jump straight into that workspace.
+  // Deep-link: match by email against any client (persistent or orphan).
   useEffect(() => {
     if (!focusedEmail) return;
-    const key = focusedEmail.toLowerCase().trim();
-    if (clients.some((c) => c.key === key)) {
-      setSelectedKey(key);
+    const email = focusedEmail.toLowerCase().trim();
+    const match = clients.find((c) => (c.email || "").toLowerCase().trim() === email);
+    if (match) {
+      setSelectedKey(match.key);
       onFocusHandled?.();
     }
   }, [focusedEmail, clients, onFocusHandled]);
 
+  const openCreate = () => { setEditorClient(null); setEditorOpen(true); };
+  const openEdit = (c: ManagedClient) => { setEditorClient(c); setEditorOpen(true); };
+  const openMerge = (c: ManagedClient) => { setMergeSourceId(c.id); setMergeOpen(true); };
+
+  const doMerge = async (targetId: string) => {
+    if (!mergeSourceId || !targetId || mergeSourceId === targetId) return;
+    const { data, error } = await (supabase as any).rpc("merge_managed_clients", { _target: targetId, _source: mergeSourceId });
+    if (error) { toast.error(error.message || "Merge failed"); return; }
+    toast.success(`Merged — ${data?.moved_orders ?? 0} order(s) moved.`);
+    setMergeOpen(false); setMergeSourceId(null); setSelectedKey(null);
+    await onReload();
+  };
+
+  const dialogs = (
+    <>
+      <ManagedClientEditor
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        ownerUserId={ownerUserId}
+        client={editorClient}
+        onSaved={async () => { setEditorOpen(false); await onReload(); }}
+      />
+      <MergeClientDialog
+        open={mergeOpen}
+        onOpenChange={setMergeOpen}
+        sourceId={mergeSourceId}
+        candidates={clients.filter((c) => c.id && c.id !== mergeSourceId)}
+        onMerge={doMerge}
+      />
+    </>
+  );
+
   if (clients.length === 0) {
     return (
-      <EmptyState
-        icon={UserCircle2}
-        title="No B2B clients yet"
-        description="When you place an order for someone else (a different customer email/name than your own account), that end client will appear here with their own order history, invoices and status tracking."
-      />
+      <>
+        <EmptyState
+          icon={UserCircle2}
+          title="No B2B clients yet"
+          description="Add a client below, or place an order for someone else — they'll appear here with their own order history, invoices and status tracking."
+          action={<Button variant="hero" className="rounded-full" onClick={openCreate}><Plus className="w-4 h-4" /> Add client</Button>}
+        />
+        {dialogs}
+      </>
     );
   }
 
   const selected = selectedKey ? clients.find((c) => c.key === selectedKey) : null;
+
 
   // ---- Client detail workspace ----
   if (selected) {
@@ -1194,10 +1317,12 @@ const MyClientsSection = ({ rows, ownerEmail, focusedEmail, onFocusHandled }: { 
     };
 
     return (
+      <>
       <div className="space-y-5">
         <button onClick={() => setSelectedKey(null)} className="inline-flex items-center gap-1.5 text-sm opacity-80 hover:opacity-100">
           <ArrowLeft className="w-4 h-4" /> Back to My Clients
         </button>
+
 
         {/* Client summary */}
         <div className="glass rounded-2xl p-5 sm:p-6">
@@ -1209,12 +1334,25 @@ const MyClientsSection = ({ rows, ownerEmail, focusedEmail, onFocusHandled }: { 
               <h3 className="text-lg font-semibold truncate">{selected.name || selected.email}</h3>
               <div className="text-sm opacity-70 truncate">{selected.email}</div>
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs opacity-70">
+                {selected.company && <span>🏢 {selected.company}</span>}
                 {selected.phone && <span>📞 {selected.phone}</span>}
                 {selected.country && <span>🌍 {selected.country}</span>}
                 {latest && <span>Last order: {latest.order_date || (latest.created_at ? new Date(latest.created_at).toLocaleDateString() : "—")}</span>}
               </div>
+              {selected.notes && <div className="mt-2 text-xs opacity-70 italic">"{selected.notes}"</div>}
+            </div>
+            <div className="flex gap-2 shrink-0">
+              <Button size="sm" variant="outline" className="rounded-full" onClick={() => openEdit(selected)}>
+                <Pencil className="w-3.5 h-3.5" /> Edit
+              </Button>
+              {selected.id && clients.filter((c) => c.id && c.id !== selected.id).length > 0 && (
+                <Button size="sm" variant="ghost" className="rounded-full" onClick={() => openMerge(selected)}>
+                  <Combine className="w-3.5 h-3.5" /> Merge
+                </Button>
+              )}
             </div>
           </div>
+
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
             <div className="rounded-xl bg-muted/20 p-3">
@@ -1295,7 +1433,10 @@ const MyClientsSection = ({ rows, ownerEmail, focusedEmail, onFocusHandled }: { 
           </div>
         </div>
       </div>
+      {dialogs}
+      </>
     );
+
   }
 
   // ---- List view: search + sort + filter ----
@@ -1320,14 +1461,21 @@ const MyClientsSection = ({ rows, ownerEmail, focusedEmail, onFocusHandled }: { 
     });
 
   return (
+    <>
     <div className="space-y-4">
-      <div className="glass rounded-2xl p-5">
-        <h3 className="font-semibold">B2B / Managed Clients</h3>
-        <p className="text-xs opacity-70 mt-1">
-          Every order you place from your portal on behalf of another customer is grouped here.
-          Open a client to see their full profile, orders, invoices and status tracking — all inside your own account.
-        </p>
+      <div className="glass rounded-2xl p-5 flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h3 className="font-semibold">B2B / Managed Clients</h3>
+          <p className="text-xs opacity-70 mt-1">
+            Every order you place from your portal on behalf of another customer is grouped here.
+            Open a client to see their full profile, orders, invoices and status tracking — all inside your own account.
+          </p>
+        </div>
+        <Button variant="hero" size="sm" className="rounded-full shrink-0" onClick={openCreate}>
+          <Plus className="w-4 h-4" /> Add client
+        </Button>
       </div>
+
 
       {/* Toolbar */}
       <div className="glass rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row gap-3">
@@ -1402,8 +1550,176 @@ const MyClientsSection = ({ rows, ownerEmail, focusedEmail, onFocusHandled }: { 
         </div>
       )}
     </div>
+    {dialogs}
+    </>
   );
 };
+
+// ---- B2B managed-client editor (create / edit) ----
+const ManagedClientEditor = ({
+  open, onOpenChange, ownerUserId, client, onSaved,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  ownerUserId: string;
+  client: ManagedClient | null;
+  onSaved: () => Promise<void> | void;
+}) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [company, setCompany] = useState("");
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setName(client?.name || "");
+    setEmail(client?.email || "");
+    setPhone(client?.phone || "");
+    setCompany(client?.company || "");
+    setNotes(client?.notes || "");
+  }, [open, client]);
+
+  const isEdit = !!client?.id;
+
+  const save = async () => {
+    const trimmedEmail = email.trim();
+    if (!name.trim() && !trimmedEmail) {
+      toast.error("Give the client at least a name or an email.");
+      return;
+    }
+    setSaving(true);
+    const payload: any = {
+      portal_owner_user_id: ownerUserId,
+      name: name.trim() || null,
+      email: trimmedEmail || null,
+      phone: phone.trim() || null,
+      company: company.trim() || null,
+      notes: notes.trim() || null,
+    };
+    const query = isEdit
+      ? (supabase as any).from("managed_clients").update(payload).eq("id", client!.id)
+      : (supabase as any).from("managed_clients").insert(payload);
+    const { error } = await query;
+    setSaving(false);
+    if (error) {
+      const msg = error.code === "23505"
+        ? "You already have a client with that email."
+        : (error.message || "Could not save client.");
+      toast.error(msg);
+      return;
+    }
+    toast.success(isEdit ? "Client updated." : "Client added.");
+    await onSaved();
+  };
+
+  const remove = async () => {
+    if (!client?.id) return;
+    if (!confirm("Delete this client? Their orders will remain in your account but will lose the client link.")) return;
+    setDeleting(true);
+    const { error } = await (supabase as any).from("managed_clients").delete().eq("id", client.id);
+    setDeleting(false);
+    if (error) { toast.error(error.message || "Delete failed"); return; }
+    toast.success("Client removed.");
+    await onSaved();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{isEdit ? "Edit client" : "Add client"}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label className="text-xs opacity-70">Name</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Client full name" className="mt-1.5" />
+          </div>
+          <div>
+            <Label className="text-xs opacity-70">Email</Label>
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="client@example.com" className="mt-1.5" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs opacity-70">Phone</Label>
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+44…" className="mt-1.5" />
+            </div>
+            <div>
+              <Label className="text-xs opacity-70">Company</Label>
+              <Input value={company} onChange={(e) => setCompany(e.target.value)} className="mt-1.5" />
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs opacity-70">Notes</Label>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="mt-1.5" />
+          </div>
+          <div className="flex items-center justify-between pt-2">
+            {isEdit ? (
+              <Button variant="ghost" size="sm" onClick={remove} disabled={deleting} className="text-destructive">
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Trash2 className="w-4 h-4" /> Delete</>}
+              </Button>
+            ) : <span />}
+            <Button variant="hero" size="sm" className="rounded-full" onClick={save} disabled={saving}>
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4" /> Save</>}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// ---- Merge duplicate clients ----
+const MergeClientDialog = ({
+  open, onOpenChange, sourceId, candidates, onMerge,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  sourceId: string | null;
+  candidates: ManagedClient[];
+  onMerge: (targetId: string) => Promise<void> | void;
+}) => {
+  const [targetId, setTargetId] = useState<string>("");
+  useEffect(() => { if (open) setTargetId(""); }, [open]);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Merge into another client</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 text-sm">
+          <p className="opacity-70">
+            All orders from this client will move to the target client, then this duplicate entry will be removed.
+          </p>
+          <div>
+            <Label className="text-xs opacity-70">Target client</Label>
+            <select
+              value={targetId}
+              onChange={(e) => setTargetId(e.target.value)}
+              className="mt-1.5 w-full rounded-xl bg-muted/30 border border-border/40 px-3 py-2 text-sm"
+            >
+              <option value="">Select client…</option>
+              {candidates.map((c) => (
+                <option key={c.id!} value={c.id!}>
+                  {(c.name || c.email || "Unnamed client")}{c.email ? ` — ${c.email}` : ""} ({c.orders.length} order{c.orders.length === 1 ? "" : "s"})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button variant="hero" size="sm" className="rounded-full" disabled={!targetId || !sourceId} onClick={() => targetId && onMerge(targetId)}>
+              <Combine className="w-4 h-4" /> Merge
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 
 const ClientOrdersSection = ({ rows, onBrowse, ownerEmail, onOpenClient }: { rows: any[]; onBrowse: () => void; ownerEmail?: string; onOpenClient?: (email: string) => void }) => {
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
