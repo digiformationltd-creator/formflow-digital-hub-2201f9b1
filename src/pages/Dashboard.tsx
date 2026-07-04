@@ -1067,6 +1067,27 @@ const ClientOrdersSection = ({ rows, onBrowse }: { rows: any[]; onBrowse: () => 
                       <div className="text-sm opacity-80 whitespace-pre-wrap">{selected.notes}</div>
                     </div>
                   )}
+                  {selected.__invoice_pdf && (
+                    <div>
+                      <div className="text-[11px] uppercase tracking-wider opacity-60 mb-1">Deliverables</div>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const { data, error } = await supabase.storage
+                            .from("invoices")
+                            .createSignedUrl(selected.__invoice_pdf, 60 * 60);
+                          if (error || !data?.signedUrl) {
+                            toast.error("Could not open invoice — please try again.");
+                            return;
+                          }
+                          window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+                        }}
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                      >
+                        <Download className="w-4 h-4" /> Invoice {selected.__invoice_number || ""}
+                      </button>
+                    </div>
+                  )}
                   <div className="text-xs opacity-60">Current status: <StatusBadge status={selected.status} /></div>
                 </div>
               </>
