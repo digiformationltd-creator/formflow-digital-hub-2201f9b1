@@ -25,7 +25,7 @@ import UserDrawer from "@/components/UserDrawer";
 import { downloadInvoicePdf } from "@/lib/invoice";
 
 type SectionId =
-  | "overview" | "company" | "addresses" | "orders" | "invoices" | "wallet" | "documents"
+  | "overview" | "company" | "addresses" | "orders" | "myClients" | "invoices" | "wallet" | "documents"
   | "editAccount" | "newServices" | "tickets" | "openTicket";
 
 const menu: { id: SectionId; label: string; icon: any }[] = [
@@ -33,6 +33,7 @@ const menu: { id: SectionId; label: string; icon: any }[] = [
   { id: "company", label: "My Company", icon: Building2 },
   { id: "addresses", label: "Address Subscription", icon: MapPin },
   { id: "orders", label: "My Orders", icon: ShoppingBag },
+  { id: "myClients", label: "My Clients (B2B)", icon: UserCircle2 },
   { id: "invoices", label: "My Invoices", icon: FileText },
   { id: "wallet", label: "My Wallet", icon: Wallet },
   { id: "documents", label: "Documents", icon: FileText },
