@@ -886,6 +886,7 @@ Deno.serve(async (req) => {
       .insert({
         user_id: orderUserId,
         placed_by_user_id: placedByUserId,
+        order_ref: orderRef,
         service: body.packageName ? `${body.service} — ${body.packageName}` : body.service,
         amount_gbp: body.amount_gbp,
         status: 'Pending',
