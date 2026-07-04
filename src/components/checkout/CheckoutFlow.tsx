@@ -122,6 +122,12 @@ export type CheckoutFlowProps = {
   showCompanyName?: boolean;
   /** When true, the company name field is shown but not required (used for IDV) */
   companyNameOptional?: boolean;
+  /** When true, reject obvious placeholder/fake company names (ABC, XYZ, Test, N/A, etc.).
+   *  Used by address-service checkouts where a genuine company name is required. */
+  strictCompanyName?: boolean;
+  /** When set, renders a mandatory "Address Verification" block at the end of the
+   *  details step (mirrors liveSelfieLink). User must open the link before Continue. */
+  addressVerificationLink?: string;
   /** Show the "what do you need?" service-mode picker at top of details (UK LTD) */
   showServiceMode?: boolean;
   /** Show a role picker (Director / PSC / Shareholder / Secretary) — used for IDV */
