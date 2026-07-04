@@ -490,7 +490,11 @@ const Dashboard = () => {
           )}
 
           {active === "orders" && (
-            <ClientOrdersSection rows={orders} onBrowse={() => setActive("newServices")} />
+            <ClientOrdersSection rows={orders} ownerEmail={(user.email || "").toLowerCase()} onBrowse={() => setActive("newServices")} />
+          )}
+
+          {active === "myClients" && (
+            <MyClientsSection rows={orders} ownerEmail={(user.email || "").toLowerCase()} />
           )}
 
           {active === "invoices" && (
