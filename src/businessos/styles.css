@@ -179,7 +179,18 @@
   backdrop-filter: blur(8px);
 }
 
-/* ── Mobile polish ───────────────────────────────────────────────── */
+/* ── Global overflow safety for admin pages ──────────────────────── */
+/* Prevent grid/flex children from forcing horizontal overflow of the page. */
+.businessos main > * { min-width: 0; }
+.businessos main .grid { min-width: 0; }
+.businessos main .grid > * { min-width: 0; }
+.businessos main .flex > * { min-width: 0; }
+/* Opt-out helper for children that legitimately need intrinsic width
+   (e.g. kanban columns, drag overlays). */
+.businessos .os-keep-width, .businessos .os-keep-width > * { min-width: revert; }
+/* Cards / glass panels should never spill their border past the wrapper. */
+.businessos .os-glass { max-width: 100%; }
+
 @media (max-width: 767px) {
   .businessos main { padding-bottom: 5rem; }
   .businessos .os-glass { border-radius: 14px; }
