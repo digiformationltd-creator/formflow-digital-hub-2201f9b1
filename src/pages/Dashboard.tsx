@@ -114,7 +114,9 @@ const Dashboard = () => {
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
   const [walletRows, setWalletRows] = useState<any[]>([]);
   const [tickets, setTickets] = useState<any[]>([]);
+  const [managedClients, setManagedClients] = useState<any[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+
   const [active, setActive] = useState<SectionId>("overview");
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
