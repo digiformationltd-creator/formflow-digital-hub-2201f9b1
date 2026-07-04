@@ -1157,13 +1157,12 @@ const CheckoutFlow = ({
                   <Field label="First name" value={form.first_name} onChange={(v) => setForm({ ...form, first_name: v, full_name: `${v} ${form.last_name}`.trim() })} required minLength={2} />
                   <Field label="Last name" value={form.last_name} onChange={(v) => setForm({ ...form, last_name: v, full_name: `${form.first_name} ${v}`.trim() })} required minLength={2} />
                   <Field
-                    label={isAuthed ? "Email (signed-in account)" : "Email"}
+                    label={isAuthed ? "Customer email" : "Email"}
                     type="email"
                     value={form.email}
                     onChange={(v) => setForm({ ...form, email: v })}
                     required
-                    readOnly={isAuthed && !!authedEmail}
-                    hint={isAuthed && !!authedEmail ? "Locked to your account so this order attaches to your portal." : undefined}
+                    hint={isAuthed ? "Placing this order for one of your own clients? Enter their email — the order stays in your portal under My Clients." : undefined}
                   />
                   <Field label={whatsappLabel} value={form.whatsapp} onChange={(v) => setForm({ ...form, whatsapp: v })} required minLength={5} placeholder={whatsappPlaceholder} />
                   {showSeparateWhatsapp && (
