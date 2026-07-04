@@ -118,6 +118,13 @@ const Dashboard = () => {
   const [active, setActive] = useState<SectionId>("overview");
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  // When the portal owner clicks "Open client" on a B2B row in My Orders,
+  // we jump straight into that client's workspace inside My Clients.
+  const [focusedClientEmail, setFocusedClientEmail] = useState<string | null>(null);
+  const openManagedClient = (email: string) => {
+    setFocusedClientEmail(email);
+    setActive("myClients");
+  };
 
   // Sync active section from ?section= query param (used by the global UserDrawer for deep linking).
   useEffect(() => {
