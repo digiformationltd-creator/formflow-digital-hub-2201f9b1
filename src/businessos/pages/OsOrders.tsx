@@ -30,7 +30,17 @@ interface OrderRow {
   inquiry_id?: string | null;
   invoice_number?: string | null;
   invoice_status?: string | null;
+  placed_by_user_id?: string | null;
+  managed_client_id?: string | null;
 }
+
+interface PortalOwnerLite {
+  user_id: string;
+  full_name: string | null;
+  email: string | null;
+  company_name: string | null;
+}
+
 
 const STATUSES = [
   { key: "all",         label: "All",         icon: Filter,        color: "text-white/70" },
