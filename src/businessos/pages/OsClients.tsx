@@ -15,8 +15,16 @@ interface ClientRow {
   phone: string | null;
   company_name: string | null;
   created_at: string;
-  order_count?: number;
+  // Direct orders the client placed for themselves (linked by user_id or
+  // guest-matched by email).
+  direct_order_count?: number;
+  // B2B orders this client placed from their portal for their own customers
+  // (placed_by_user_id = this client, distinct end customer).
+  b2b_order_count?: number;
+  // Distinct managed clients this portal owner has served.
+  managed_client_count?: number;
 }
+
 
 const initialsOf = (c: ClientRow) => {
   const src = c.full_name || c.email || "?";
