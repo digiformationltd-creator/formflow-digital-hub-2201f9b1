@@ -589,9 +589,13 @@ const Dashboard = () => {
               <MyClientsSection
                 rows={b2bOrders}
                 ownerEmail={ownerEmailLc}
+                ownerUserId={user.id}
+                managedClients={managedClients}
                 focusedEmail={focusedClientEmail}
                 onFocusHandled={() => setFocusedClientEmail(null)}
+                onReload={async () => { await reloadManagedClients(); await reloadOrders(); }}
               />
+
             </div>
           )}
 
