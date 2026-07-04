@@ -1235,28 +1235,45 @@ const MyClientsSection = ({ rows, ownerEmail, ownerUserId, managedClients, focus
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<ClientSort>("recent");
   const [statusFilter, setStatusFilter] = useState<ClientStatusFilter>("all");
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorClient, setEditorClient] = useState<ManagedClient | null>(null); // null = create
+  const [mergeOpen, setMergeOpen] = useState(false);
+  const [mergeSourceId, setMergeSourceId] = useState<string | null>(null);
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
 
-  // Deep-link: when the parent asks us to focus a specific client (e.g. from
-  // an "Open client" click in My Orders), jump straight into that workspace.
+  // Deep-link: match by email against any client (persistent or orphan).
   useEffect(() => {
     if (!focusedEmail) return;
-    const key = focusedEmail.toLowerCase().trim();
-    if (clients.some((c) => c.key === key)) {
-      setSelectedKey(key);
+    const email = focusedEmail.toLowerCase().trim();
+    const match = clients.find((c) => (c.email || "").toLowerCase().trim() === email);
+    if (match) {
+      setSelectedKey(match.key);
       onFocusHandled?.();
     }
   }, [focusedEmail, clients, onFocusHandled]);
 
-  if (clients.length === 0) {
-    return (
-      <EmptyState
-        icon={UserCircle2}
-        title="No B2B clients yet"
-        description="When you place an order for someone else (a different customer email/name than your own account), that end client will appear here with their own order history, invoices and status tracking."
-      />
-    );
-  }
+  const openCreate = () => { setEditorClient(null); setEditorOpen(true); };
+  const openEdit = (c: ManagedClient) => { setEditorClient(c); setEditorOpen(true); };
+  const openMerge = (c: ManagedClient) => { setMergeSourceId(c.id); setMergeOpen(true); };
+
+  const doMerge = async (targetId: string) => {
+    if (!mergeSourceId || !targetId || mergeSourceId === targetId) return;
+    const { data, error } = await (supabase as any).rpc("merge_managed_clients", { _target: targetId, _source: mergeSourceId });
+    if (error) { toast.error(error.message || "Merge failed"); return; }
+    toast.success(`Merged — ${data?.moved_orders ?? 0} order(s) moved.`);
+    setMergeOpen(false); setMergeSourceId(null); setSelectedKey(null);
+    await onReload();
+  };
+
+  const emptyState = clients.length === 0 ? (
+    <EmptyState
+      icon={UserCircle2}
+      title="No B2B clients yet"
+      description="Add a client below, or place an order for someone else — they'll appear here with their own order history, invoices and status tracking."
+      action={<Button variant="hero" className="rounded-full" onClick={openCreate}><Plus className="w-4 h-4" /> Add client</Button>}
+    />
+  ) : null;
+
 
   const selected = selectedKey ? clients.find((c) => c.key === selectedKey) : null;
 
