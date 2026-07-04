@@ -1316,7 +1316,7 @@ const MyClientsSection = ({ rows, ownerEmail }: { rows: any[]; ownerEmail: strin
   );
 };
 
-const ClientOrdersSection = ({ rows, onBrowse, ownerEmail }: { rows: any[]; onBrowse: () => void; ownerEmail?: string }) => {
+const ClientOrdersSection = ({ rows, onBrowse, ownerEmail, onOpenClient }: { rows: any[]; onBrowse: () => void; ownerEmail?: string; onOpenClient?: (email: string) => void }) => {
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
   const [selected, setSelected] = useState<any | null>(null);
   if (rows.length === 0) return <EmptyState icon={ShoppingBag} title="No orders yet" description="Your service orders will appear here automatically once placed." action={<Button variant="hero" className="rounded-full" onClick={onBrowse}>Place First Order</Button>} />;
@@ -1327,25 +1327,36 @@ const ClientOrdersSection = ({ rows, onBrowse, ownerEmail }: { rows: any[]; onBr
         const custEmail = (o.customer_email || "").toLowerCase();
         const isB2B = !!ownerEmail && custEmail && custEmail !== ownerEmail;
         return (
-        <button
+        <div
           key={o.id}
-          type="button"
-          onClick={() => setSelected(o)}
-          className="w-full text-left glass rounded-xl p-4 flex items-center justify-between gap-3 flex-wrap hover:bg-white/5 transition"
+          className={`w-full text-left glass rounded-xl p-4 flex items-center justify-between gap-3 flex-wrap hover:bg-white/5 transition ${isB2B ? "ring-1 ring-primary/25" : ""}`}
         >
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-wider opacity-50 mb-0.5">Order #</div>
+          <button type="button" onClick={() => setSelected(o)} className="min-w-0 flex-1 text-left">
+            <div className="text-[10px] uppercase tracking-wider opacity-50 mb-0.5">
+              {isB2B ? "B2B Order #" : "Order #"}
+            </div>
             <div className="font-mono font-semibold text-primary">{o.order_ref || "Reference pending"}</div>
             <div className="text-sm">{o.service}</div>
             <div className="text-xs opacity-60">{o.order_date} • {fmt(Number(o.amount_gbp))}</div>
             {isB2B && (
-              <div className="mt-1 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-primary/90 bg-primary/10 rounded-full px-2 py-0.5">
+              <div className="mt-1.5 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-primary bg-primary/15 rounded-full px-2 py-0.5">
                 <UserCircle2 className="w-3 h-3" /> For client: {o.customer_name || o.customer_email}
               </div>
             )}
+          </button>
+          <div className="flex flex-col items-end gap-2">
+            <StatusBadge status={o.status} />
+            {isB2B && onOpenClient && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onOpenClient(custEmail); }}
+                className="text-[11px] text-primary hover:underline inline-flex items-center gap-0.5"
+              >
+                Open client <ChevronRight className="w-3 h-3" />
+              </button>
+            )}
           </div>
-          <StatusBadge status={o.status} />
-        </button>
+        </div>
         );
       })}
       <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
