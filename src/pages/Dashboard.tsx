@@ -1123,10 +1123,13 @@ const stageIndex = (status: string) => {
  * invoice download.
  */
 interface ManagedClient {
-  key: string;              // customer_email (lowercased) or fallback
+  key: string;              // managed_client_id when available, else lower(email)
+  id: string | null;        // managed_clients.id (null for orphan email-only groups)
   email: string | null;
   name: string | null;
   phone: string | null;
+  company: string | null;
+  notes: string | null;
   country: string | null;
   orders: any[];
   totalGbp: number;
@@ -1134,27 +1137,69 @@ interface ManagedClient {
   statuses: { pending: number; inProgress: number; completed: number };
 }
 
-const buildManagedClients = (rows: any[], ownerEmail: string): ManagedClient[] => {
+const buildManagedClients = (
+  rows: any[],
+  ownerEmail: string,
+  managedClients: any[] = [],
+): ManagedClient[] => {
+  const byId = new Map<string, ManagedClient>();
+  const byEmail = new Map<string, ManagedClient>();
   const map = new Map<string, ManagedClient>();
+
+  // Seed with persistent managed_clients so empty clients still appear
+  for (const mc of managedClients) {
+    const emailLc = (mc.email || "").toLowerCase().trim();
+    const client: ManagedClient = {
+      key: `mc:${mc.id}`,
+      id: mc.id,
+      email: mc.email || null,
+      name: mc.name || null,
+      phone: mc.phone || null,
+      company: mc.company || null,
+      notes: mc.notes || null,
+      country: null,
+      orders: [],
+      totalGbp: 0,
+      lastDate: mc.updated_at || mc.created_at || "",
+      statuses: { pending: 0, inProgress: 0, completed: 0 },
+    };
+    map.set(client.key, client);
+    byId.set(mc.id, client);
+    if (emailLc) byEmail.set(emailLc, client);
+  }
+
   for (const o of rows) {
     const email = (o.customer_email || "").toLowerCase().trim();
     if (!email || email === ownerEmail) continue; // skip self-orders
-    const key = email;
-    let c = map.get(key);
-    if (!c) {
-      c = {
-        key,
-        email: o.customer_email || null,
-        name: o.customer_name || null,
-        phone: o.customer_whatsapp || o.customer_phone_e164 || null,
-        country: o.country_code || null,
-        orders: [],
-        totalGbp: 0,
-        lastDate: o.order_date || o.created_at || "",
-        statuses: { pending: 0, inProgress: 0, completed: 0 },
-      };
-      map.set(key, c);
+    let c: ManagedClient | undefined;
+    if (o.managed_client_id && byId.has(o.managed_client_id)) {
+      c = byId.get(o.managed_client_id);
+    } else if (byEmail.has(email)) {
+      c = byEmail.get(email);
+    } else {
+      // Orphan email group (no managed_clients row yet)
+      const key = `em:${email}`;
+      c = map.get(key);
+      if (!c) {
+        c = {
+          key,
+          id: null,
+          email: o.customer_email || null,
+          name: o.customer_name || null,
+          phone: o.customer_whatsapp || o.customer_phone_e164 || null,
+          company: null,
+          notes: null,
+          country: o.country_code || null,
+          orders: [],
+          totalGbp: 0,
+          lastDate: o.order_date || o.created_at || "",
+          statuses: { pending: 0, inProgress: 0, completed: 0 },
+        };
+        map.set(key, c);
+        byEmail.set(email, c);
+      }
     }
+    if (!c) continue;
     c.orders.push(o);
     c.totalGbp += Number(o.amount_gbp || 0);
     const d = o.order_date || o.created_at || "";
@@ -1165,6 +1210,7 @@ const buildManagedClients = (rows: any[], ownerEmail: string): ManagedClient[] =
     else c.statuses.pending++;
     if (!c.name && o.customer_name) c.name = o.customer_name;
     if (!c.phone && (o.customer_whatsapp || o.customer_phone_e164)) c.phone = o.customer_whatsapp || o.customer_phone_e164;
+    if (!c.country && o.country_code) c.country = o.country_code;
   }
   return Array.from(map.values()).sort((a, b) => (b.lastDate || "").localeCompare(a.lastDate || ""));
 };
@@ -1172,8 +1218,19 @@ const buildManagedClients = (rows: any[], ownerEmail: string): ManagedClient[] =
 type ClientSort = "recent" | "orders" | "spend" | "name";
 type ClientStatusFilter = "all" | "pending" | "inProgress" | "completed";
 
-const MyClientsSection = ({ rows, ownerEmail, focusedEmail, onFocusHandled }: { rows: any[]; ownerEmail: string; focusedEmail?: string | null; onFocusHandled?: () => void }) => {
-  const clients = buildManagedClients(rows, ownerEmail);
+interface MyClientsSectionProps {
+  rows: any[];
+  ownerEmail: string;
+  ownerUserId: string;
+  managedClients: any[];
+  focusedEmail?: string | null;
+  onFocusHandled?: () => void;
+  onReload: () => Promise<void>;
+}
+
+const MyClientsSection = ({ rows, ownerEmail, ownerUserId, managedClients, focusedEmail, onFocusHandled, onReload }: MyClientsSectionProps) => {
+  const clients = buildManagedClients(rows, ownerEmail, managedClients);
+
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<ClientSort>("recent");
