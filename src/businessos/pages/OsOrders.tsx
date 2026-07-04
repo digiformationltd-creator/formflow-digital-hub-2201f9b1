@@ -565,20 +565,33 @@ export default function OsOrders() {
               <tbody>
                 {filtered.map((o) => {
                   const cancelled = o.status === "Cancelled";
+                  const b2b = isB2BOrder(o);
+                  const owner = o.placed_by_user_id ? portalOwners[o.placed_by_user_id] : null;
+                  const ownerLabel = owner?.full_name || owner?.company_name || owner?.email || (o.placed_by_user_id ? o.placed_by_user_id.slice(0, 8) : "");
                   return (
                   <tr
                     key={o.id}
                     onClick={() => openOrder(o)}
                     className={`border-b border-white/5 last:border-0 hover:bg-white/[0.03] transition cursor-pointer ${
-                      cancelled ? "bg-rose-500/[0.04] border-l-2 border-l-rose-400/60 opacity-70" : ""
+                      cancelled ? "bg-rose-500/[0.04] border-l-2 border-l-rose-400/60 opacity-70" :
+                      b2b ? "border-l-2 border-l-fuchsia-400/50" : ""
                     }`}
                   >
                     <td className="py-3 px-4">
                       <div className={`font-mono text-xs ${cancelled ? "line-through text-white/50" : "text-white/80"}`}>{o.order_ref}</div>
-                      <div className="mt-1 flex items-center gap-1">
+                      <div className="mt-1 flex items-center gap-1 flex-wrap">
                         <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider ${sourceChip(o.source)}`}>
                           {sourceLabel(o.source)}
                         </span>
+                        {b2b && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); if (o.placed_by_user_id) setOwnerFilter(o.placed_by_user_id); }}
+                            className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-fuchsia-500/20 text-fuchsia-100 ring-1 ring-fuchsia-400/40 inline-flex items-center gap-1 hover:bg-fuchsia-500/30"
+                            title={`B2B order placed by ${ownerLabel} — click to filter`}
+                          >
+                            <Building2 className="w-2.5 h-2.5" /> B2B
+                          </button>
+                        )}
                         {cancelled && (
                           <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-200 ring-1 ring-rose-400/40">
                             Cancelled
@@ -598,6 +611,17 @@ export default function OsOrders() {
                     <td className="py-3 px-4">
                       <div className={`font-semibold truncate max-w-[180px] ${cancelled ? "line-through text-white/50" : ""}`}>{o.customer_name || "(guest)"}</div>
                       {o.customer_email && <div className="text-[11px] text-white/40 truncate max-w-[180px]">{o.customer_email}</div>}
+                      {b2b && ownerLabel && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); if (o.placed_by_user_id) setOwnerFilter(o.placed_by_user_id); }}
+                          className="mt-1 text-[10px] text-fuchsia-200/90 hover:text-fuchsia-100 inline-flex items-center gap-1 truncate max-w-[180px]"
+                          title={`Placed by ${ownerLabel}${owner?.email ? ` · ${owner.email}` : ""}`}
+                        >
+                          <Users className="w-2.5 h-2.5 shrink-0" />
+                          <span className="truncate">via {ownerLabel}</span>
+                        </button>
+                      )}
+
                     </td>
                     <td className={`py-3 px-4 truncate max-w-[200px] ${cancelled ? "line-through text-white/40" : "text-white/70"}`}>{o.service}</td>
                     <td className="py-3 px-4">
