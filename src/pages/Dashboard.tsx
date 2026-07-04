@@ -1265,17 +1265,41 @@ const MyClientsSection = ({ rows, ownerEmail, ownerUserId, managedClients, focus
     await onReload();
   };
 
-  const emptyState = clients.length === 0 ? (
-    <EmptyState
-      icon={UserCircle2}
-      title="No B2B clients yet"
-      description="Add a client below, or place an order for someone else — they'll appear here with their own order history, invoices and status tracking."
-      action={<Button variant="hero" className="rounded-full" onClick={openCreate}><Plus className="w-4 h-4" /> Add client</Button>}
-    />
-  ) : null;
+  const dialogs = (
+    <>
+      <ManagedClientEditor
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        ownerUserId={ownerUserId}
+        client={editorClient}
+        onSaved={async () => { setEditorOpen(false); await onReload(); }}
+      />
+      <MergeClientDialog
+        open={mergeOpen}
+        onOpenChange={setMergeOpen}
+        sourceId={mergeSourceId}
+        candidates={clients.filter((c) => c.id && c.id !== mergeSourceId)}
+        onMerge={doMerge}
+      />
+    </>
+  );
 
+  if (clients.length === 0) {
+    return (
+      <>
+        <EmptyState
+          icon={UserCircle2}
+          title="No B2B clients yet"
+          description="Add a client below, or place an order for someone else — they'll appear here with their own order history, invoices and status tracking."
+          action={<Button variant="hero" className="rounded-full" onClick={openCreate}><Plus className="w-4 h-4" /> Add client</Button>}
+        />
+        {dialogs}
+      </>
+    );
+  }
 
   const selected = selectedKey ? clients.find((c) => c.key === selectedKey) : null;
+
 
   // ---- Client detail workspace ----
   if (selected) {
