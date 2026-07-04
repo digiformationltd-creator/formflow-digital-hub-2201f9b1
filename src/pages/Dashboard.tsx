@@ -188,22 +188,62 @@ const Dashboard = () => {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const [{ data: prof }, { data: comps }, { data: role }, { data: orderRows }, { data: guestOrderRows }, { data: subRows }, { data: walletData }, { data: ticketRows }] = await Promise.all([
+      const emailLower = (user.email || "").toLowerCase();
+      const [
+        { data: prof },
+        { data: comps },
+        { data: role },
+        { data: orderRows },
+        { data: guestOrderRows },
+        { data: subRows },
+        { data: walletData },
+        { data: ticketRows },
+        { data: invRowsOwn },
+        { data: invRowsOrphan },
+      ] = await Promise.all([
         supabase.from("profiles").select("full_name,email,phone,company_name,avatar_initials").eq("user_id", user.id).maybeSingle(),
         supabase.from("client_company_details").select("*").eq("user_id", user.id).order("created_at", { ascending: true }),
         supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle(),
+        // All orders directly linked to this account — no limit, all rows.
         supabase.from("client_orders").select("*").eq("user_id", user.id).order("order_date", { ascending: false }),
-        supabase.from("client_orders").select("*").is("user_id", null).ilike("customer_email", user.email || "").order("order_date", { ascending: false }),
+        // Legacy orphan-recovery: orders placed as guest with the same email
+        // (e.g. before signup). The checkout now hard-locks email to the
+        // authed account, so this is only for historical data.
+        supabase.from("client_orders").select("*").is("user_id", null).ilike("customer_email", emailLower).order("order_date", { ascending: false }),
         supabase.from("client_subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
         supabase.from("client_wallet_transactions").select("*").eq("user_id", user.id).order("txn_date", { ascending: false }),
         supabase.from("client_tickets").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status").eq("user_id", user.id),
+        supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status").is("user_id", null).ilike("bill_to_email", emailLower),
       ]);
       if (cancelled) return;
-      const combinedOrders = [...(orderRows || [])];
-      for (const row of guestOrderRows || []) {
-        if (!combinedOrders.some((order) => order.id === row.id)) combinedOrders.push(row);
+      // De-dupe & merge orders (owned + email-matched orphans) so repeat
+      // purchases of the same service ALL appear as separate rows.
+      const seen = new Set<string>();
+      const combinedOrders: any[] = [];
+      for (const row of [...(orderRows || []), ...(guestOrderRows || [])]) {
+        if (row?.id && !seen.has(row.id)) {
+          seen.add(row.id);
+          combinedOrders.push(row);
+        }
       }
       combinedOrders.sort((a, b) => new Date(b.order_date || b.created_at).getTime() - new Date(a.order_date || a.created_at).getTime());
+
+      // Attach invoice metadata (invoice number + PDF storage path) to each
+      // order so the client can download deliverables from the modal.
+      const invMap = new Map<string, any>();
+      for (const inv of [...(invRowsOwn || []), ...(invRowsOrphan || [])]) {
+        if (inv?.order_id) invMap.set(inv.order_id, inv);
+      }
+      for (const o of combinedOrders) {
+        const inv = invMap.get(o.id);
+        if (inv) {
+          o.__invoice_number = inv.invoice_number;
+          o.__invoice_pdf = inv.pdf_url;
+          o.__invoice_status = inv.status;
+        }
+      }
+
       setProfile(prof as Profile);
       setCompanies((comps as CompanyDetails[]) || []);
       setOrders(combinedOrders);
