@@ -321,12 +321,16 @@ const CheckoutFlow = ({
   };
   const [form, setForm] = useState(() => ({ ...emptyForm, ...(draft?.form ?? {}) }));
 
-  // Prefill name/email from the logged-in user once auth resolves
+  // Prefill name/email from the logged-in user once auth resolves.
+  // IMPORTANT: for logged-in users we ALWAYS force the checkout email to
+  // match their authenticated account email. `generate-invoice` only links
+  // orders to `user_id` when these match (anti-spoofing), so any edit here
+  // would produce invisible orphan orders in the client portal.
   useEffect(() => {
     if (!isAuthed) return;
     setForm((prev: any) => {
       const next = { ...prev };
-      if (authedEmail && !prev.email) next.email = authedEmail;
+      if (authedEmail) next.email = authedEmail;
       if (authedName && !prev.full_name) {
         next.full_name = authedName;
         if (!prev.first_name && !prev.last_name) {
@@ -1151,7 +1155,15 @@ const CheckoutFlow = ({
                 <div className="grid sm:grid-cols-2 gap-4">
                   <Field label="First name" value={form.first_name} onChange={(v) => setForm({ ...form, first_name: v, full_name: `${v} ${form.last_name}`.trim() })} required minLength={2} />
                   <Field label="Last name" value={form.last_name} onChange={(v) => setForm({ ...form, last_name: v, full_name: `${form.first_name} ${v}`.trim() })} required minLength={2} />
-                  <Field label="Email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} required />
+                  <Field
+                    label={isAuthed ? "Email (signed-in account)" : "Email"}
+                    type="email"
+                    value={form.email}
+                    onChange={(v) => setForm({ ...form, email: v })}
+                    required
+                    readOnly={isAuthed && !!authedEmail}
+                    hint={isAuthed && !!authedEmail ? "Locked to your account so this order attaches to your portal." : undefined}
+                  />
                   <Field label={whatsappLabel} value={form.whatsapp} onChange={(v) => setForm({ ...form, whatsapp: v })} required minLength={5} placeholder={whatsappPlaceholder} />
                   {showSeparateWhatsapp && (
                     <Field label={whatsappContactLabel} value={form.whatsapp_contact} onChange={(v) => setForm({ ...form, whatsapp_contact: v })} required minLength={5} placeholder={whatsappContactPlaceholder} />
@@ -1639,6 +1651,8 @@ const Field = ({
   required,
   minLength,
   placeholder,
+  readOnly,
+  hint,
 }: {
   label: string;
   value: string;
@@ -1647,6 +1661,8 @@ const Field = ({
   required?: boolean;
   minLength?: number;
   placeholder?: string;
+  readOnly?: boolean;
+  hint?: string;
 }) => (
   <div>
     <label className="block text-sm font-medium mb-1.5">{label}</label>
@@ -1657,8 +1673,11 @@ const Field = ({
       required={required}
       minLength={minLength}
       placeholder={placeholder}
-      className="w-full px-4 py-2.5 rounded-xl bg-muted/30 border border-border/40 focus:border-primary outline-none text-sm"
+      readOnly={readOnly}
+      aria-readonly={readOnly || undefined}
+      className={`w-full px-4 py-2.5 rounded-xl bg-muted/30 border border-border/40 focus:border-primary outline-none text-sm ${readOnly ? "opacity-80 cursor-not-allowed" : ""}`}
     />
+    {hint && <p className="mt-1 text-[11px] opacity-60">{hint}</p>}
   </div>
 );
 

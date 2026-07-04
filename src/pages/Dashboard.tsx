@@ -188,22 +188,62 @@ const Dashboard = () => {
     if (!user) return;
     let cancelled = false;
     (async () => {
-      const [{ data: prof }, { data: comps }, { data: role }, { data: orderRows }, { data: guestOrderRows }, { data: subRows }, { data: walletData }, { data: ticketRows }] = await Promise.all([
+      const emailLower = (user.email || "").toLowerCase();
+      const [
+        { data: prof },
+        { data: comps },
+        { data: role },
+        { data: orderRows },
+        { data: guestOrderRows },
+        { data: subRows },
+        { data: walletData },
+        { data: ticketRows },
+        { data: invRowsOwn },
+        { data: invRowsOrphan },
+      ] = await Promise.all([
         supabase.from("profiles").select("full_name,email,phone,company_name,avatar_initials").eq("user_id", user.id).maybeSingle(),
         supabase.from("client_company_details").select("*").eq("user_id", user.id).order("created_at", { ascending: true }),
         supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle(),
+        // All orders directly linked to this account — no limit, all rows.
         supabase.from("client_orders").select("*").eq("user_id", user.id).order("order_date", { ascending: false }),
-        supabase.from("client_orders").select("*").is("user_id", null).ilike("customer_email", user.email || "").order("order_date", { ascending: false }),
+        // Legacy orphan-recovery: orders placed as guest with the same email
+        // (e.g. before signup). The checkout now hard-locks email to the
+        // authed account, so this is only for historical data.
+        supabase.from("client_orders").select("*").is("user_id", null).ilike("customer_email", emailLower).order("order_date", { ascending: false }),
         supabase.from("client_subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
         supabase.from("client_wallet_transactions").select("*").eq("user_id", user.id).order("txn_date", { ascending: false }),
         supabase.from("client_tickets").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status").eq("user_id", user.id),
+        supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status").is("user_id", null).ilike("bill_to_email", emailLower),
       ]);
       if (cancelled) return;
-      const combinedOrders = [...(orderRows || [])];
-      for (const row of guestOrderRows || []) {
-        if (!combinedOrders.some((order) => order.id === row.id)) combinedOrders.push(row);
+      // De-dupe & merge orders (owned + email-matched orphans) so repeat
+      // purchases of the same service ALL appear as separate rows.
+      const seen = new Set<string>();
+      const combinedOrders: any[] = [];
+      for (const row of [...(orderRows || []), ...(guestOrderRows || [])]) {
+        if (row?.id && !seen.has(row.id)) {
+          seen.add(row.id);
+          combinedOrders.push(row);
+        }
       }
       combinedOrders.sort((a, b) => new Date(b.order_date || b.created_at).getTime() - new Date(a.order_date || a.created_at).getTime());
+
+      // Attach invoice metadata (invoice number + PDF storage path) to each
+      // order so the client can download deliverables from the modal.
+      const invMap = new Map<string, any>();
+      for (const inv of [...(invRowsOwn || []), ...(invRowsOrphan || [])]) {
+        if (inv?.order_id) invMap.set(inv.order_id, inv);
+      }
+      for (const o of combinedOrders) {
+        const inv = invMap.get(o.id);
+        if (inv) {
+          o.__invoice_number = inv.invoice_number;
+          o.__invoice_pdf = inv.pdf_url;
+          o.__invoice_status = inv.status;
+        }
+      }
+
       setProfile(prof as Profile);
       setCompanies((comps as CompanyDetails[]) || []);
       setOrders(combinedOrders);
@@ -387,6 +427,37 @@ const Dashboard = () => {
                   );
                 })}
               </div>
+
+
+              {orders.length > 0 && (
+                <div className="glass rounded-2xl p-5 sm:p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="font-semibold">Recent orders</h3>
+                      <p className="text-xs opacity-60 mt-0.5">Your latest {Math.min(orders.length, 5)} of {orders.length} order{orders.length === 1 ? "" : "s"}.</p>
+                    </div>
+                    <button onClick={() => setActive("orders")} className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1">
+                      View all <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {orders.slice(0, 5).map((o) => (
+                      <button
+                        key={o.id}
+                        onClick={() => setActive("orders")}
+                        className="w-full flex items-center justify-between gap-3 rounded-xl bg-muted/20 hover:bg-muted/30 transition px-3 py-2.5 text-left"
+                      >
+                        <div className="min-w-0">
+                          <div className="font-mono text-xs text-primary">{o.order_ref || "—"}</div>
+                          <div className="text-sm truncate">{o.service}</div>
+                          <div className="text-[11px] opacity-60">{o.order_date || (o.created_at ? new Date(o.created_at).toLocaleDateString() : "")} • {formatGBP(Number(o.amount_gbp || 0))}</div>
+                        </div>
+                        <StatusBadge status={o.status} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <button onClick={() => setActive("newServices")} className="glass rounded-2xl p-6 text-left hover:shadow-glow transition">
@@ -994,6 +1065,27 @@ const ClientOrdersSection = ({ rows, onBrowse }: { rows: any[]; onBrowse: () => 
                     <div>
                       <div className="text-[11px] uppercase tracking-wider opacity-60 mb-1">Notes</div>
                       <div className="text-sm opacity-80 whitespace-pre-wrap">{selected.notes}</div>
+                    </div>
+                  )}
+                  {selected.__invoice_pdf && (
+                    <div>
+                      <div className="text-[11px] uppercase tracking-wider opacity-60 mb-1">Deliverables</div>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const { data, error } = await supabase.storage
+                            .from("invoices")
+                            .createSignedUrl(selected.__invoice_pdf, 60 * 60);
+                          if (error || !data?.signedUrl) {
+                            toast.error("Could not open invoice — please try again.");
+                            return;
+                          }
+                          window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+                        }}
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                      >
+                        <Download className="w-4 h-4" /> Invoice {selected.__invoice_number || ""}
+                      </button>
                     </div>
                   )}
                   <div className="text-xs opacity-60">Current status: <StatusBadge status={selected.status} /></div>
