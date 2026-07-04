@@ -636,28 +636,41 @@ function AddressesTab({ userId }: { userId: string }) {
 
 
 // ─────────────────────────── ORDERS ───────────────────────────
+// Shows *this client's full relationship* with DigiFormation:
+//   • Direct orders — placed for themselves (user_id=userId or guest email match)
+//   • B2B orders    — placed by this client from their portal for their own
+//                     customers (placed_by_user_id=userId, distinct end customer)
+// Everything is fetched here and split in-memory so the admin sees combined
+// totals + a per-managed-client breakdown without leaving the client workspace.
 function OrdersTab({ userId, email }: { userId: string; email?: string | null }) {
   const [rows, setRows] = useState<any[]>([]);
+  const [managedClients, setManagedClients] = useState<any[]>([]);
   const [invCounts, setInvCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [view, setView] = useState<"direct" | "b2b">("direct");
 
   const load = async () => {
     setLoading(true);
-    const [{ data: linked }, { data: guest }] = await Promise.all([
+    const [{ data: linked }, { data: guest }, { data: placed }, { data: mc }] = await Promise.all([
       supabase.from("client_orders").select("*").eq("user_id", userId).order("order_date", { ascending: false }),
       email
         ? supabase.from("client_orders").select("*").is("user_id", null).ilike("customer_email", email).order("order_date", { ascending: false })
         : Promise.resolve({ data: [] as any[] }),
+      // B2B: orders this client placed from their portal for other customers.
+      supabase.from("client_orders").select("*").eq("placed_by_user_id", userId).order("order_date", { ascending: false }),
+      supabase.from("managed_clients").select("*").eq("portal_owner_user_id", userId),
     ]);
-    const merged = [...(linked || [])];
-    for (const row of guest || []) {
-      if (!merged.some((order) => order.id === row.id)) merged.push(row);
-    }
+    const merged: any[] = [];
+    const seen = new Set<string>();
+    const push = (row: any) => { if (row && !seen.has(row.id)) { seen.add(row.id); merged.push(row); } };
+    (linked || []).forEach(push);
+    (guest || []).forEach(push);
+    (placed || []).forEach(push);
     merged.sort((a, b) => new Date(b.order_date || b.created_at).getTime() - new Date(a.order_date || a.created_at).getTime());
     setRows(merged);
+    setManagedClients(mc || []);
 
-    // Invoice counts per order — gives admin a quick at-a-glance "is this billed?"
     if (merged.length) {
       const { data: invs } = await supabase
         .from("invoices")
@@ -677,9 +690,48 @@ function OrdersTab({ userId, email }: { userId: string; email?: string | null })
     load();
     const ch = supabase.channel(`os-cd-orders-${userId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "client_orders", filter: `user_id=eq.${userId}` }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "client_orders", filter: `placed_by_user_id=eq.${userId}` }, load)
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, [userId, email]);
+
+  const emailLc = (email || "").toLowerCase();
+  const isB2B = (o: any) => {
+    if (o.placed_by_user_id !== userId) return false;
+    if (o.managed_client_id) return true;
+    if (o.user_id && o.user_id !== userId) return true;
+    if (!o.user_id) {
+      const ce = (o.customer_email || "").toLowerCase();
+      return !!ce && !!emailLc && ce !== emailLc;
+    }
+    return false;
+  };
+
+  const directRows = useMemo(() => rows.filter((o) => !isB2B(o)), [rows, userId, emailLc]);
+  const b2bRows = useMemo(() => rows.filter(isB2B), [rows, userId, emailLc]);
+  const directTotal = useMemo(() => directRows.reduce((s, o) => s + Number(o.amount_gbp || 0), 0), [directRows]);
+  const b2bTotal = useMemo(() => b2bRows.reduce((s, o) => s + Number(o.amount_gbp || 0), 0), [b2bRows]);
+
+  // Group B2B orders per end customer (managed_client_id → managed_clients row,
+  // otherwise fall back to lowercased customer email).
+  const b2bGroups = useMemo(() => {
+    const map = new Map<string, { key: string; name: string; email: string; count: number; total: number; last: string; orderIds: string[] }>();
+    const mcById = new Map(managedClients.map((m) => [m.id, m]));
+    for (const o of b2bRows) {
+      const mc = o.managed_client_id ? mcById.get(o.managed_client_id) : null;
+      const key = o.managed_client_id || (o.customer_email || "").toLowerCase() || o.id;
+      const name = mc?.name || o.customer_name || o.customer_email || "(unknown)";
+      const cemail = mc?.email || o.customer_email || "";
+      const g = map.get(key) || { key, name, email: cemail, count: 0, total: 0, last: o.order_date || o.created_at, orderIds: [] };
+      g.count++;
+      g.total += Number(o.amount_gbp || 0);
+      g.orderIds.push(o.id);
+      const d = o.order_date || o.created_at;
+      if (new Date(d).getTime() > new Date(g.last).getTime()) g.last = d;
+      map.set(key, g);
+    }
+    return Array.from(map.values()).sort((a, b) => b.count - a.count);
+  }, [b2bRows, managedClients]);
 
   const statusTone = (s: string) => {
     const k = (s || "").toLowerCase();
@@ -692,69 +744,145 @@ function OrdersTab({ userId, email }: { userId: string; email?: string | null })
   };
 
   if (loading) return <div className="os-glass p-8 text-center"><Loader2 className="w-5 h-5 animate-spin mx-auto text-white/40" /></div>;
-  if (!rows.length) return <div className="os-glass p-8 text-center text-sm text-white/50">No orders for this client.</div>;
 
-  const total = rows.reduce((s, o) => s + Number(o.amount_gbp || 0), 0);
+  const listRows = view === "direct" ? directRows : b2bRows;
+  const total = directTotal + b2bTotal;
 
   return (
     <div className="space-y-3">
-      <div className="os-glass p-3 flex items-center justify-between text-xs">
-        <span className="text-white/60">{rows.length} order{rows.length === 1 ? "" : "s"} · Qty {rows.length}</span>
-        <span className="font-semibold">Total: {fmtGBP(total)}</span>
+      {/* Relationship summary — combined view of the client's full activity */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <SummaryStat label="Total orders" value={rows.length} sub={fmtGBP(total)} tone="white" />
+        <SummaryStat label="Direct orders" value={directRows.length} sub={fmtGBP(directTotal)} tone="blue" />
+        <SummaryStat label="B2B orders" value={b2bRows.length} sub={fmtGBP(b2bTotal)} tone="fuchsia" />
+        <SummaryStat label="B2B customers" value={b2bGroups.length} sub={`${managedClients.length} managed`} tone="cyan" />
       </div>
-      {rows.map((o) => {
-        const cancelled = (o.status || "").toLowerCase().includes("cancel");
-        const cancelOrder = async (e: React.MouseEvent) => {
-          e.stopPropagation();
-          if (cancelled) return;
-          if (!window.confirm(`Cancel order ${o.order_ref || ""}? This cannot be undone from here.`)) return;
-          const { error } = await supabase.from("client_orders").update({ status: "Cancelled" }).eq("id", o.id);
-          if (error) { toast.error(error.message); return; }
-          toast.success("Order cancelled");
-          load();
-        };
-        return (
-          <div key={o.id} className="os-glass p-3 hover:bg-white/[0.04]">
-            <button onClick={() => setOpenId(o.id)} className="w-full text-left">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] uppercase tracking-wider text-white/40">Order #</span>
-                    <span className="font-mono text-xs text-white/90">{o.order_ref || "Reference pending"}</span>
-                    {!o.user_id && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-200">guest</span>}
+
+      {/* View switcher */}
+      <div className="os-glass p-1 inline-flex gap-1 rounded-xl text-xs">
+        <button
+          onClick={() => setView("direct")}
+          className={`px-3 h-8 rounded-lg font-semibold inline-flex items-center gap-1.5 ${view === "direct" ? "bg-white/[0.10] text-white" : "text-white/60 hover:bg-white/[0.04]"}`}
+        >
+          <ShoppingBag className="w-3.5 h-3.5" /> Direct ({directRows.length})
+        </button>
+        <button
+          onClick={() => setView("b2b")}
+          className={`px-3 h-8 rounded-lg font-semibold inline-flex items-center gap-1.5 ${view === "b2b" ? "bg-fuchsia-500/20 text-fuchsia-100 ring-1 ring-fuchsia-400/40" : "text-white/60 hover:bg-white/[0.04]"}`}
+        >
+          <User className="w-3.5 h-3.5" /> B2B / My Clients ({b2bRows.length})
+        </button>
+      </div>
+
+      {/* B2B grouped-by-customer overview (only in B2B view) */}
+      {view === "b2b" && b2bGroups.length > 0 && (
+        <div className="os-glass p-3 space-y-2 border border-fuchsia-400/20">
+          <div className="text-[11px] uppercase tracking-widest text-fuchsia-100/80 font-semibold flex items-center gap-1.5">
+            <User className="w-3 h-3" /> B2B customers this client has ordered for
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {b2bGroups.map((g) => (
+              <div key={g.key} className="rounded-lg bg-white/[0.03] p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="font-semibold text-sm truncate">{g.name}</div>
+                    {g.email && g.email.toLowerCase() !== g.name.toLowerCase() && (
+                      <div className="text-[11px] text-white/50 truncate">{g.email}</div>
+                    )}
                   </div>
-                  <div className="text-sm font-semibold truncate mt-0.5">{o.service}</div>
-                  <div className="text-[11px] text-white/50 mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
-                    <span>Qty 1</span>
-                    <span>{fmtDate(o.order_date)}</span>
-                    {o.customer_email && <span className="truncate">{o.customer_email}</span>}
-                    {o.customer_whatsapp && <span>{o.customer_whatsapp}</span>}
-                    <span>{invCounts[o.id] || 0} invoice{(invCounts[o.id] || 0) === 1 ? "" : "s"}</span>
+                  <div className="text-right shrink-0">
+                    <div className="text-sm font-bold">{g.count}</div>
+                    <div className="text-[10px] text-white/40 uppercase tracking-wider">orders</div>
                   </div>
                 </div>
-                <div className="text-right shrink-0">
-                  <div className="font-bold">{fmtGBP(Number(o.amount_gbp))}</div>
-                  <div className={`text-[10px] mt-1 px-2 py-0.5 rounded-full ring-1 inline-block ${statusTone(o.status)}`}>{o.status}</div>
+                <div className="mt-1.5 text-[11px] text-white/50 flex items-center justify-between">
+                  <span>{fmtGBP(g.total)}</span>
+                  <span>Last: {fmtDate(g.last)}</span>
                 </div>
               </div>
-            </button>
-            <div className="mt-2 pt-2 border-t border-white/5 flex justify-end">
-              <button
-                onClick={cancelOrder}
-                disabled={cancelled}
-                className="px-2.5 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500/20 ring-1 ring-rose-400/30 text-rose-200 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                <Trash2 className="w-3 h-3" />
-                {cancelled ? "Cancelled" : "Cancel order"}
-              </button>
-            </div>
+            ))}
           </div>
-        );
-      })}
+        </div>
+      )}
+
+      {listRows.length === 0 ? (
+        <div className="os-glass p-8 text-center text-sm text-white/50">
+          {view === "direct" ? "No direct orders for this client." : "No B2B customer orders placed by this client yet."}
+        </div>
+      ) : (
+        listRows.map((o) => {
+          const cancelled = (o.status || "").toLowerCase().includes("cancel");
+          const b2b = isB2B(o);
+          const cancelOrder = async (e: React.MouseEvent) => {
+            e.stopPropagation();
+            if (cancelled) return;
+            if (!window.confirm(`Cancel order ${o.order_ref || ""}? This cannot be undone from here.`)) return;
+            const { error } = await supabase.from("client_orders").update({ status: "Cancelled" }).eq("id", o.id);
+            if (error) { toast.error(error.message); return; }
+            toast.success("Order cancelled");
+            load();
+          };
+          return (
+            <div key={o.id} className={`os-glass p-3 hover:bg-white/[0.04] ${b2b ? "border-l-2 border-l-fuchsia-400/50" : ""}`}>
+              <button onClick={() => setOpenId(o.id)} className="w-full text-left">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] uppercase tracking-wider text-white/40">Order #</span>
+                      <span className="font-mono text-xs text-white/90">{o.order_ref || "Reference pending"}</span>
+                      {b2b && <span className="text-[10px] px-1.5 py-0.5 rounded bg-fuchsia-500/20 text-fuchsia-100 ring-1 ring-fuchsia-400/40 font-bold uppercase tracking-wider">B2B</span>}
+                      {!o.user_id && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-200">guest</span>}
+                    </div>
+                    <div className="text-sm font-semibold truncate mt-0.5">{o.service}</div>
+                    <div className="text-[11px] text-white/50 mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
+                      <span>{fmtDate(o.order_date)}</span>
+                      {b2b && o.customer_name && <span className="text-fuchsia-200/80">for {o.customer_name}</span>}
+                      {o.customer_email && <span className="truncate">{o.customer_email}</span>}
+                      {o.customer_whatsapp && <span>{o.customer_whatsapp}</span>}
+                      <span>{invCounts[o.id] || 0} invoice{(invCounts[o.id] || 0) === 1 ? "" : "s"}</span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="font-bold">{fmtGBP(Number(o.amount_gbp))}</div>
+                    <div className={`text-[10px] mt-1 px-2 py-0.5 rounded-full ring-1 inline-block ${statusTone(o.status)}`}>{o.status}</div>
+                  </div>
+                </div>
+              </button>
+              <div className="mt-2 pt-2 border-t border-white/5 flex justify-end">
+                <button
+                  onClick={cancelOrder}
+                  disabled={cancelled}
+                  className="px-2.5 py-1 rounded-md text-[11px] font-semibold inline-flex items-center gap-1 bg-rose-500/10 hover:bg-rose-500/20 ring-1 ring-rose-400/30 text-rose-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  {cancelled ? "Cancelled" : "Cancel order"}
+                </button>
+              </div>
+            </div>
+          );
+        })
+      )}
       <OsOrderDrawer orderId={openId} open={!!openId} onClose={() => setOpenId(null)} onChanged={load} />
     </div>
   );
 }
+
+function SummaryStat({ label, value, sub, tone }: { label: string; value: number; sub?: string; tone: "white" | "blue" | "fuchsia" | "cyan" }) {
+  const toneMap: Record<string, string> = {
+    white: "text-white",
+    blue: "text-blue-200",
+    fuchsia: "text-fuchsia-200",
+    cyan: "text-cyan-200",
+  };
+  return (
+    <div className="os-glass p-3">
+      <div className="text-[10px] uppercase tracking-widest text-white/50">{label}</div>
+      <div className={`text-xl font-bold mt-1 ${toneMap[tone]}`}>{value}</div>
+      {sub && <div className="text-[10px] text-white/40 mt-0.5">{sub}</div>}
+    </div>
+  );
+}
+
 
 // ─────────────────────────── INVOICES ───────────────────────────
 function InvoicesTab({ userId, email }: { userId: string; email?: string | null }) {
