@@ -321,16 +321,17 @@ const CheckoutFlow = ({
   };
   const [form, setForm] = useState(() => ({ ...emptyForm, ...(draft?.form ?? {}) }));
 
-  // Prefill name/email from the logged-in user once auth resolves.
-  // IMPORTANT: for logged-in users we ALWAYS force the checkout email to
-  // match their authenticated account email. `generate-invoice` only links
-  // orders to `user_id` when these match (anti-spoofing), so any edit here
-  // would produce invisible orphan orders in the client portal.
+  // Prefill name/email from the logged-in user once auth resolves, BUT keep
+  // the fields editable. Portal owners (B2B/resellers) frequently place orders
+  // on behalf of their own end clients using the client's real name/email —
+  // the order still stays visible in the portal owner's account because
+  // `generate-invoice` records `placed_by_user_id` from the auth session
+  // regardless of what customer email is entered.
   useEffect(() => {
     if (!isAuthed) return;
     setForm((prev: any) => {
       const next = { ...prev };
-      if (authedEmail) next.email = authedEmail;
+      if (authedEmail && !prev.email) next.email = authedEmail;
       if (authedName && !prev.full_name) {
         next.full_name = authedName;
         if (!prev.first_name && !prev.last_name) {
