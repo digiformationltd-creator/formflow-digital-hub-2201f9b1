@@ -1475,6 +1475,66 @@ const CheckoutFlow = ({
                     </div>
                   )}
 
+                  {addressVerificationLink && (
+                    <div className="rounded-2xl bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-background border-2 border-blue-500/40 p-5 space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-blue-500 text-white grid place-items-center flex-shrink-0">
+                          <ShieldCheck className="w-6 h-6" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-base">Address Verification <span className="text-destructive">*</span></h4>
+                          <p className="text-xs opacity-75 mt-0.5">Required for all address-service orders — takes about 2 minutes.</p>
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl bg-background/60 border border-border/40 p-4 space-y-2.5">
+                        <p className="text-xs font-semibold uppercase tracking-wider opacity-70">What you'll do on the link:</p>
+                        <ol className="space-y-1.5 text-sm">
+                          <li className="flex gap-2.5"><span className="font-bold text-blue-500">1.</span><span><strong>Verify your identity</strong> — quick selfie + ID scan on your phone</span></li>
+                          <li className="flex gap-2.5"><span className="font-bold text-blue-500">2.</span><span><strong>Proof of residential address</strong> — upload a recent utility bill / bank statement</span></li>
+                        </ol>
+                      </div>
+
+                      {!addressVerificationRequested ? (
+                        <>
+                          <button
+                            type="button"
+                            disabled={!/\S+@\S+\.\S+/.test(form.email)}
+                            onClick={() => {
+                              if (!/\S+@\S+\.\S+/.test(form.email)) {
+                                toast({ title: "Enter your email first", description: "We need your email to send the verification link.", variant: "destructive" });
+                                return;
+                              }
+                              window.open(addressVerificationLink, "_blank", "noopener,noreferrer");
+                              setAddressVerificationRequested(true);
+                              toast({ title: "Address verification opened", description: "Complete the verification, then come back to continue your order." });
+                            }}
+                            className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-blue-500 text-white font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          >
+                            <Send className="w-4 h-4" /> Open Address Verification
+                          </button>
+                          <p className="text-xs text-center opacity-70">👆 Click here, then continue to the next step</p>
+                        </>
+                      ) : (
+                        <div className="rounded-xl bg-blue-500/15 border border-blue-500/40 p-4 space-y-2">
+                          <div className="flex items-center gap-2 text-blue-500 font-semibold text-sm">
+                            <CheckCircle2 className="w-5 h-5" /> Address verification opened
+                          </div>
+                          <p className="text-xs opacity-85 leading-relaxed">
+                            Complete the verification steps on the link (ID + proof of address). Once done, the <span className="font-semibold">Continue</span> button below will be enabled.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => window.open(addressVerificationLink, "_blank", "noopener,noreferrer")}
+                            className="text-xs font-semibold text-blue-500 hover:underline"
+                          >
+                            Open verification link again →
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
               </div>
             )}
 
