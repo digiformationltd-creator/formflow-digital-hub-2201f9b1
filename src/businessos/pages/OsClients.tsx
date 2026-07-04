@@ -52,21 +52,53 @@ export default function OsClients() {
     const baseClients: ClientRow[] = data?.clients || [];
     const { data: orders } = await supabase
       .from("client_orders")
-      .select("user_id, customer_email");
-    const counts = new Map<string, number>();
+      .select("user_id, customer_email, placed_by_user_id, managed_client_id");
+
     const emailToClient = new Map<string, string>();
     for (const client of baseClients) {
       if (client.email) emailToClient.set(client.email.toLowerCase(), client.user_id);
     }
+
+    const direct = new Map<string, number>();
+    const b2b = new Map<string, number>();
+    // Distinct managed-client identity per portal owner. Uses managed_client_id
+    // when present, otherwise falls back to the end-customer email so grouping
+    // still works for older rows.
+    const managed = new Map<string, Set<string>>();
+
     for (const order of orders || []) {
-      const clientId = order.user_id || (order.customer_email ? emailToClient.get(order.customer_email.toLowerCase()) : null);
-      if (clientId) counts.set(clientId, (counts.get(clientId) || 0) + 1);
+      const ownerId = order.placed_by_user_id || null;
+      const linkedId = order.user_id || (order.customer_email ? emailToClient.get(order.customer_email.toLowerCase()) : null);
+      const isB2B = !!ownerId && (
+        !!order.managed_client_id ||
+        (order.user_id && order.user_id !== ownerId) ||
+        (!order.user_id && (!linkedId || linkedId !== ownerId))
+      );
+
+      if (isB2B && ownerId) {
+        b2b.set(ownerId, (b2b.get(ownerId) || 0) + 1);
+        const key = order.managed_client_id || (order.customer_email || "").toLowerCase();
+        if (key) {
+          const set = managed.get(ownerId) || new Set<string>();
+          set.add(key);
+          managed.set(ownerId, set);
+        }
+      } else if (linkedId) {
+        direct.set(linkedId, (direct.get(linkedId) || 0) + 1);
+      }
     }
+
     const enriched = baseClients
-      .map((client) => ({ ...client, order_count: counts.get(client.user_id) || 0 }))
+      .map((client) => ({
+        ...client,
+        direct_order_count: direct.get(client.user_id) || 0,
+        b2b_order_count: b2b.get(client.user_id) || 0,
+        managed_client_count: managed.get(client.user_id)?.size || 0,
+      }))
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     setClients(enriched);
   };
+
 
   const loadManagedStats = async () => {
     const { data } = await supabase
