@@ -717,6 +717,9 @@ export default function OsOrders() {
         <div className="md:hidden space-y-3">
           {filtered.map((o) => {
             const cancelled = o.status === "Cancelled";
+            const b2b = isB2BOrder(o);
+            const owner = o.placed_by_user_id ? portalOwners[o.placed_by_user_id] : null;
+            const ownerLabel = owner?.full_name || owner?.company_name || owner?.email || (o.placed_by_user_id ? o.placed_by_user_id.slice(0, 8) : "");
             return (
             <div
               key={o.id}
@@ -724,7 +727,8 @@ export default function OsOrders() {
               role="button"
               tabIndex={0}
               className={`os-glass p-4 w-full text-left active:scale-[0.99] transition cursor-pointer ${
-                cancelled ? "border-l-2 border-l-rose-400/60 bg-rose-500/[0.04] opacity-75" : ""
+                cancelled ? "border-l-2 border-l-rose-400/60 bg-rose-500/[0.04] opacity-75" :
+                b2b ? "border-l-2 border-l-fuchsia-400/50" : ""
               }`}
             >
               <div className="flex items-start justify-between gap-3">
@@ -737,6 +741,11 @@ export default function OsOrders() {
                     <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider ${sourceChip(o.source)}`}>
                       {sourceLabel(o.source)}
                     </span>
+                    {b2b && (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-fuchsia-500/20 text-fuchsia-100 ring-1 ring-fuchsia-400/40 inline-flex items-center gap-1">
+                        <Building2 className="w-2.5 h-2.5" /> B2B
+                      </span>
+                    )}
                   </div>
                   <div className={`font-semibold truncate ${cancelled ? "line-through text-white/50" : ""}`}>{o.service}</div>
                   <div className="flex items-center gap-1.5 text-xs text-white/60 mt-1 truncate">
@@ -748,6 +757,12 @@ export default function OsOrders() {
                       <Mail className="w-3 h-3 shrink-0" /><span className="truncate">{o.customer_email}</span>
                     </div>
                   )}
+                  {b2b && ownerLabel && (
+                    <div className="flex items-center gap-1.5 text-[11px] text-fuchsia-200/90 mt-0.5 truncate">
+                      <Users className="w-3 h-3 shrink-0" /><span className="truncate">via {ownerLabel}</span>
+                    </div>
+                  )}
+
                 </div>
                 <div className="text-right shrink-0">
                   <div className="font-bold text-base">{fmtGBP(Number(o.amount_gbp))}</div>
