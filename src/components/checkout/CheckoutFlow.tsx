@@ -1651,6 +1651,8 @@ const Field = ({
   required,
   minLength,
   placeholder,
+  readOnly,
+  hint,
 }: {
   label: string;
   value: string;
@@ -1659,6 +1661,8 @@ const Field = ({
   required?: boolean;
   minLength?: number;
   placeholder?: string;
+  readOnly?: boolean;
+  hint?: string;
 }) => (
   <div>
     <label className="block text-sm font-medium mb-1.5">{label}</label>
@@ -1669,8 +1673,11 @@ const Field = ({
       required={required}
       minLength={minLength}
       placeholder={placeholder}
-      className="w-full px-4 py-2.5 rounded-xl bg-muted/30 border border-border/40 focus:border-primary outline-none text-sm"
+      readOnly={readOnly}
+      aria-readonly={readOnly || undefined}
+      className={`w-full px-4 py-2.5 rounded-xl bg-muted/30 border border-border/40 focus:border-primary outline-none text-sm ${readOnly ? "opacity-80 cursor-not-allowed" : ""}`}
     />
+    {hint && <p className="mt-1 text-[11px] opacity-60">{hint}</p>}
   </div>
 );
 
