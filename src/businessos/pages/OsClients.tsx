@@ -135,7 +135,7 @@ export default function OsClients() {
 
   const total = clients.length;
   const withCompany = clients.filter(c => c.company_name).length;
-  const totalOrders = clients.reduce((sum, client) => sum + (client.order_count || 0), 0);
+  const totalOrders = clients.reduce((sum, client) => sum + (client.direct_order_count || 0) + (client.b2b_order_count || 0), 0);
   const newThisMonth = clients.filter(c => {
     const d = new Date(c.created_at);
     const n = new Date();
