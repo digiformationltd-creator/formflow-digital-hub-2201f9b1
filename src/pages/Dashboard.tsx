@@ -83,6 +83,19 @@ const services = [
   { name: "EIN Number (US)", price: "$30", desc: "EIN registration with IRS for your US LLC", icon: FileText, link: "/usa-services/ein-number" },
 ];
 
+// Compact "Order New Services" shortcuts shown on the dashboard overview.
+// Keep this list short (5–6 items) — it's a quick launcher, not the full
+// catalogue. Each entry links straight to the public service page where the
+// client can see packages and start the checkout flow.
+const QUICK_ORDER_SERVICES: { name: string; blurb: string; link: string; icon: any }[] = [
+  { name: "Companies House ID Verification", blurb: "Verify your identity for Companies House", icon: ShieldCheck, link: "/uk-services/ltd-id-verification" },
+  { name: "UK Limited Company Registration", blurb: "Form a new UK Ltd company — pick a package", icon: Building2, link: "/uk-services/uk-ltd-formation" },
+  { name: "Registered Office Address", blurb: "Use our London address for your company", icon: MapPin, link: "/uk-services/registered-office-address" },
+  { name: "USA LLC Registration", blurb: "Start a US LLC — choose your state", icon: Globe, link: "/usa-services/us-llc-formation" },
+  { name: "Confirmation Statement Filing", blurb: "Annual confirmation statement to Companies House", icon: FileText, link: "/uk-compliance/confirmation-statement" },
+];
+
+
 const StatusBadge = ({ status }: { status: string }) => {
   const variant =
     status === "ACTIVE" || status === "Active" || status === "Completed"
