@@ -32,7 +32,17 @@ type Order = {
   order_date: string;
   created_at: string;
   notes: string | null;
+  placed_by_user_id?: string | null;
+  managed_client_id?: string | null;
 };
+
+type PortalOwner = {
+  user_id: string;
+  full_name: string | null;
+  email: string | null;
+  company_name: string | null;
+};
+
 
 type Invoice = {
   id: string;
