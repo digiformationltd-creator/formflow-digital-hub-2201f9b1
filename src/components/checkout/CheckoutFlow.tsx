@@ -196,6 +196,8 @@ const CheckoutFlow = ({
   showBusinessType = false,
   showCompanyName = false,
   companyNameOptional = false,
+  strictCompanyName = false,
+  addressVerificationLink,
   showServiceMode = false,
   showRole = false,
   hideBusinessActivity = false,
