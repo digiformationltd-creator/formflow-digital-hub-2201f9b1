@@ -1550,8 +1550,176 @@ const MyClientsSection = ({ rows, ownerEmail, ownerUserId, managedClients, focus
         </div>
       )}
     </div>
+    {dialogs}
+    </>
   );
 };
+
+// ---- B2B managed-client editor (create / edit) ----
+const ManagedClientEditor = ({
+  open, onOpenChange, ownerUserId, client, onSaved,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  ownerUserId: string;
+  client: ManagedClient | null;
+  onSaved: () => Promise<void> | void;
+}) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [company, setCompany] = useState("");
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setName(client?.name || "");
+    setEmail(client?.email || "");
+    setPhone(client?.phone || "");
+    setCompany(client?.company || "");
+    setNotes(client?.notes || "");
+  }, [open, client]);
+
+  const isEdit = !!client?.id;
+
+  const save = async () => {
+    const trimmedEmail = email.trim();
+    if (!name.trim() && !trimmedEmail) {
+      toast.error("Give the client at least a name or an email.");
+      return;
+    }
+    setSaving(true);
+    const payload: any = {
+      portal_owner_user_id: ownerUserId,
+      name: name.trim() || null,
+      email: trimmedEmail || null,
+      phone: phone.trim() || null,
+      company: company.trim() || null,
+      notes: notes.trim() || null,
+    };
+    const query = isEdit
+      ? (supabase as any).from("managed_clients").update(payload).eq("id", client!.id)
+      : (supabase as any).from("managed_clients").insert(payload);
+    const { error } = await query;
+    setSaving(false);
+    if (error) {
+      const msg = error.code === "23505"
+        ? "You already have a client with that email."
+        : (error.message || "Could not save client.");
+      toast.error(msg);
+      return;
+    }
+    toast.success(isEdit ? "Client updated." : "Client added.");
+    await onSaved();
+  };
+
+  const remove = async () => {
+    if (!client?.id) return;
+    if (!confirm("Delete this client? Their orders will remain in your account but will lose the client link.")) return;
+    setDeleting(true);
+    const { error } = await (supabase as any).from("managed_clients").delete().eq("id", client.id);
+    setDeleting(false);
+    if (error) { toast.error(error.message || "Delete failed"); return; }
+    toast.success("Client removed.");
+    await onSaved();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{isEdit ? "Edit client" : "Add client"}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label className="text-xs opacity-70">Name</Label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Client full name" className="mt-1.5" />
+          </div>
+          <div>
+            <Label className="text-xs opacity-70">Email</Label>
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="client@example.com" className="mt-1.5" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-xs opacity-70">Phone</Label>
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+44…" className="mt-1.5" />
+            </div>
+            <div>
+              <Label className="text-xs opacity-70">Company</Label>
+              <Input value={company} onChange={(e) => setCompany(e.target.value)} className="mt-1.5" />
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs opacity-70">Notes</Label>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="mt-1.5" />
+          </div>
+          <div className="flex items-center justify-between pt-2">
+            {isEdit ? (
+              <Button variant="ghost" size="sm" onClick={remove} disabled={deleting} className="text-destructive">
+                {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Trash2 className="w-4 h-4" /> Delete</>}
+              </Button>
+            ) : <span />}
+            <Button variant="hero" size="sm" className="rounded-full" onClick={save} disabled={saving}>
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Save className="w-4 h-4" /> Save</>}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// ---- Merge duplicate clients ----
+const MergeClientDialog = ({
+  open, onOpenChange, sourceId, candidates, onMerge,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  sourceId: string | null;
+  candidates: ManagedClient[];
+  onMerge: (targetId: string) => Promise<void> | void;
+}) => {
+  const [targetId, setTargetId] = useState<string>("");
+  useEffect(() => { if (open) setTargetId(""); }, [open]);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Merge into another client</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 text-sm">
+          <p className="opacity-70">
+            All orders from this client will move to the target client, then this duplicate entry will be removed.
+          </p>
+          <div>
+            <Label className="text-xs opacity-70">Target client</Label>
+            <select
+              value={targetId}
+              onChange={(e) => setTargetId(e.target.value)}
+              className="mt-1.5 w-full rounded-xl bg-muted/30 border border-border/40 px-3 py-2 text-sm"
+            >
+              <option value="">Select client…</option>
+              {candidates.map((c) => (
+                <option key={c.id!} value={c.id!}>
+                  {(c.name || c.email || "Unnamed client")}{c.email ? ` — ${c.email}` : ""} ({c.orders.length} order{c.orders.length === 1 ? "" : "s"})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button variant="hero" size="sm" className="rounded-full" disabled={!targetId || !sourceId} onClick={() => targetId && onMerge(targetId)}>
+              <Combine className="w-4 h-4" /> Merge
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 
 const ClientOrdersSection = ({ rows, onBrowse, ownerEmail, onOpenClient }: { rows: any[]; onBrowse: () => void; ownerEmail?: string; onOpenClient?: (email: string) => void }) => {
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
