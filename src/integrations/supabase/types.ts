@@ -377,6 +377,7 @@ export type Database = {
           order_date: string
           order_ref: string
           payment_status: string
+          placed_by_user_id: string | null
           preferred_contact_method: string | null
           service: string
           source: string
@@ -405,6 +406,7 @@ export type Database = {
           order_date?: string
           order_ref: string
           payment_status?: string
+          placed_by_user_id?: string | null
           preferred_contact_method?: string | null
           service: string
           source?: string
@@ -433,6 +435,7 @@ export type Database = {
           order_date?: string
           order_ref?: string
           payment_status?: string
+          placed_by_user_id?: string | null
           preferred_contact_method?: string | null
           service?: string
           source?: string
@@ -1168,6 +1171,7 @@ export type Database = {
           notes: string | null
           order_id: string | null
           pdf_url: string | null
+          placed_by_user_id: string | null
           service_code: string
           service_description: string
           status: string
@@ -1192,6 +1196,7 @@ export type Database = {
           notes?: string | null
           order_id?: string | null
           pdf_url?: string | null
+          placed_by_user_id?: string | null
           service_code?: string
           service_description: string
           status?: string
@@ -1216,6 +1221,7 @@ export type Database = {
           notes?: string | null
           order_id?: string | null
           pdf_url?: string | null
+          placed_by_user_id?: string | null
           service_code?: string
           service_description?: string
           status?: string
