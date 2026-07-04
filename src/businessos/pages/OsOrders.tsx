@@ -278,9 +278,32 @@ export default function OsOrders() {
       invoice_number: invMap.get(o.id)?.invoice_number ?? null,
       invoice_status: invMap.get(o.id)?.status ?? null,
     }));
+
+    // Resolve portal owners (placed_by_user_id) → profile info, so admins can
+    // see at a glance which DigiFormation client placed each B2B order.
+    const ownerIds = Array.from(
+      new Set(
+        merged
+          .map((o) => o.placed_by_user_id)
+          .filter((v): v is string => !!v),
+      ),
+    );
+    if (ownerIds.length) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, email, company_name")
+        .in("user_id", ownerIds);
+      const map: Record<string, PortalOwnerLite> = {};
+      for (const p of profs || []) map[p.user_id] = p as PortalOwnerLite;
+      setPortalOwners(map);
+    } else {
+      setPortalOwners({});
+    }
+
     setOrders(merged);
     setLoading(false);
   };
+
 
   useEffect(() => {
     load();
