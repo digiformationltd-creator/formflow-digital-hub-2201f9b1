@@ -282,6 +282,8 @@ const Dashboard = () => {
       setSubscriptions(subRows || []);
       setWalletRows(walletData || []);
       setTickets(ticketRows || []);
+      setManagedClients((managedRows as any[]) || []);
+
       setIsAdmin(user.email?.toLowerCase() === "info@digiformation.uk" || !!role);
       setLoading(false);
     })();
