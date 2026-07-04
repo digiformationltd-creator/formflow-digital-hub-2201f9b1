@@ -15,7 +15,7 @@ import {
   MapPin, ShoppingCart, Ticket, LifeBuoy, LogOut, UserCircle2,
   ChevronRight, Loader2, Inbox, Download, ArrowUpRight,
   LayoutDashboard,
-  Menu, ShieldCheck, Save, Trash2, ChevronDown, ArrowLeft, Home,
+  Menu, ShieldCheck, Save, Trash2, ChevronDown, ArrowLeft, Home, Plus, Pencil, Combine,
 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
