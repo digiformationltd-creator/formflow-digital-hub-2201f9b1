@@ -224,6 +224,7 @@ const Dashboard = () => {
         { data: ticketRows },
         { data: invRowsOwn },
         { data: invRowsOrphan },
+        { data: managedRows },
       ] = await Promise.all([
         supabase.from("profiles").select("full_name,email,phone,company_name,avatar_initials").eq("user_id", user.id).maybeSingle(),
         supabase.from("client_company_details").select("*").eq("user_id", user.id).order("created_at", { ascending: true }),
@@ -244,7 +245,9 @@ const Dashboard = () => {
         supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status")
           .or(`user_id.eq.${user.id},placed_by_user_id.eq.${user.id}`),
         supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status").is("user_id", null).is("placed_by_user_id", null).ilike("bill_to_email", emailLower),
+        (supabase as any).from("managed_clients").select("*").eq("portal_owner_user_id", user.id).order("created_at", { ascending: false }),
       ]);
+
       if (cancelled) return;
       // De-dupe & merge orders (owned + email-matched orphans) so repeat
       // purchases of the same service ALL appear as separate rows.
