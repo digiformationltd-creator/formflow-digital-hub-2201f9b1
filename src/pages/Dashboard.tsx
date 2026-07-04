@@ -1461,14 +1461,21 @@ const MyClientsSection = ({ rows, ownerEmail, ownerUserId, managedClients, focus
     });
 
   return (
+    <>
     <div className="space-y-4">
-      <div className="glass rounded-2xl p-5">
-        <h3 className="font-semibold">B2B / Managed Clients</h3>
-        <p className="text-xs opacity-70 mt-1">
-          Every order you place from your portal on behalf of another customer is grouped here.
-          Open a client to see their full profile, orders, invoices and status tracking — all inside your own account.
-        </p>
+      <div className="glass rounded-2xl p-5 flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h3 className="font-semibold">B2B / Managed Clients</h3>
+          <p className="text-xs opacity-70 mt-1">
+            Every order you place from your portal on behalf of another customer is grouped here.
+            Open a client to see their full profile, orders, invoices and status tracking — all inside your own account.
+          </p>
+        </div>
+        <Button variant="hero" size="sm" className="rounded-full shrink-0" onClick={openCreate}>
+          <Plus className="w-4 h-4" /> Add client
+        </Button>
       </div>
+
 
       {/* Toolbar */}
       <div className="glass rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row gap-3">
