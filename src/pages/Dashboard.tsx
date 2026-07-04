@@ -535,7 +535,48 @@ const Dashboard = () => {
               )}
 
 
+              {/* Order New Services — compact shortcut launcher */}
+              <div className="glass rounded-2xl p-5 sm:p-6">
+                <div className="flex items-center justify-between mb-4 gap-3">
+                  <div className="min-w-0">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <ShoppingCart className="w-4 h-4 opacity-80" />
+                      Order New Services
+                    </h3>
+                    <p className="text-xs opacity-60 mt-0.5">Jump straight to a service page to view packages and place an order.</p>
+                  </div>
+                  <button
+                    onClick={() => setActive("newServices")}
+                    className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1 shrink-0"
+                  >
+                    All services <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {QUICK_ORDER_SERVICES.map((s) => {
+                    const Icon = s.icon;
+                    return (
+                      <Link
+                        key={s.name}
+                        to={s.link}
+                        className="group rounded-xl bg-muted/20 hover:bg-muted/40 transition p-4 flex items-start gap-3 text-left"
+                      >
+                        <div className="rounded-lg bg-primary/10 text-primary p-2 shrink-0">
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold text-sm truncate">{s.name}</div>
+                          <div className="text-[11px] opacity-70 mt-0.5 line-clamp-2">{s.blurb}</div>
+                        </div>
+                        <ArrowUpRight className="w-4 h-4 opacity-40 group-hover:opacity-100 transition shrink-0" />
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+
               <div className="grid sm:grid-cols-2 gap-4">
+
                 <button onClick={() => setActive("newServices")} className="glass rounded-2xl p-6 text-left hover:shadow-glow transition">
                   <ShoppingCart className="w-6 h-6 opacity-80 mb-2" />
                   <div className="font-semibold">Order New Services</div>
