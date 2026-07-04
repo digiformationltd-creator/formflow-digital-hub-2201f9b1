@@ -321,16 +321,17 @@ const CheckoutFlow = ({
   };
   const [form, setForm] = useState(() => ({ ...emptyForm, ...(draft?.form ?? {}) }));
 
-  // Prefill name/email from the logged-in user once auth resolves.
-  // IMPORTANT: for logged-in users we ALWAYS force the checkout email to
-  // match their authenticated account email. `generate-invoice` only links
-  // orders to `user_id` when these match (anti-spoofing), so any edit here
-  // would produce invisible orphan orders in the client portal.
+  // Prefill name/email from the logged-in user once auth resolves, BUT keep
+  // the fields editable. Portal owners (B2B/resellers) frequently place orders
+  // on behalf of their own end clients using the client's real name/email —
+  // the order still stays visible in the portal owner's account because
+  // `generate-invoice` records `placed_by_user_id` from the auth session
+  // regardless of what customer email is entered.
   useEffect(() => {
     if (!isAuthed) return;
     setForm((prev: any) => {
       const next = { ...prev };
-      if (authedEmail) next.email = authedEmail;
+      if (authedEmail && !prev.email) next.email = authedEmail;
       if (authedName && !prev.full_name) {
         next.full_name = authedName;
         if (!prev.first_name && !prev.last_name) {
@@ -1156,13 +1157,12 @@ const CheckoutFlow = ({
                   <Field label="First name" value={form.first_name} onChange={(v) => setForm({ ...form, first_name: v, full_name: `${v} ${form.last_name}`.trim() })} required minLength={2} />
                   <Field label="Last name" value={form.last_name} onChange={(v) => setForm({ ...form, last_name: v, full_name: `${form.first_name} ${v}`.trim() })} required minLength={2} />
                   <Field
-                    label={isAuthed ? "Email (signed-in account)" : "Email"}
+                    label={isAuthed ? "Customer email" : "Email"}
                     type="email"
                     value={form.email}
                     onChange={(v) => setForm({ ...form, email: v })}
                     required
-                    readOnly={isAuthed && !!authedEmail}
-                    hint={isAuthed && !!authedEmail ? "Locked to your account so this order attaches to your portal." : undefined}
+                    hint={isAuthed ? "Placing this order for one of your own clients? Enter their email — the order stays in your portal under My Clients." : undefined}
                   />
                   <Field label={whatsappLabel} value={form.whatsapp} onChange={(v) => setForm({ ...form, whatsapp: v })} required minLength={5} placeholder={whatsappPlaceholder} />
                   {showSeparateWhatsapp && (
