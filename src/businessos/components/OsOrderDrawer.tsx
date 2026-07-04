@@ -240,7 +240,7 @@ export default function OsOrderDrawer({
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto bg-slate-950/95 border-l border-white/10 text-white">
+      <SheetContent side="right" className="w-full sm:max-w-xl lg:max-w-2xl overflow-y-auto overflow-x-hidden bg-slate-950/95 border-l border-white/10 text-white [&>*]:min-w-0">
         <SheetHeader>
           <SheetTitle className="text-white flex items-center gap-2 text-base">
             <Hash className="w-4 h-4" />
