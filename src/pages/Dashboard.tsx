@@ -1317,10 +1317,12 @@ const MyClientsSection = ({ rows, ownerEmail, ownerUserId, managedClients, focus
     };
 
     return (
+      <>
       <div className="space-y-5">
         <button onClick={() => setSelectedKey(null)} className="inline-flex items-center gap-1.5 text-sm opacity-80 hover:opacity-100">
           <ArrowLeft className="w-4 h-4" /> Back to My Clients
         </button>
+
 
         {/* Client summary */}
         <div className="glass rounded-2xl p-5 sm:p-6">
