@@ -428,6 +428,37 @@ const Dashboard = () => {
                 })}
               </div>
 
+
+              {orders.length > 0 && (
+                <div className="glass rounded-2xl p-5 sm:p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="font-semibold">Recent orders</h3>
+                      <p className="text-xs opacity-60 mt-0.5">Your latest {Math.min(orders.length, 5)} of {orders.length} order{orders.length === 1 ? "" : "s"}.</p>
+                    </div>
+                    <button onClick={() => setActive("orders")} className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1">
+                      View all <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {orders.slice(0, 5).map((o) => (
+                      <button
+                        key={o.id}
+                        onClick={() => setActive("orders")}
+                        className="w-full flex items-center justify-between gap-3 rounded-xl bg-muted/20 hover:bg-muted/30 transition px-3 py-2.5 text-left"
+                      >
+                        <div className="min-w-0">
+                          <div className="font-mono text-xs text-primary">{o.order_ref || "—"}</div>
+                          <div className="text-sm truncate">{o.service}</div>
+                          <div className="text-[11px] opacity-60">{o.order_date || (o.created_at ? new Date(o.created_at).toLocaleDateString() : "")} • {formatGBP(Number(o.amount_gbp || 0))}</div>
+                        </div>
+                        <StatusBadge status={o.status} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="grid sm:grid-cols-2 gap-4">
                 <button onClick={() => setActive("newServices")} className="glass rounded-2xl p-6 text-left hover:shadow-glow transition">
                   <ShoppingCart className="w-6 h-6 opacity-80 mb-2" />
