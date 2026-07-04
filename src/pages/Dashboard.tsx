@@ -1013,6 +1013,149 @@ const stageIndex = (status: string) => {
   return 0;
 };
 
+/* ---- B2B / My Clients ----
+ * A portal owner (e.g. a reseller placing orders for their own customers)
+ * sees every order they submitted grouped by the end-customer email. Clicking
+ * a client card drills into a per-client order list with status tracking and
+ * invoice download.
+ */
+interface ManagedClient {
+  key: string;              // customer_email (lowercased) or fallback
+  email: string | null;
+  name: string | null;
+  phone: string | null;
+  country: string | null;
+  orders: any[];
+  totalGbp: number;
+  lastDate: string;
+  statuses: { pending: number; inProgress: number; completed: number };
+}
+
+const buildManagedClients = (rows: any[], ownerEmail: string): ManagedClient[] => {
+  const map = new Map<string, ManagedClient>();
+  for (const o of rows) {
+    const email = (o.customer_email || "").toLowerCase().trim();
+    if (!email || email === ownerEmail) continue; // skip self-orders
+    const key = email;
+    let c = map.get(key);
+    if (!c) {
+      c = {
+        key,
+        email: o.customer_email || null,
+        name: o.customer_name || null,
+        phone: o.customer_whatsapp || o.customer_phone_e164 || null,
+        country: o.country_code || null,
+        orders: [],
+        totalGbp: 0,
+        lastDate: o.order_date || o.created_at || "",
+        statuses: { pending: 0, inProgress: 0, completed: 0 },
+      };
+      map.set(key, c);
+    }
+    c.orders.push(o);
+    c.totalGbp += Number(o.amount_gbp || 0);
+    const d = o.order_date || o.created_at || "";
+    if (d > c.lastDate) c.lastDate = d;
+    const s = (o.status || "").toLowerCase();
+    if (s === "completed") c.statuses.completed++;
+    else if (s === "in progress" || s === "in-progress") c.statuses.inProgress++;
+    else c.statuses.pending++;
+    if (!c.name && o.customer_name) c.name = o.customer_name;
+    if (!c.phone && (o.customer_whatsapp || o.customer_phone_e164)) c.phone = o.customer_whatsapp || o.customer_phone_e164;
+  }
+  return Array.from(map.values()).sort((a, b) => (b.lastDate || "").localeCompare(a.lastDate || ""));
+};
+
+const MyClientsSection = ({ rows, ownerEmail }: { rows: any[]; ownerEmail: string }) => {
+  const clients = buildManagedClients(rows, ownerEmail);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
+
+  if (clients.length === 0) {
+    return (
+      <EmptyState
+        icon={UserCircle2}
+        title="No B2B clients yet"
+        description="When you place an order for someone else (a different customer email/name than your own account), that end client will appear here with their own order history."
+      />
+    );
+  }
+
+  const selected = selectedKey ? clients.find((c) => c.key === selectedKey) : null;
+
+  if (selected) {
+    return (
+      <div className="space-y-4">
+        <button onClick={() => setSelectedKey(null)} className="inline-flex items-center gap-1.5 text-sm opacity-80 hover:opacity-100">
+          <ArrowLeft className="w-4 h-4" /> Back to My Clients
+        </button>
+        <div className="glass rounded-2xl p-5 sm:p-6">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <h3 className="text-lg font-semibold">{selected.name || selected.email}</h3>
+              <div className="text-sm opacity-70 mt-0.5">{selected.email}</div>
+              {selected.phone && <div className="text-xs opacity-60 mt-0.5">{selected.phone}</div>}
+            </div>
+            <div className="text-right">
+              <div className="text-[11px] uppercase tracking-widest opacity-60">Total billed</div>
+              <div className="text-lg font-semibold">{fmt(selected.totalGbp)}</div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-3">
+            {selected.statuses.pending > 0 && <Badge variant="secondary">Pending: {selected.statuses.pending}</Badge>}
+            {selected.statuses.inProgress > 0 && <Badge variant="outline">In Progress: {selected.statuses.inProgress}</Badge>}
+            {selected.statuses.completed > 0 && <Badge>Completed: {selected.statuses.completed}</Badge>}
+          </div>
+        </div>
+        <ClientOrdersSection rows={selected.orders} ownerEmail={ownerEmail} onBrowse={() => {}} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="glass rounded-2xl p-5">
+        <h3 className="font-semibold">B2B / Managed Clients</h3>
+        <p className="text-xs opacity-70 mt-1">
+          Every order you place from your portal on behalf of another customer is grouped here.
+          You keep full tracking, status updates and invoices for each of your clients — all inside your own account.
+        </p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {clients.map((c) => (
+          <button
+            key={c.key}
+            onClick={() => setSelectedKey(c.key)}
+            className="glass rounded-2xl p-4 text-left hover:shadow-glow transition"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="font-semibold truncate">{c.name || c.email}</div>
+                <div className="text-xs opacity-70 truncate">{c.email}</div>
+                {c.phone && <div className="text-[11px] opacity-60 mt-0.5 truncate">{c.phone}</div>}
+              </div>
+              <ChevronRight className="w-4 h-4 opacity-50 shrink-0 mt-1" />
+            </div>
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/40">
+              <div className="text-xs">
+                <span className="font-semibold">{c.orders.length}</span>
+                <span className="opacity-60"> order{c.orders.length === 1 ? "" : "s"}</span>
+                <span className="opacity-40"> • </span>
+                <span className="opacity-70">{fmt(c.totalGbp)}</span>
+              </div>
+              <div className="flex gap-1">
+                {c.statuses.pending > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300">{c.statuses.pending}P</span>}
+                {c.statuses.inProgress > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300">{c.statuses.inProgress}IP</span>}
+                {c.statuses.completed > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300">{c.statuses.completed}C</span>}
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const ClientOrdersSection = ({ rows, onBrowse, ownerEmail }: { rows: any[]; onBrowse: () => void; ownerEmail?: string }) => {
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
   const [selected, setSelected] = useState<any | null>(null);
