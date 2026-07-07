@@ -477,7 +477,8 @@ const CheckoutFlow = ({
         (hideBusinessActivity || (form.business_category === "Other"
           ? form.business_other.trim().length >= 10
           : form.business_subcategory.trim().length > 0)) &&
-        (!(idVerificationActive && liveSelfieLink) || verificationLinkRequested) &&
+        // ID verification live selfie link is optional — clients often complete it out-of-band
+        // via a link we send them manually. Continue is always allowed without opening it.
         (!addressVerificationLink || addressVerificationRequested) &&
         (!(showServiceMode && serviceMode === "ltd-only") || form.personal_code.trim().length >= 8) &&
         (!showDateOfBirth || form.date_of_birth.trim().length >= 8) &&
@@ -1460,8 +1461,8 @@ const CheckoutFlow = ({
                             <CheckCircle2 className="w-5 h-5" /> Verification link opened
                           </div>
                           <p className="text-xs opacity-85 leading-relaxed">
-                            Complete both <span className="font-semibold">steps</span> on the verification link and upload the requested documents (live selfie and passport/ID scan).
-                            Once done, the <span className="font-semibold">Continue</span> button below will be enabled — then continue to review and place your order.
+                            Complete both <span className="font-semibold">steps</span> on the verification link when you're ready (live selfie + passport/ID scan).
+                            You can also continue placing your order now — if you've already verified with us earlier via a link we sent you, no need to redo it.
                           </p>
                           <button
                             type="button"
