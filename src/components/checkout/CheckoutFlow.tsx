@@ -477,7 +477,8 @@ const CheckoutFlow = ({
         (hideBusinessActivity || (form.business_category === "Other"
           ? form.business_other.trim().length >= 10
           : form.business_subcategory.trim().length > 0)) &&
-        (!(idVerificationActive && liveSelfieLink) || verificationLinkRequested) &&
+        // ID verification live selfie link is optional — clients often complete it out-of-band
+        // via a link we send them manually. Continue is always allowed without opening it.
         (!addressVerificationLink || addressVerificationRequested) &&
         (!(showServiceMode && serviceMode === "ltd-only") || form.personal_code.trim().length >= 8) &&
         (!showDateOfBirth || form.date_of_birth.trim().length >= 8) &&
