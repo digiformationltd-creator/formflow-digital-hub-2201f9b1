@@ -207,6 +207,8 @@ Deno.serve(async (req) => {
     const ALLOWED_URL_HOSTS = new Set([
       'digiformation.uk',
       'www.digiformation.uk',
+      'digiformation.co.uk',
+      'www.digiformation.co.uk',
       'formflow-digital-hub.lovable.app',
     ])
     const URL_FIELDS = ['loginUrl', 'invoiceUrl', 'liveSelfieLink', 'invoice_url', 'login_url']
