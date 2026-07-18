@@ -10,11 +10,11 @@ const SITE_NAME = "Digiformation Ltd"
 // SENDER_DOMAIN is the verified sender subdomain FQDN (e.g., "notify.example.com").
 // It MUST match the subdomain delegated to Lovable's nameservers — never the root domain.
 // The email API looks up this exact domain; a mismatch causes "No email domain record found".
-const SENDER_DOMAIN = "sender.digiformation.uk"
+const SENDER_DOMAIN = "notify.digiformation.co.uk"
 // FROM_DOMAIN must align with SENDER_DOMAIN (same registered domain or a parent).
-// SENDER_DOMAIN is a subdomain of digiformation.uk, so the From address can
-// use the root digiformation.uk — this lets clients see info@digiformation.uk.
-const FROM_DOMAIN = "digiformation.uk"
+// SENDER_DOMAIN is a subdomain of digiformation.co.uk, so the From address can
+// use the root digiformation.co.uk — this lets clients see info@digiformation.co.uk.
+const FROM_DOMAIN = "digiformation.co.uk"
 // FROM_EMAIL is the full address shown to recipients in the From: header.
 const FROM_EMAIL = `info@${FROM_DOMAIN}`
 
@@ -207,6 +207,8 @@ Deno.serve(async (req) => {
     const ALLOWED_URL_HOSTS = new Set([
       'digiformation.uk',
       'www.digiformation.uk',
+      'digiformation.co.uk',
+      'www.digiformation.co.uk',
       'formflow-digital-hub.lovable.app',
     ])
     const URL_FIELDS = ['loginUrl', 'invoiceUrl', 'liveSelfieLink', 'invoice_url', 'login_url']
