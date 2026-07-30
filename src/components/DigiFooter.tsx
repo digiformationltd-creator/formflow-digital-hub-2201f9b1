@@ -34,9 +34,9 @@ const DigiFooter = () => {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     name: "Digiformation Ltd",
-    url: "https://digiformation.uk",
-    logo: "https://digiformation.uk/logo.png",
-    email: "Info@digiformation.uk",
+    url: "https://digiformation.co.uk",
+    logo: "https://digiformation.co.uk/logo.png",
+    email: "info@digiformation.co.uk",
     telephone: "+92 316 446 7464",
     priceRange: "££",
     address: {
@@ -58,7 +58,7 @@ const DigiFooter = () => {
       {
         "@type": "ContactPoint",
         contactType: "customer support",
-        email: "Info@digiformation.uk",
+        email: "info@digiformation.co.uk",
         telephone: "+92 316 446 7464",
         availableLanguage: ["English", "Urdu"],
       },
@@ -167,8 +167,8 @@ const DigiFooter = () => {
           <ul className="space-y-3 text-sm">
             <li className="flex items-start gap-3">
               <Mail className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-              <a href="mailto:Info@digiformation.uk" className="hover:text-primary transition break-all">
-                Info@digiformation.uk
+              <a href="mailto:info@digiformation.co.uk" className="hover:text-primary transition break-all">
+                info@digiformation.co.uk
               </a>
             </li>
             <li className="flex items-start gap-3">
