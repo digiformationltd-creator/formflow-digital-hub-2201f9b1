@@ -64,8 +64,8 @@ const COMPANY = {
   name: "Digiformation Ltd",
   phoneUk: "+44 7438 351454",
   phonePk: "+92 316 4467464",
-  email: "info@digiformation.uk",
-  website: "www.digiformation.uk",
+  email: "info@digiformation.co.uk",
+  website: "www.digiformation.co.uk",
 };
 
 const INK: [number, number, number] = [20, 20, 20];
