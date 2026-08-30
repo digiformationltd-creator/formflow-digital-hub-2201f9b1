@@ -290,13 +290,36 @@ const Dashboard = () => {
     navigate("/", { replace: true });
   };
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background grid place-items-center">
         <Loader2 className="w-8 h-8 animate-spin opacity-60" />
       </div>
     );
   }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background grid place-items-center px-6">
+        <div className="max-w-md w-full text-center rounded-2xl border border-border/40 bg-card/40 backdrop-blur p-8">
+          <h1 className="text-2xl font-semibold mb-2">Client Dashboard</h1>
+          <p className="text-sm opacity-70 mb-6">
+            You're browsing as a guest. Orders, invoices and documents are tied to an account,
+            so sign in to see your own data.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button variant="hero" className="rounded-full" onClick={() => navigate("/auth")}>
+              Sign in
+            </Button>
+            <Button variant="outline" className="rounded-full" onClick={() => navigate("/")}>
+              Back to site
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
 
   const initials = profile?.avatar_initials || (profile?.full_name?.slice(0, 2) || user.email?.slice(0, 2) || "U").toUpperCase();
   const displayName = profile?.full_name?.trim() || user.email?.split("@")[0] || "Client";
