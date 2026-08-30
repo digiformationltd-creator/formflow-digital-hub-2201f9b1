@@ -193,6 +193,28 @@ const Auth = () => {
     setShowForgot(false);
   };
 
+  const handleMagicLink = async () => {
+    const input = document.getElementById("si-email") as HTMLInputElement | null;
+    const ev = emailSchema.safeParse(input?.value || "");
+    if (!ev.success) return toast.error("Enter your email first, then tap the link button.");
+
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOtp({
+      email: ev.data,
+      options: {
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+        shouldCreateUser: false,
+      },
+    });
+    setLoading(false);
+    if (error) {
+      return toast.error("Login link could not be sent. Please try again in a minute.");
+    }
+    toast.success("Login link sent — check your inbox and open it on this device.");
+  };
+
+
+
   return (
     <div className="min-h-screen bg-gradient-hero grid-pattern flex flex-col">
       <div className="container mx-auto px-4 pt-3 pb-2">
@@ -302,7 +324,18 @@ const Auth = () => {
                       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserCircle2 className="w-4 h-4" />}
                       Sign In to Dashboard
                     </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full rounded-full"
+                      disabled={loading}
+                      onClick={handleMagicLink}
+                    >
+                      <Mail className="w-4 h-4" />
+                      Email me a login link (no password)
+                    </Button>
                   </form>
+
                 )}
               </TabsContent>
 
