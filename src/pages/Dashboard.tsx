@@ -155,41 +155,22 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    let authenticatedOnce = false;
-
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") {
         navigate("/reset-password", { replace: true });
         return;
       }
       if (event === "SIGNED_OUT") {
-        // Refresh-storms / 429 / cross-tab races can fire spurious SIGNED_OUT
-        // events on desktop. Verify the session is truly gone across 3 checks
-        // spread over ~6s before redirecting — autoRefreshToken often recovers
-        // the session within that window.
-        const delays = [500, 2000, 4000];
-        (async () => {
-          for (const d of delays) {
-            await new Promise((r) => setTimeout(r, d));
-            const { data } = await supabase.auth.getSession();
-            if (data.session) return; // recovered — keep user on page
-          }
-          setUser(null);
-          navigate("/auth", { replace: true });
-        })();
+        // No auth wall on the dashboard: stay on the page as a guest.
+        setUser(null);
+        setLoading(false);
         return;
       }
-      // Handle initial session + sign in. INITIAL_SESSION always fires once on mount,
-      // so we don't need a separate getSession() call (which would cause duplicate refreshes).
       if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
         if (!session) {
           recoverSession().then(({ session: recovered }) => {
-            if (recovered) {
-              authenticatedOnce = true;
-              setUser(recovered.user);
-            } else if (!authenticatedOnce) {
-              navigate("/auth", { replace: true });
-            }
+            if (recovered) setUser(recovered.user);
+            else setLoading(false);
           });
           return;
         }
@@ -197,7 +178,6 @@ const Dashboard = () => {
           navigate("/admin", { replace: true });
           return;
         }
-        authenticatedOnce = true;
         setUser((prev) => (prev?.id === session.user.id ? prev : session.user));
       }
     });
@@ -206,6 +186,7 @@ const Dashboard = () => {
       sub.subscription.unsubscribe();
     };
   }, [navigate]);
+
 
   const reloadManagedClients = async () => {
     if (!user) return;
@@ -309,13 +290,36 @@ const Dashboard = () => {
     navigate("/", { replace: true });
   };
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background grid place-items-center">
         <Loader2 className="w-8 h-8 animate-spin opacity-60" />
       </div>
     );
   }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background grid place-items-center px-6">
+        <div className="max-w-md w-full text-center rounded-2xl border border-border/40 bg-card/40 backdrop-blur p-8">
+          <h1 className="text-2xl font-semibold mb-2">Client Dashboard</h1>
+          <p className="text-sm opacity-70 mb-6">
+            You're browsing as a guest. Orders, invoices and documents are tied to an account,
+            so sign in to see your own data.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button variant="hero" className="rounded-full" onClick={() => navigate("/auth")}>
+              Sign in
+            </Button>
+            <Button variant="outline" className="rounded-full" onClick={() => navigate("/")}>
+              Back to site
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
 
   const initials = profile?.avatar_initials || (profile?.full_name?.slice(0, 2) || user.email?.slice(0, 2) || "U").toUpperCase();
   const displayName = profile?.full_name?.trim() || user.email?.split("@")[0] || "Client";
