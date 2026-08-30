@@ -324,7 +324,18 @@ const Auth = () => {
                       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserCircle2 className="w-4 h-4" />}
                       Sign In to Dashboard
                     </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full rounded-full"
+                      disabled={loading}
+                      onClick={handleMagicLink}
+                    >
+                      <Mail className="w-4 h-4" />
+                      Email me a login link (no password)
+                    </Button>
                   </form>
+
                 )}
               </TabsContent>
 
