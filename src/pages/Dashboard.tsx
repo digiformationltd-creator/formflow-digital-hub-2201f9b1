@@ -155,41 +155,22 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    let authenticatedOnce = false;
-
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY") {
         navigate("/reset-password", { replace: true });
         return;
       }
       if (event === "SIGNED_OUT") {
-        // Refresh-storms / 429 / cross-tab races can fire spurious SIGNED_OUT
-        // events on desktop. Verify the session is truly gone across 3 checks
-        // spread over ~6s before redirecting — autoRefreshToken often recovers
-        // the session within that window.
-        const delays = [500, 2000, 4000];
-        (async () => {
-          for (const d of delays) {
-            await new Promise((r) => setTimeout(r, d));
-            const { data } = await supabase.auth.getSession();
-            if (data.session) return; // recovered — keep user on page
-          }
-          setUser(null);
-          navigate("/auth", { replace: true });
-        })();
+        // No auth wall on the dashboard: stay on the page as a guest.
+        setUser(null);
+        setLoading(false);
         return;
       }
-      // Handle initial session + sign in. INITIAL_SESSION always fires once on mount,
-      // so we don't need a separate getSession() call (which would cause duplicate refreshes).
       if (event === "INITIAL_SESSION" || event === "SIGNED_IN") {
         if (!session) {
           recoverSession().then(({ session: recovered }) => {
-            if (recovered) {
-              authenticatedOnce = true;
-              setUser(recovered.user);
-            } else if (!authenticatedOnce) {
-              navigate("/auth", { replace: true });
-            }
+            if (recovered) setUser(recovered.user);
+            else setLoading(false);
           });
           return;
         }
@@ -197,7 +178,6 @@ const Dashboard = () => {
           navigate("/admin", { replace: true });
           return;
         }
-        authenticatedOnce = true;
         setUser((prev) => (prev?.id === session.user.id ? prev : session.user));
       }
     });
@@ -206,6 +186,7 @@ const Dashboard = () => {
       sub.subscription.unsubscribe();
     };
   }, [navigate]);
+
 
   const reloadManagedClients = async () => {
     if (!user) return;
