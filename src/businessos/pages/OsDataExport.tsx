@@ -23,10 +23,9 @@ function csvCell(value: any) {
 
 function toCsv(rows: any[]) {
   if (!rows.length) return "";
-  const cols = Array.from(rows.reduce((set: Set<string>, r) => {
-    Object.keys(r ?? {}).forEach((k) => set.add(k));
-    return set;
-  }, new Set<string>()));
+  const set = new Set<string>();
+  for (const r of rows) Object.keys(r ?? {}).forEach((k) => set.add(k));
+  const cols: string[] = Array.from(set);
   const lines = [cols.join(",")];
   for (const r of rows) lines.push(cols.map((c) => csvCell(r?.[c])).join(","));
   return lines.join("\n");
