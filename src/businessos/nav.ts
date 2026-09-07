@@ -40,5 +40,12 @@ export const NAV: NavItem[] = [
   },
   { label: "Growth Intelligence", to: "/admin/attribution",     icon: Sparkles,        glow: "purple" },
   { label: "Support",             to: "/admin/support",         icon: LifeBuoy,        glow: "red" },
-  { label: "Settings",            to: "/admin/settings",        icon: Settings,        glow: "blue" },
+  {
+    label: "Settings", to: "/admin/settings", icon: Settings, glow: "blue",
+    children: [
+      { label: "General",         to: "/admin/settings" },
+      { label: "Services",        to: "/admin/settings/services" },
+      { label: "Export All Data", to: "/admin/settings/export" },
+    ],
+  },
 ];
