@@ -26,6 +26,7 @@ const OsAutomation = lazy(() => import("@/businessos/pages/OsAutomation"));
 const OsAutomationWorkflows = lazy(() => import("@/businessos/pages/OsAutomationWorkflows"));
 const OsAutomationJobs = lazy(() => import("@/businessos/pages/OsAutomationJobs"));
 const OsSettings = lazy(() => import("@/businessos/pages/OsSettings"));
+const OsDataExport = lazy(() => import("@/businessos/pages/OsDataExport"));
 const OsEmailMarketing = lazy(() => import("@/businessos/pages/OsEmailMarketing"));
 const OsAICommandCenter = lazy(() => import("@/businessos/pages/OsAICommandCenter"));
 const OsReminderCenter = lazy(() => import("@/businessos/pages/OsReminderCenter"));
@@ -82,6 +83,7 @@ export default function Admin() {
           <Route path="compliance" element={<OsCompliance />} />
           <Route path="settings" element={<OsSettings />} />
           <Route path="settings/services" element={<OsServices />} />
+          <Route path="settings/export" element={<OsDataExport />} />
           <Route path="help" element={<OsHelpCenter />} />
           {/* Legacy redirects-by-route for stability */}
           <Route path="services" element={<OsServices />} />
