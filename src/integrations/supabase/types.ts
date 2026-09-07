@@ -2706,6 +2706,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      list_public_tables: { Args: never; Returns: string[] }
       merge_managed_clients: {
         Args: { _source: string; _target: string }
         Returns: Json
