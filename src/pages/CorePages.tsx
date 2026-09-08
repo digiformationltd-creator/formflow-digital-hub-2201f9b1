@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { buildOrderRef } from "@/lib/orderRef";
+import { notifyDigibizCrm } from "@/lib/crmBridge";
 import {
   ArrowRight,
   CheckCircle2,
@@ -232,6 +233,10 @@ export const Contact = () => {
         declared: declaredSource,
       });
     }
+
+    // Mirror the enquiry into the Digibizverse desktop CRM (lead + ticket).
+    notifyDigibizCrm({ type: "ticket", subject: form.service || "Website enquiry", name: form.fullName, email: form.email, message: form.message });
+    notifyDigibizCrm({ type: "lead", name: form.fullName, email: form.email, phone: form.whatsapp, company: form.country, source: "website-contact", message: form.message });
 
     if (form.email) {
       supabase.functions.invoke("send-transactional-email", {

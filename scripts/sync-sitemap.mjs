@@ -3,8 +3,10 @@
 // AND refreshes <lastmod> on every <url>. Runs before `vite build`.
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const ROOT = path.resolve(new URL(".", import.meta.url).pathname, "..");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, "..");
 const BLOG_FILE = path.join(ROOT, "src", "data", "blog.ts");
 const SITEMAP = path.join(ROOT, "public", "sitemap.xml");
 const MARK_START = "  <!-- Blog Posts (auto-generated) -->";
