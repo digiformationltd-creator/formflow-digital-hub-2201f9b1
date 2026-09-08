@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { buildOrderRef } from "@/lib/orderRef";
+import { notifyDigibizCrm } from "@/lib/crmBridge";
 import { COUNTRIES } from "@/lib/countries";
 import { normalizePhoneToE164 } from "@/lib/phone";
 import { recordLeadAttribution, type DeclaredSource } from "@/lib/attribution";
@@ -728,6 +729,19 @@ const CheckoutFlow = ({
       entityType: "order",
       entityId: finalOrderRef,
       declared: declaredSource,
+    });
+
+    // Mirror this order into the Digibizverse desktop CRM (live order + report).
+    notifyDigibizCrm({
+      type: "order",
+      number: finalOrderRef,
+      title: `${serviceTitle}${packageName ? " — " + packageName : ""}`,
+      amount: total,
+      currency,
+      name: form.full_name,
+      email: form.email,
+      whatsapp: form.whatsapp,
+      notes: invoiceNumber ? `Invoice ${invoiceNumber}` : "",
     });
 
     const priceStr = formatMoney(total, currency);
