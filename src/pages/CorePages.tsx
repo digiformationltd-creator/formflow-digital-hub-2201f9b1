@@ -1538,7 +1538,7 @@ export const WebDevelopment = () => {
       "Conversion-focused business website development in 2026 — Shopify, WooCommerce, WordPress, custom React builds, landing pages and ongoing support. SEO-ready websites for founders in UK, USA, Pakistan, India, UAE & worldwide.",
       "business website development 2026, Shopify development, WordPress design, custom web development, ecommerce website worldwide, conversion landing pages"
     );
-    return injectJsonLd("web-faq-jsonld", {
+    const cleanupFaq = injectJsonLd("web-faq-jsonld", {
       "@context": "https://schema.org",
       "@type": "FAQPage",
       mainEntity: webFaqs.map((f) => ({
@@ -1547,6 +1547,26 @@ export const WebDevelopment = () => {
         acceptedAnswer: { "@type": "Answer", text: f.a },
       })),
     });
+
+    const cleanupService = injectJsonLd("web-service-jsonld", {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: "Business Website Development & E-commerce Engineering",
+      provider: {
+        "@type": "Organization",
+        name: "Digiformation Ltd",
+        url: "https://www.digiformation.co.uk",
+      },
+      serviceType: "Web Design, Shopify Stores, Custom React Development",
+      areaServed: ["GB", "US", "CA", "AU", "EU", "PK", "AE", "Worldwide"],
+      description:
+        "Conversion-focused business website development in 2026 — Shopify, WooCommerce, WordPress, custom React builds, landing pages and ongoing support.",
+    });
+
+    return () => {
+      cleanupFaq();
+      cleanupService();
+    };
   }, []);
 
   return (
