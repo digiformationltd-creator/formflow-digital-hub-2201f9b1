@@ -1481,7 +1481,7 @@ export const Blog = () => {
             <h3 className="font-display text-xl font-semibold mb-4">Helpful links</h3>
             <ul className="space-y-2 text-sm">
               <li><Link to="/faq" className="text-primary hover:underline">→ Read our FAQ for common questions</Link></li>
-              <li><Link to="/pricing" className="text-primary hover:underline">→ See transparent pricing for every service</Link></li>
+              <li><Link to="/packages" className="text-primary hover:underline">→ See transparent pricing for every service</Link></li>
               <li><Link to="/contact" className="text-primary hover:underline">→ Contact us for a free consultation</Link></li>
             </ul>
           </section>

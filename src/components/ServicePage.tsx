@@ -103,7 +103,7 @@ const ServicePage = ({ eyebrow, title, description, highlights, contactService, 
                 <Link to={primaryHref}>{primaryLabel} <ArrowRight className="w-4 h-4" /></Link>
               </Button>
               <Button asChild variant="ghostGlow" size="lg" className="rounded-full">
-                <Link to={catalog ? "/contact" : "/pricing"}>{catalog ? "Talk to us" : "View Pricing"}</Link>
+                <Link to={catalog ? "/contact" : "/packages"}>{catalog ? "Talk to us" : "View Pricing"}</Link>
               </Button>
             </div>
           </div>

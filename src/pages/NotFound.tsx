@@ -9,7 +9,7 @@ const popularLinks = [
   { label: "UK LTD Formation", href: "/uk-services/uk-ltd-formation" },
   { label: "USA LLC Formation", href: "/usa-services/us-llc-formation" },
   { label: "Banks & Payment Solutions", href: "/banks-payment-solutions" },
-  { label: "Pricing & Packages", href: "/pricing" },
+  { label: "Pricing & Packages", href: "/packages" },
   { label: "Contact Us", href: "/contact" },
   { label: "Read Our Blog", href: "/blog" },
 ];
