@@ -1227,6 +1227,10 @@ export default function SoftwareDevelopment() {
 
 const faqs = [
   {
+    q: "What is an AI agent and how does it differ from a traditional chatbot or automation?",
+    a: "An AI agent combines large language model reasoning with defined tools, system instructions, memory, and permissions to autonomously execute multi-step tasks (such as qualifying leads, fetching database records, calculating prices, and updating CRMs). In contrast, a traditional chatbot only returns pre-scripted text without tool actions, and traditional automation follows rigid hardcoded if-then rules without contextual understanding.",
+  },
+  {
     q: "What is the difference between custom CRM and custom ERP software?",
     a: "CRM (Customer Relationship Management) focuses externally on customer acquisition, lead capture, sales pipelines, communication threads (like WhatsApp), and client support. ERP (Enterprise Resource Planning) focuses internally on overall business operations—inventory tracking, order fulfillment, invoicing/accounting workflows, role-based security, and cross-department operations. DigiFormation designs both standalone systems and unified CRM+ERP platforms where a customer lead flows seamlessly into fulfillment and accounting.",
   },
