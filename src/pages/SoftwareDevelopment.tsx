@@ -1227,6 +1227,10 @@ export default function SoftwareDevelopment() {
 
 const faqs = [
   {
+    q: "What is agentic software and how does it automate complex business operations?",
+    a: "Agentic software refers to applications where autonomous or assistive AI agents are equipped with specialized tools, APIs, reasoning loops, and contextual memory to complete complex multi-step workflows with human oversight. Unlike static legacy software that only executes hardcoded rules, agentic software can dynamically interpret business instructions, query live databases, call external services (like WhatsApp, Stripe, or CRMs), and execute end-to-end operational workflows.",
+  },
+  {
     q: "What is an AI agent and how does it differ from a traditional chatbot or automation?",
     a: "An AI agent combines large language model reasoning with defined tools, system instructions, memory, and permissions to autonomously execute multi-step tasks (such as qualifying leads, fetching database records, calculating prices, and updating CRMs). In contrast, a traditional chatbot only returns pre-scripted text without tool actions, and traditional automation follows rigid hardcoded if-then rules without contextual understanding.",
   },
