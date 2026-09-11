@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "prebuild": "node scripts/sync-sitemap.mjs",
     "prebuild:dev": "node scripts/sync-sitemap.mjs",
-    "indexnow": "node scripts/submit-indexnow.mjs"
+    "indexnow": "node scripts/submit-indexnow.mjs",
+    "test:seo": "node scripts/seo-health-check.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
