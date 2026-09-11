@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, ShieldCheck, Building2, FileCheck, Lock, Users, Star } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Building2, FileCheck, Lock, Users, Star, Globe2, HelpCircle, FileText, BadgeCheck, AlertCircle } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import UKLtdHero from "@/components/hero-animations/UKLtdHero";
 import ServiceFAQ from "@/components/seo/ServiceFAQ";
 import RelatedServices from "@/components/seo/RelatedServices";
 import RecommendedGuides from "@/components/seo/RecommendedGuides";
+import { useSeo } from "@/lib/seo";
 
 const rotatingHeadlines = [
   { lead: "Register Your UK Limited Company in", accent: "Days" },
@@ -23,13 +24,61 @@ const trustSignals = [
 ];
 
 const whatYouGet = [
-  "Companies House incorporation",
-  "Digital & printed company documents",
-  "UTR registration",
-  "Company authentication code",
-  "Registered office & director service address",
-  "ID verification",
-  "Ongoing support",
+  "Official Companies House incorporation & certificate",
+  "Digital & printed Memorandum & Articles of Association",
+  "HMRC Corporation Tax UTR registration support",
+  "Official Company Authentication Code (WebFiling)",
+  "London Registered Office & Director Service Address",
+  "Companies House ID verification (ECCT Act compliant)",
+  "Digital share certificates & statutory register",
+  "Dedicated ongoing director & compliance guidance",
+];
+
+const formationSteps = [
+  {
+    step: "01",
+    title: "Select Jurisdiction & Package",
+    desc: "Choose England & Wales, Scotland, or Northern Ireland along with your formation package tailored to UK or non-resident founders.",
+  },
+  {
+    step: "02",
+    title: "Company Name & Identity Verification",
+    desc: "Submit your proposed company name and complete identity verification for directors and PSCs under the ECCT Act 2023.",
+  },
+  {
+    step: "03",
+    title: "Companies House Incorporation",
+    desc: "We prepare and submit your electronic incorporation documents directly to Companies House for official registration.",
+  },
+  {
+    step: "04",
+    title: "Receive Certificate & Statutory Documents",
+    desc: "Get your official Certificate of Incorporation, Memorandum & Articles of Association, and digital share certificates.",
+  },
+  {
+    step: "05",
+    title: "HMRC UTR, Banking & Gateway Support",
+    desc: "Receive your HMRC UTR number by mail at your registered office, and get guided onboarding for UK business bank accounts and payment gateways.",
+  },
+];
+
+const nonResidentBenefits = [
+  {
+    title: "100% Foreign Ownership",
+    desc: "No UK residency or citizenship required. Non-residents can hold 100% of company shares and act as sole director.",
+  },
+  {
+    title: "London Registered Office Included",
+    desc: "A prestigious UK registered office address to meet statutory Companies House and HMRC mail requirements.",
+  },
+  {
+    title: "Global Banking Guidance",
+    desc: "Assistance applying for business bank accounts with providers like Wise, Tide, and Airwallex (subject to provider approval).",
+  },
+  {
+    title: "International Payment Gateways",
+    desc: "Connect Stripe and PayPal to your UK Limited Company to accept global card payments seamlessly.",
+  },
 ];
 
 type Pkg = {
@@ -142,70 +191,34 @@ const UKLtdFormation = () => {
     }
   }, []);
 
-  useEffect(() => {
-    document.title = "UK LTD Formation — Register with Companies House";
-
-    const setMeta = (name: string, content: string, attr: "name" | "property" = "name") => {
-      let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
-      if (!el) {
-        el = document.createElement("meta");
-        el.setAttribute(attr, name);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", content);
-    };
-
-    const desc =
-      "Register your UK Limited Company quickly with Digiformation Ltd. Includes UTR, ID verification, registered office address, and full compliance support.";
-    setMeta("description", desc);
-    setMeta(
-      "keywords",
-      "uk ltd formation, register uk company, uk company registration, companies house registration, uk business setup, ltd formation services"
-    );
-    setMeta("og:title", "UK LTD Formation Services | Digiformation Ltd", "property");
-    setMeta("og:description", desc, "property");
-    setMeta("og:type", "website", "property");
-
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.setAttribute("rel", "canonical");
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute("href", "https://www.digiformation.co.uk/uk-services/uk-ltd-formation");
-
-    const schemaId = "ld-uk-ltd-formation";
-    document.getElementById(schemaId)?.remove();
-    const script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.id = schemaId;
-    script.text = JSON.stringify([
-      {
-        "@context": "https://schema.org",
-        "@type": "Service",
-        name: "UK LTD Formation",
-        provider: { "@type": "Organization", name: "Digiformation Ltd" },
-        areaServed: "GB",
-        description: desc,
-        offers: packages.map((p) => ({
-          "@type": "Offer",
-          name: `${p.name} Package`,
-          price: p.price.replace("£", ""),
-          priceCurrency: "GBP",
-        })),
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: `${window.location.origin}/` },
-          { "@type": "ListItem", position: 2, name: "UK Services", item: `${window.location.origin}/uk-services` },
-          { "@type": "ListItem", position: 3, name: "UK LTD Formation", item: `${window.location.origin}/uk-services/uk-ltd-formation` },
-        ],
-      },
-    ]);
-    document.head.appendChild(script);
-  }, []);
+  useSeo({
+    title: "UK LTD Formation Services 2026 — Register with Companies House | DigiFormation",
+    description:
+      "Fast, fully compliant UK Limited Company registration for UK & non-resident founders worldwide. Includes Companies House incorporation, UTR tax setup, registered office, ID verification & banking support.",
+    keywords:
+      "uk ltd formation, register uk company, uk company registration, companies house registration 2026, non resident uk company formation, uk ltd packages, london registered office, hmrc utr registration, director id verification",
+    path: "/uk-services/uk-ltd-formation",
+    breadcrumbs: [
+      { name: "Home", path: "/" },
+      { name: "UK Services", path: "/uk-services" },
+      { name: "UK LTD Formation", path: "/uk-services/uk-ltd-formation" },
+    ],
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: "UK LTD Formation Services",
+      provider: { "@type": "Organization", name: "Digiformation Ltd" },
+      areaServed: "Worldwide",
+      description:
+        "End-to-end UK Limited Company incorporation for UK and non-resident directors, including Companies House filing, UTR tax registration, registered office, and identity verification.",
+      offers: packages.map((p) => ({
+        "@type": "Offer",
+        name: `${p.name} Package`,
+        price: p.price.replace("£", ""),
+        priceCurrency: "GBP",
+      })),
+    },
+  });
 
   const current = rotatingHeadlines[headlineIdx];
 
@@ -341,6 +354,69 @@ const UKLtdFormation = () => {
         </div>
       </section>
 
+      {/* FORMATION PROCESS STEPS */}
+      <section className="py-14 border-t border-border/60 bg-muted/10">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <span className="text-xs uppercase tracking-[0.18em] font-semibold">How It Works</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold leading-tight">
+              UK LTD Formation <em className="not-italic text-gradient">in 5 Simple Steps</em>
+            </h2>
+            <p className="opacity-80 mt-3">
+              From application to incorporation and bank setup — our fully managed workflow.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-5">
+            {formationSteps.map((s) => (
+              <div key={s.step} className="glass glass-tint-green rounded-2xl p-6 flex flex-col justify-between">
+                <div>
+                  <div className="font-display text-3xl font-bold text-gradient mb-3">{s.step}</div>
+                  <h3 className="text-base font-semibold mb-2">{s.title}</h3>
+                  <p className="text-xs opacity-80 leading-relaxed">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* NON RESIDENT FOUNDERS */}
+      <section className="py-14 border-t border-border/60">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-[1fr_1.2fr] gap-10 items-center">
+            <div>
+              <div className="inline-flex items-center gap-3 mb-4">
+                <span className="text-xs uppercase tracking-[0.18em] font-semibold">International Founders</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-4">
+                Form a UK Company from <em className="not-italic text-gradient">Anywhere in the World</em>
+              </h2>
+              <p className="text-sm opacity-90 leading-relaxed mb-6">
+                You do not need to live in the UK or hold a British passport to form and own a UK Limited Company. We specialize in cross-border incorporations for entrepreneurs in Pakistan, India, UAE, Bangladesh, Nigeria, Morocco, the US, and 80+ countries.
+              </p>
+              <div className="p-4 rounded-xl glass border-primary/20 flex items-start gap-3 text-xs opacity-90">
+                <ShieldCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <span>
+                  All incorporations comply with the Economic Crime and Corporate Transparency Act (ECCTA 2023) and Companies House identity verification standards.
+                </span>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              {nonResidentBenefits.map((b) => (
+                <div key={b.title} className="glass glass-tint-cyan rounded-xl p-5">
+                  <h3 className="text-sm font-semibold mb-2 text-primary">{b.title}</h3>
+                  <p className="text-xs opacity-80 leading-relaxed">{b.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <RelatedServices
         eyebrow="Bundle With"
         title="Complete Your UK Setup"
@@ -368,6 +444,18 @@ const UKLtdFormation = () => {
           { q: "Can I open a UK business bank account afterwards?", a: "Yes. After incorporation we'll help you apply with Tide, Wise, Airwallex or traditional UK banks — most non-resident applications are approved within 7–14 days." },
         ]}
       />
+
+      {/* REGULATORY DISCLAIMER */}
+      <section className="py-8 border-t border-border/40 text-xs opacity-70">
+        <div className="container mx-auto px-4 max-w-4xl text-center space-y-2">
+          <p>
+            <strong>Regulatory Disclaimer:</strong> DigiFormation Ltd provides company formation, administrative corporate filing, and business support services. DigiFormation Ltd is not a law firm or a regulated financial institution and does not provide formal legal, tax, or financial advice.
+          </p>
+          <p>
+            Bank account and payment gateway approvals are determined solely by the respective banking institutions (Tide, Wise, Airwallex, Stripe, PayPal) and are subject to their individual underwriting and compliance criteria.
+          </p>
+        </div>
+      </section>
     </Layout>
   );
 };

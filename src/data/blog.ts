@@ -1376,7 +1376,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         h: "Get Expert Help — Verify Your Identity the Right Way",
-        body: "<p>The new Companies House ID verification rule is not a future event — it is happening <strong>right now</strong>. Whether you are a first-time UK LTD founder or already running an active company, completing verification correctly is essential to keep your company in good standing.</p><p><strong>Digiformation Ltd</strong> supports directors and PSCs across 20+ countries with end-to-end guidance through the verification process, fully aligned with UK Companies House standards.</p><p>👉 <a href=\"/services\">View our ID verification & compliance services</a> or <a href=\"/contact\">contact our team</a> to get started today. Most clients hear back within an hour during UK business hours.</p>",
+        body: "<p>The new Companies House ID verification rule is not a future event — it is happening <strong>right now</strong>. Whether you are a first-time UK LTD founder or already running an active company, completing verification correctly is essential to keep your company in good standing.</p><p><strong>Digiformation Ltd</strong> supports directors and PSCs across 20+ countries with end-to-end guidance through the verification process, fully aligned with UK Companies House standards.</p><p>👉 <a href=\"/uk-services/ltd-id-verification\">View our ID verification service</a> · <a href=\"/uk-services/uk-ltd-formation\">Explore UK LTD Formation packages</a> or <a href=\"/contact\">contact our team</a> to get started today. Most clients hear back within an hour during UK business hours.</p>",
       },
     ],
   },
