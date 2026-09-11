@@ -47,7 +47,7 @@ import osMarketing from "@/assets/digibizos/os-digi-marketing-XK_e_Bwl.png";
 import osChat from "@/assets/digibizos/os-digi-ai-chat-EU4baMLN.png";
 import osAiImage from "@/assets/digibizos/os-digi-ai-image-Blo_K5K8.png";
 
-const DIGI_BIZ_OS_URL = "https://digibizos.co.uk/";
+const DIGI_BIZ_OS_URL = "https://www.digibizos.co.uk/";
 const WHATSAPP_CONTACT_URL = "https://wa.me/923164467464?text=Hi%20DigiFormation%2C%20I%20am%20interested%20in%20Software%20Development%20%2F%20Custom%20AI%20Agents.";
 
 const setMeta = (title: string, description: string, keywords?: string) => {
@@ -144,7 +144,7 @@ export default function SoftwareDevelopment() {
           {
             "@type": "Offer",
             name: "Digi Biz OS (Desktop AI Business Operating System)",
-            url: "https://digibizos.co.uk/",
+            url: "https://www.digibizos.co.uk/",
           },
           {
             "@type": "Offer",
@@ -181,7 +181,7 @@ export default function SoftwareDevelopment() {
         "@type": "Offer",
         price: "50",
         priceCurrency: "GBP",
-        url: "https://digibizos.co.uk/",
+        url: "https://www.digibizos.co.uk/",
       },
       creator: {
         "@type": "Organization",
