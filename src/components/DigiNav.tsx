@@ -148,7 +148,6 @@ const DigiNav = () => {
             ))}
             <NavLink to="/software-development" className="text-sm hover:opacity-80 transition">Software & AI</NavLink>
             <NavLink to="/web-development" className="text-sm hover:opacity-80 transition">Web Dev</NavLink>
-            <NavLink to="/blog" className="text-sm hover:opacity-80 transition">Blog</NavLink>
 
             {/* More dropdown for the rest */}
             <div className="relative group">
@@ -159,6 +158,8 @@ const DigiNav = () => {
               <div className="absolute top-full right-0 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                 <div className="min-w-[200px] glass rounded-xl p-2">
                   {[
+                    { name: "Blog", path: "/blog" },
+                    { name: "Insights", path: "/insights" },
                     { name: "About", path: "/#about" },
                     { name: "FAQ", path: "/faq" },
                   ].map((l) => (
@@ -267,8 +268,9 @@ const DigiNav = () => {
               {openGroup === "__more" && (
                 <div className="pl-4">
                   {[
-                    { name: "About", path: "/#about" },
                     { name: "Blog", path: "/blog" },
+                    { name: "Insights", path: "/insights" },
+                    { name: "About", path: "/#about" },
                     { name: "FAQ", path: "/faq" },
                   ].map((l) => (
                     <Link key={l.path} to={l.path} onClick={() => setOpen(false)} className="block px-4 py-2 text-sm rounded-md hover:bg-primary/10 opacity-80">
