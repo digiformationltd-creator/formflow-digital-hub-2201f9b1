@@ -17,21 +17,35 @@ import {
   Workflow,
   CheckCircle2,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Monitor,
   Code2,
   Building2,
-  ChevronRight,
+  Maximize2,
+  X,
+  ZoomIn,
 } from "lucide-react";
 
 // Real Digi Biz OS authentic screenshots & logo
 import logoClean from "@/assets/digibizos/logo-clean-B3ZQbUGe.png";
 import osDashboard from "@/assets/digibizos/os-main-dashboard-BoY8H15Q.png";
 import osCrm from "@/assets/digibizos/os-digi-crm-dashboard-sYLfgAHv.png";
+import osCrmNav from "@/assets/digibizos/os-digi-crm-navigation-DgB8YzW3.png";
+import osCrmAccounts from "@/assets/digibizos/os-digi-crm-accounts-CgPU0rvm.png";
 import osAgentSearch from "@/assets/digibizos/os-active-agent-search-CfiLwplo.png";
+import osLiveTracking from "@/assets/digibizos/os-live-tracking-modal-C_irvoTk.png";
 import osWhatsapp from "@/assets/digibizos/os-digi-crm-whatsapp-CICbIdfA.png";
+import osFlow from "@/assets/digibizos/os-digi-flow-COD-wY-R.png";
 import osStudio from "@/assets/digibizos/os-digi-studio-video-editor-CuL-TZSF.png";
+import osAvatar from "@/assets/digibizos/os-digi-studio-avatar-DUQumzVr.png";
+import osVoice from "@/assets/digibizos/os-digi-studio-voice-CFtk0QZU.png";
 import osCode from "@/assets/digibizos/os-digi-code-CbVWFLnn.png";
 import osSkills from "@/assets/digibizos/os-skills-BTs8QIiL.png";
+import osDesktopTools from "@/assets/digibizos/os-desktop-tools-CEu3jUP0.png";
+import osMarketing from "@/assets/digibizos/os-digi-marketing-XK_e_Bwl.png";
+import osChat from "@/assets/digibizos/os-digi-ai-chat-EU4baMLN.png";
+import osAiImage from "@/assets/digibizos/os-digi-ai-image-Blo_K5K8.png";
 
 const DIGI_BIZ_OS_URL = "https://digibizos.co.uk/";
 const WHATSAPP_CONTACT_URL = "https://wa.me/923164467464?text=Hi%20DigiFormation%2C%20I%20am%20interested%20in%20Software%20Development%20%2F%20Custom%20AI%20Agents.";
@@ -92,6 +106,7 @@ const injectJsonLd = (id: string, schema: object) => {
 
 export default function SoftwareDevelopment() {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [lightboxImg, setLightboxImg] = useState<{ src: string; title: string; desc: string } | null>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   useEffect(() => {
@@ -177,18 +192,18 @@ export default function SoftwareDevelopment() {
   const showcaseSlides = [
     {
       id: "os-dashboard",
-      title: "Universal AI Business OS",
+      title: "Universal AI Business Dashboard",
       tag: "Main Dashboard",
       badge: "Desktop Core",
-      desc: "Central command center with real-time neural reasoning, multi-module live telemetry, and universal voice control across all enterprise operations.",
+      desc: "Central command center with real-time neural reasoning status, multi-module telemetry, quick launch shortcuts, and universal voice control across all enterprise operations.",
       image: osDashboard,
     },
     {
       id: "os-crm",
       title: "DIGI CRM & Pipeline Intelligence",
-      tag: "CRM & Contacts",
-      badge: "Customer Hub",
-      desc: "Full customer lifecycle intelligence, multi-stage sales pipeline, company account tracking, deal forecasting, and contextual customer memory.",
+      tag: "CRM & Pipelines",
+      badge: "Customer Intelligence",
+      desc: "Full customer lifecycle intelligence, multi-stage sales pipeline, company accounts, revenue forecasting, notes, and persistent contextual business memory.",
       image: osCrm,
     },
     {
@@ -200,11 +215,19 @@ export default function SoftwareDevelopment() {
       image: osAgentSearch,
     },
     {
+      id: "os-live-tracking",
+      title: "Live Agent Execution & Memory Monitor",
+      tag: "Agent Monitor",
+      badge: "Live Telemetry",
+      desc: "Real-time inspection modal tracking agent step-by-step thinking, tool usage, memory context retrieval, and subagent collaboration.",
+      image: osLiveTracking,
+    },
+    {
       id: "os-whatsapp",
-      title: "WhatsApp Automated CRM",
+      title: "WhatsApp Automated CRM Hub",
       tag: "WhatsApp CRM",
       badge: "Direct Messaging",
-      desc: "Direct WhatsApp business sync, customer threads, automated message flows, auto-responder rules, and full client conversation archiving.",
+      desc: "Direct WhatsApp business integration, customer chat threads, automated auto-responder workflows, and client conversation history logged in local SQLite.",
       image: osWhatsapp,
     },
     {
@@ -212,7 +235,7 @@ export default function SoftwareDevelopment() {
       title: "Digi Studio Creative AI Suite",
       tag: "Media & Studio",
       badge: "Content Engine",
-      desc: "AI video generation, neural voice synthesis, avatar presentations, transcript extraction, and automated social media asset generation.",
+      desc: "Integrated video editing, voice synthesis, avatar presentations, transcript extraction, and automated marketing media generation directly on your desktop.",
       image: osStudio,
     },
     {
@@ -231,10 +254,92 @@ export default function SoftwareDevelopment() {
       desc: "Extensible Model Context Protocol (MCP) toolchain connecting local neural models, screen inspection, vision cameras, and system executables.",
       image: osSkills,
     },
+    {
+      id: "os-desktop-tools",
+      title: "Integrated Desktop Tools Suite",
+      tag: "Desktop Tools",
+      badge: "Productivity",
+      desc: "Local file converters, batch utilities, system cleaners, audio recorders, and secure encrypted data storage built right into the OS.",
+      image: osDesktopTools,
+    },
+    {
+      id: "os-marketing",
+      title: "AI Marketing & Campaign Engine",
+      tag: "Marketing Suite",
+      badge: "Growth Engine",
+      desc: "Automated social media campaign generation, SEO article drafting, audience intelligence, and multi-platform content scheduling.",
+      image: osMarketing,
+    },
+    {
+      id: "os-chat",
+      title: "Multi-Model AI Chat Interface",
+      tag: "AI Chat",
+      badge: "Universal LLM",
+      desc: "Seamless switching between local offline models (Ollama/Llama) and cloud frontier models (OpenAI, Claude, DeepSeek) with zero data leakage.",
+      image: osChat,
+    },
   ];
+
+  const nextSlide = () => setActiveSlide((prev) => (prev + 1) % showcaseSlides.length);
+  const prevSlide = () => setActiveSlide((prev) => (prev - 1 + showcaseSlides.length) % showcaseSlides.length);
 
   return (
     <Layout>
+      {/* LIGHTBOX MODAL */}
+      {lightboxImg && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-4 md:p-8 animate-fade-in"
+          onClick={() => setLightboxImg(null)}
+        >
+          <div className="absolute top-4 right-4 flex items-center gap-3 z-50">
+            <a
+              href={DIGI_BIZ_OS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 rounded-full text-xs font-semibold bg-primary/20 text-white hover:bg-primary/30 transition flex items-center gap-1.5"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Visit Digi Biz OS <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+            <button
+              onClick={() => setLightboxImg(null)}
+              className="w-10 h-10 rounded-full glass flex items-center justify-center text-white hover:bg-white/20 transition"
+              aria-label="Close preview"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div
+            className="relative max-w-6xl max-h-[85vh] w-full flex flex-col items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-full glass rounded-2xl p-2 md:p-3 border border-border/80 shadow-2xl overflow-hidden flex flex-col">
+              {/* Window Header */}
+              <div className="flex items-center justify-between px-3 py-2 border-b border-border/60 bg-secondary/40 rounded-t-xl mb-2 text-xs opacity-80">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
+                  <span className="ml-2 font-mono text-[11px] text-white/90">{lightboxImg.title} — Full UI Overview</span>
+                </div>
+                <span className="text-[10px] uppercase tracking-wider text-primary font-bold">Digi Biz OS Desktop Preview</span>
+              </div>
+              <div className="overflow-auto max-h-[75vh] rounded-b-xl bg-background/90 flex items-center justify-center p-1">
+                <img
+                  src={lightboxImg.src}
+                  alt={lightboxImg.title}
+                  className="max-w-full h-auto max-h-[72vh] object-contain rounded-lg shadow-inner"
+                />
+              </div>
+            </div>
+            <p className="mt-3 text-xs md:text-sm text-center opacity-80 max-w-2xl text-white/90">
+              {lightboxImg.desc}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* SECTION 1 — HERO */}
       <section className="relative overflow-hidden bg-gradient-hero">
         <div className="absolute inset-0 grid-pattern opacity-40 pointer-events-none" />
@@ -242,8 +347,8 @@ export default function SoftwareDevelopment() {
         <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-accent/10 blur-3xl animate-pulse-glow pointer-events-none" />
 
         <div className="container mx-auto px-4 py-12 md:py-20 relative">
-          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 lg:gap-14 items-center">
-            <div className="max-w-3xl">
+          <div className="grid lg:grid-cols-[1.1fr_1.1fr] gap-10 lg:gap-12 items-center">
+            <div className="max-w-2xl">
               {/* Eyebrow badge */}
               <div className="inline-flex items-center gap-3 mb-6">
                 <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
@@ -255,7 +360,7 @@ export default function SoftwareDevelopment() {
                 Software Development & <em className="not-italic text-gradient">AI Agents</em> for Modern Businesses
               </h1>
 
-              <p className="mt-8 text-lg md:text-xl leading-relaxed max-w-2xl opacity-90">
+              <p className="mt-8 text-lg md:text-xl leading-relaxed opacity-90">
                 DigiFormation engineers bespoke business software, autonomous AI agents, CRM & ERP platforms, and custom workflow automation. We are also the creator of <strong className="font-semibold text-white">Digi Biz OS</strong> — our flagship AI desktop Business Operating System.
               </p>
 
@@ -274,7 +379,7 @@ export default function SoftwareDevelopment() {
               </div>
 
               {/* Key capabilities tag strip */}
-              <div className="mt-12 pt-6 border-t border-border/60 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-medium">
+              <div className="mt-10 pt-6 border-t border-border/60 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-medium">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
                   <span className="opacity-90">Custom CRM & ERP</span>
@@ -302,33 +407,46 @@ export default function SoftwareDevelopment() {
               </div>
             </div>
 
-            {/* Hero Visual Preview */}
+            {/* Hero Visual Preview — Desktop Window Frame (Uncropped) */}
             <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden glass shadow-elegant aspect-[16/10] border border-border/60">
-                <img
-                  src={osDashboard}
-                  alt="Digi Biz OS Main AI Desktop Dashboard developed by DigiFormation"
-                  className="w-full h-full object-cover object-top"
-                />
-                <div className="absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-transparent pointer-events-none" />
-
-                {/* Floating pill badge */}
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3 p-3 rounded-xl glass border border-border/60">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                    <div>
-                      <div className="text-xs font-bold">DIGI BIZ OS • Windows 10 & 11</div>
-                      <div className="text-[10px] opacity-70">Autonomous AI Operating System</div>
-                    </div>
+              <div
+                onClick={() =>
+                  setLightboxImg({
+                    src: osDashboard,
+                    title: "Digi Biz OS — Universal AI Desktop Operating System",
+                    desc: "Full dashboard view showing active neural reasoning, voice AI input, multi-agent status, and local business tools.",
+                  })
+                }
+                className="relative rounded-2xl glass shadow-elegant border border-border/70 p-2 md:p-3 cursor-pointer group hover:border-primary/50 transition-all"
+              >
+                {/* OS Window Header */}
+                <div className="flex items-center justify-between px-3 py-2 border-b border-border/60 bg-secondary/30 rounded-t-xl mb-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
+                    <span className="ml-2 font-mono text-[11px] opacity-75 hidden sm:inline">Digi Biz OS • Main Dashboard</span>
                   </div>
-                  <a
-                    href={DIGI_BIZ_OS_URL}
-                    target="_blank",
-                    rel="noopener noreferrer"
-                    className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 shrink-0"
-                  >
-                    Visit Product <ExternalLink className="w-3 h-3" />
-                  </a>
+                  <div className="flex items-center gap-1.5 text-[11px] text-primary font-semibold group-hover:underline">
+                    <ZoomIn className="w-3.5 h-3.5" /> Click to Expand
+                  </div>
+                </div>
+
+                {/* Screenshot Container without crop */}
+                <div className="relative rounded-xl overflow-hidden bg-background/90 flex items-center justify-center">
+                  <img
+                    src={osDashboard}
+                    alt="Digi Biz OS Main AI Desktop Dashboard developed by DigiFormation"
+                    className="w-full h-auto object-contain rounded-lg group-hover:scale-[1.01] transition-transform duration-300"
+                  />
+                </div>
+
+                {/* Bottom pill */}
+                <div className="mt-2.5 flex items-center justify-between px-2 text-xs opacity-80">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Windows 10 & 11 Desktop Edition
+                  </span>
+                  <span className="text-primary font-semibold">£50 Lifetime License</span>
                 </div>
               </div>
             </div>
@@ -339,29 +457,49 @@ export default function SoftwareDevelopment() {
       {/* SECTION 2 — DIGI BIZ OS FEATURED PRODUCT SHOWCASE */}
       <section className="py-14 md:py-20 border-t border-border/60 relative overflow-hidden">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div>
               <div className="inline-flex items-center gap-3 mb-3">
                 <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
-                  Flagship Product
+                  Interactive Showcase
                 </span>
               </div>
               <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
                 Meet <em className="not-italic text-gradient">Digi Biz OS</em>
               </h2>
-              <p className="mt-4 text-base md:text-lg opacity-80 max-w-2xl">
-                An AI-powered Business Operating System designed to bring business operations, multi-agent automation, voice control, CRM, and intelligent workflows into one unified desktop environment.
-              </p
+              <p className="mt-3 text-base md:text-lg opacity-80 max-w-2xl">
+                Explore the full suite of modules built into Digi Biz OS. Click any screenshot below to view the uncompressed full-screen dashboard.
+              </p>
             </div>
 
-            <Button asChild variant="hero" size="lg" className="rounded-full self-start md:self-auto shrink-0">
-              <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer">
-                Explore Digi Biz OS <ExternalLink className="w-4 h-4 ml-1" />
-              </a>
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghostGlow"
+                size="sm"
+                onClick={prevSlide}
+                className="rounded-full w-10 h-10 p-0"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghostGlow"
+                size="sm"
+                onClick={nextSlide}
+                className="rounded-full w-10 h-10 p-0"
+                aria-label="Next slide"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+              <Button asChild variant="hero" size="default" className="rounded-full ml-2">
+                <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer">
+                  Get Digi Biz OS <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                </a>
+              </Button>
+            </div>
           </div>
 
-          {/* Interactive Showcase Tabs */}
+          {/* Category Tabs */}
           <div className="flex flex-wrap gap-2 mb-6 pb-2 overflow-x-auto">
             {showcaseSlides.map((slide, idx) => (
               <button
@@ -378,17 +516,46 @@ export default function SoftwareDevelopment() {
             ))}
           </div>
 
-          {/* Active Showcase Card */}
-          <div className="glass glass-tint-indigo rounded-3xl p-6 md:p-8 border border-border/60 shadow-elegant">
-            <div className="grid lg:grid-cols-[1.3fr_1fr] gap-8 items-center">
-              <div className="relative rounded-2xl overflow-hidden glass aspect-[16/10] border border-border/60 shadow-2xl">
-                <img
-                  src={showcaseSlides[activeSlide].image}
-                  alt={`${showcaseSlides[activeSlide].title} - Digi Biz OS`}
-                  className="w-full h-full object-cover object-top"
-                />
+          {/* Active Showcase Card — Full Uncropped Window View */}
+          <div className="glass glass-tint-indigo rounded-3xl p-5 md:p-8 border border-border/70 shadow-elegant">
+            <div className="grid lg:grid-cols-[1.5fr_1fr] gap-8 items-center">
+              {/* Uncropped OS Window with Zoom Trigger */}
+              <div
+                onClick={() =>
+                  setLightboxImg({
+                    src: showcaseSlides[activeSlide].image,
+                    title: showcaseSlides[activeSlide].title,
+                    desc: showcaseSlides[activeSlide].desc,
+                  })
+                }
+                className="relative rounded-2xl glass p-2 md:p-3 border border-border/70 shadow-xl cursor-pointer group hover:border-primary/50 transition-all"
+              >
+                {/* Window header */}
+                <div className="flex items-center justify-between px-3 py-2 border-b border-border/50 bg-secondary/40 rounded-t-xl mb-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
+                    <span className="ml-2 font-mono text-[11px] text-white/90">
+                      Digi Biz OS • {showcaseSlides[activeSlide].tag}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-primary font-semibold group-hover:underline">
+                    <Maximize2 className="w-3.5 h-3.5" /> Full Zoom
+                  </div>
+                </div>
+
+                {/* Screenshot Display: Uncropped full image */}
+                <div className="relative rounded-xl overflow-hidden bg-background/90 flex items-center justify-center">
+                  <img
+                    src={showcaseSlides[activeSlide].image}
+                    alt={`${showcaseSlides[activeSlide].title} - Digi Biz OS`}
+                    className="w-full h-auto object-contain rounded-lg group-hover:scale-[1.01] transition-transform duration-300"
+                  />
+                </div>
               </div>
 
+              {/* Description & Action */}
               <div className="space-y-4">
                 <div className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-primary/20 text-primary border border-primary/30">
                   {showcaseSlides[activeSlide].badge}
@@ -406,7 +573,18 @@ export default function SoftwareDevelopment() {
                       Get Digi Biz OS (£50 Lifetime) <ExternalLink className="w-3.5 h-3.5 ml-1" />
                     </a>
                   </Button>
-                  <span className="text-xs opacity-70">Zero monthly SaaS subscriptions</span>
+                  <button
+                    onClick={() =>
+                      setLightboxImg({
+                        src: showcaseSlides[activeSlide].image,
+                        title: showcaseSlides[activeSlide].title,
+                        desc: showcaseSlides[activeSlide].desc,
+                      })
+                    }
+                    className="text-xs text-primary hover:underline flex items-center gap-1 font-semibold"
+                  >
+                    <ZoomIn className="w-3.5 h-3.5" /> View Uncompressed UI
+                  </button>
                 </div>
               </div>
             </div>
@@ -805,7 +983,7 @@ export default function SoftwareDevelopment() {
                   <Button asChild variant="ghostGlow" size="sm" className="rounded-full w-full">
                     <Link to="/contact?service=whatsapp-ai-agent">
                       Or contact via web enquiry form →
-                    </Link
+                    </Link>
                   </Button>
                 </div>
               </div>
@@ -1026,7 +1204,7 @@ export default function SoftwareDevelopment() {
                     <h3 className="font-display text-base sm:text-lg font-semibold">{f.q}</h3>
                     <ChevronDown className={`w-5 h-5 mt-0.5 text-primary transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}`} />
                   </div>
-                  {isOpen && <p className="mt-4 text-xs sm:text-sm opacity-85 leading-relaxed">{f.a}</p>}
+                  {isOpen && <p className="mt-4 text-xs sm:text-sm opacity-85 leading-relaxed">{f.a}</p>} 
                 </div>
               );
             })}
