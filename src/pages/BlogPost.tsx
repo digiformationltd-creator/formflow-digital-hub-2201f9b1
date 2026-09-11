@@ -56,14 +56,45 @@ const BlogPost = () => {
     s.id = id;
     s.text = JSON.stringify({
       "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      headline: post.title,
-      description: post.metaDescription,
-      datePublished: post.date,
-      author: { "@type": "Organization", name: "Digiformation Ltd" },
-      publisher: { "@type": "Organization", name: "Digiformation Ltd" },
-      mainEntityOfPage: `${window.location.origin}/blog/${post.slug}`,
-      keywords: post.keywords,
+      "@graph": [
+        {
+          "@type": "BlogPosting",
+          "@id": `https://www.digiformation.co.uk/blog/${post.slug}#article`,
+          headline: post.title,
+          description: post.metaDescription,
+          datePublished: post.date,
+          dateModified: post.date,
+          author: {
+            "@type": "Organization",
+            "@id": "https://www.digiformation.co.uk/#organization",
+            name: "Digiformation Ltd",
+            url: "https://www.digiformation.co.uk/"
+          },
+          publisher: {
+            "@type": "Organization",
+            "@id": "https://www.digiformation.co.uk/#organization",
+            name: "Digiformation Ltd",
+            url: "https://www.digiformation.co.uk/",
+            logo: {
+              "@type": "ImageObject",
+              url: "https://www.digiformation.co.uk/favicon-512.png"
+            }
+          },
+          image: "https://www.digiformation.co.uk/favicon-512.png",
+          mainEntityOfPage: `https://www.digiformation.co.uk/blog/${post.slug}`,
+          keywords: post.keywords,
+          articleSection: post.category,
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": `https://www.digiformation.co.uk/blog/${post.slug}#breadcrumbs`,
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://www.digiformation.co.uk/" },
+            { "@type": "ListItem", position: 2, name: "Blog", item: "https://www.digiformation.co.uk/blog" },
+            { "@type": "ListItem", position: 3, name: post.title, item: `https://www.digiformation.co.uk/blog/${post.slug}` }
+          ]
+        }
+      ]
     });
     document.head.appendChild(s);
   }, [post]);
