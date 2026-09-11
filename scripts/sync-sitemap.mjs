@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Auto-syncs blog post slugs from src/data/blog.ts into public/sitemap.xml
-// AND refreshes <lastmod> on every <url>. Runs before `vite build`.
+// Auto-syncs blog post slugs & authentic dates from src/data/blog.ts into public/sitemap.xml
+// Runs before `vite build`.
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,32 +14,24 @@ const MARK_END = "  <!-- /Blog Posts (auto-generated) -->";
 
 const TODAY = new Date().toISOString().split("T")[0];
 
-function getSlugs() {
+function getBlogPosts() {
   const tsx = fs.readFileSync(BLOG_FILE, "utf8");
-  return [...tsx.matchAll(/slug:\s*["'](.*?)["']/g)].map((m) => m[1]);
+  const posts = [];
+  const regex = /slug:\s*["'](.*?)["'][\s\S]*?date:\s*["'](.*?)["']/g;
+  for (const match of tsx.matchAll(regex)) {
+    posts.push({ slug: match[1], date: match[2] || TODAY });
+  }
+  return posts;
 }
 
-function buildBlock(slugs) {
-  const urls = slugs
+function buildBlock(posts) {
+  const urls = posts
     .map(
-      (s) =>
-        `  <url><loc>https://www.digiformation.co.uk/blog/${s}</loc><lastmod>${TODAY}</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>`
+      (p) =>
+        `  <url><loc>https://www.digiformation.co.uk/blog/${p.slug}</loc><lastmod>${p.date}</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>`
     )
     .join("\n");
   return `${MARK_START}\n${urls}\n${MARK_END}`;
-}
-
-function refreshLastmod(xml) {
-  // Ensure every <url> has a <lastmod>; refresh if present.
-  return xml.replace(/<url>([\s\S]*?)<\/url>/g, (full, inner) => {
-    let updated = inner;
-    if (/<lastmod>.*?<\/lastmod>/.test(updated)) {
-      updated = updated.replace(/<lastmod>.*?<\/lastmod>/, `<lastmod>${TODAY}</lastmod>`);
-    } else if (/<loc>.*?<\/loc>/.test(updated)) {
-      updated = updated.replace(/(<loc>.*?<\/loc>)/, `$1<lastmod>${TODAY}</lastmod>`);
-    }
-    return `<url>${updated}</url>`;
-  });
 }
 
 function syncSitemap() {
@@ -47,8 +39,8 @@ function syncSitemap() {
   // Replace any old domain occurrences
   xml = xml.replace(/https:\/\/(www\.)?digiformation\.uk/g, 'https://www.digiformation.co.uk');
 
-  const slugs = getSlugs();
-  const block = buildBlock(slugs);
+  const posts = getBlogPosts();
+  const block = buildBlock(posts);
 
   if (xml.includes(MARK_START) && xml.includes(MARK_END)) {
     const re = new RegExp(`${MARK_START}[\\s\\S]*?${MARK_END}`);
@@ -59,10 +51,8 @@ function syncSitemap() {
     xml = xml.replace("</urlset>", `\n${block}\n</urlset>`);
   }
 
-  xml = refreshLastmod(xml);
-
   fs.writeFileSync(SITEMAP, xml);
-  console.log(`✓ sitemap.xml synced (${slugs.length} blog posts, domain=https://www.digiformation.co.uk, lastmod=${TODAY})`);
+  console.log(`✓ sitemap.xml synced (${posts.length} blog posts, authentic lastmod preserved)`);
 }
 
 syncSitemap();
