@@ -914,6 +914,73 @@ const webDevPackages: DetailPkg[] = [
 ];
 
 
+
+const softwareDevPackages: DetailPkg[] = [
+  {
+    name: "Custom WhatsApp AI Agent",
+    price: "£10",
+    badge: "Starter Offer",
+    note: "Entry-Level WhatsApp AI Agent",
+    tone: "from-cyan-500/25 to-cyan-500/5",
+    ring: "ring-cyan-400/60",
+    link: "https://wa.me/923164467464?text=Hi%20DigiFormation%2C%20I%20want%20to%20order%20the%20%C2%A310%20Custom%20WhatsApp%20AI%20Agent.",
+    features: [
+      "Custom business FAQ & service prompt engineering",
+      "Automated customer greetings & lead detail intake",
+      "Brand voice & tone alignment",
+      "Deployment guide & setup walkthrough",
+      "Instant lead notification triggers",
+    ],
+  },
+  {
+    name: "Digi Biz OS (Desktop AI OS)",
+    price: "£50",
+    badge: "Lifetime License",
+    note: "Autonomous AI Desktop Operating System",
+    tone: "from-indigo-500/25 to-indigo-500/5",
+    ring: "ring-indigo-400/60",
+    link: "https://digibizos.co.uk/",
+    features: [
+      "Universal Voice AI Assistant (JARVIS-style)",
+      "Multi-agent autonomous concurrent execution",
+      "DIGI CRM & automated WhatsApp threads",
+      "Digi Studio video & avatar content creator",
+      "Universal MCP toolchain & local SQLite storage",
+      "Zero monthly SaaS subscription fees",
+    ],
+  },
+  {
+    name: "Custom CRM & ERP Platforms",
+    price: "Custom Quote",
+    note: "Bespoke Enterprise Software",
+    tone: "from-purple-500/25 to-purple-500/5",
+    ring: "ring-purple-400/60",
+    link: "/contact?service=crm-erp-development",
+    features: [
+      "Tailored multi-stage deal & sales pipeline",
+      "Role-based staff permissions & secure auth",
+      "Automated invoicing & financial telemetry",
+      "Client portal & automated document vaults",
+      "PostgreSQL / Cloud database architecture",
+    ],
+  },
+  {
+    name: "Autonomous Multi-Agent Swarms",
+    price: "Custom Quote",
+    note: "Bespoke AI Engineering",
+    tone: "from-emerald-500/20 to-emerald-500/5",
+    ring: "ring-emerald-500/40",
+    link: "/contact?service=custom-ai-agents",
+    features: [
+      "Autonomous agent swarms for research & operations",
+      "Custom MCP tools, data extraction & verification",
+      "Local offline models or frontier cloud LLMs",
+      "Automated webhook pipelines & live sync",
+      "End-to-end deployment & ongoing support",
+    ],
+  },
+];
+
 const pricingSections: PricingSection[] = [
   {
     title: "UK Company Formation",
@@ -956,6 +1023,20 @@ const pricingSections: PricingSection[] = [
     intro: "Account creation & setup for leading payment gateways and business banks.",
     packages: bankingPackages,
     cols: 3,
+  },
+  {
+    title: "Business Website Development",
+    tag: "Web Development",
+    intro: "Fixed-price website and e-commerce packages built with Shopify, React and 3D WebGL.",
+    packages: webDevPackages,
+    cols: 3,
+  },
+  {
+    title: "Software & AI Agents",
+    tag: "Software & AI",
+    intro: "Autonomous AI agents, desktop operating systems, bespoke CRMs and automation platforms.",
+    packages: softwareDevPackages,
+    cols: 4,
   },
 ];
 

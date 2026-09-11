@@ -122,7 +122,7 @@ const DigiNav = () => {
           {/* Desktop links */}
           <div className="hidden xl:flex items-center gap-6">
             <NavLink to="/" className="text-sm hover:opacity-80 transition">Home</NavLink>
-            <NavLink to="/pricing" className="text-sm hover:opacity-80 transition">Pricing</NavLink>
+            
             {navGroups.map((g) => (
               <div key={g.label} className="relative group">
                 <button className="flex items-center gap-1 text-sm hover:opacity-80 transition">
@@ -174,16 +174,15 @@ const DigiNav = () => {
             {/* Packages quick-access pill */}
             <div className="relative group">
               <Link
-                to="/pricing"
-                className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-black transition"
+                to="/packages" className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-black transition"
               >
                 Packages
                 <ChevronDown className="w-3 h-3 transition-transform group-hover:rotate-180" />
               </Link>
               <div className="absolute top-full right-0 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                 <div className="min-w-[260px] glass rounded-xl p-2">
-                  <Link to="/pricing" className="block px-4 py-2 text-sm font-semibold rounded-md hover:bg-primary/10 transition border-b border-border/40 mb-1">
-                    All Packages →
+                  <Link to="/packages" className="block px-4 py-2 text-sm font-semibold rounded-md hover:bg-primary/10 transition border-b border-border/40 mb-1">
+                    All Packages & Pricing →
                   </Link>
                   {[
                     { name: "UK Company Formation", hash: "uk-formation" },
@@ -192,8 +191,10 @@ const DigiNav = () => {
                     { name: "USA Add-on Services", hash: "usa-services" },
                     { name: "UK Compliance Services", hash: "uk-compliance" },
                     { name: "Banking & Payments", hash: "banking-payments" },
+                    { name: "Web Development", hash: "web-development" },
+                    { name: "Software & AI Agents", hash: "software-ai" },
                   ].map((l) => (
-                    <Link key={l.hash} to={`/pricing#${l.hash}`} className="block px-4 py-2 text-sm rounded-md hover:bg-primary/10 transition">
+                    <Link key={l.hash} to={`/packages#${l.hash}`} className="block px-4 py-2 text-sm rounded-md hover:bg-primary/10 transition">
                       {l.name}
                     </Link>
                   ))}
@@ -222,8 +223,8 @@ const DigiNav = () => {
             <Link to="/" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10">
               Home
             </Link>
-            <Link to="/pricing" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10">
-              Pricing
+            <Link to="/packages" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10 font-semibold text-primary">
+              Packages & Pricing →
             </Link>
             {navGroups.map((g) => (
               <div key={g.label} className="border-t border-border/40 mt-1 pt-1">

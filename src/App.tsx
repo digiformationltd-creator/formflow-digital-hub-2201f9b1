@@ -116,6 +116,7 @@ const App = () => (
           <Route path="/client-area" element={<ClientArea />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/packages" element={<Pricing />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/blog" element={<BlogIndex />} />
