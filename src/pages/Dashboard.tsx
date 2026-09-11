@@ -2114,7 +2114,7 @@ const OpenTicketForm = ({ userId, onSubmitted }: { userId: string; onSubmitted: 
       <Button type="submit" variant="hero" className="rounded-full" disabled={submitting}>
         {submitting && <Loader2 className="w-4 h-4 animate-spin" />} Submit Ticket
       </Button>
-      <p className="text-xs opacity-70">Our team typically responds within 24 hours at <a href="mailto:info@digiformation.uk" className="underline">info@digiformation.uk</a>.</p>
+      <p className="text-xs opacity-70">Our team typically responds within 24 hours at <a href="mailto:info@digiformation.co.uk" className="underline">info@digiformation.co.uk</a>.</p>
     </form>
   );
 };

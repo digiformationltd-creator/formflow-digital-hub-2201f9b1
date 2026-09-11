@@ -39,8 +39,8 @@ const UserDrawer = () => {
   useEffect(() => {
     if (!user) { setIsAdmin(false); return; }
     (async () => {
-      const ownerEmail = "info@digiformation.uk";
-      if (user.email?.toLowerCase() === ownerEmail) { setIsAdmin(true); return; }
+      const isOwner = user.email?.toLowerCase() === "info@digiformation.co.uk" || user.email?.toLowerCase() === "info@digiformation.uk";
+      if (isOwner) { setIsAdmin(true); return; }
       const { data } = await supabase
         .from("user_roles")
         .select("role")
