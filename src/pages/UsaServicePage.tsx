@@ -25,11 +25,23 @@ const FAQS_BY_SLUG: Record<string, FAQ[]> = {
     { q: "Can I use my ITIN to open a US bank account?", a: "Yes — many US fintech banks (Mercury, Wise, Relay) accept ITIN as a tax ID alongside your EIN for personal verification." },
     { q: "Will my ITIN expire?", a: "ITINs expire if not used on a federal tax return for three consecutive years. We can help you renew it before expiry." },
   ],
+  "bio-report": [
+    { q: "What is a BOI report?", a: "Under the US Corporate Transparency Act, most US LLCs and corporations must file a Beneficial Ownership Information (BOI) report with FinCEN disclosing each owner with 25%+ stake or substantial control." },
+    { q: "When is the BOI report due?", a: "New entities formed in 2024+ must file within 90 days of formation. Existing entities had until 1 January 2025. Updates must be filed within 30 days of any ownership change." },
+    { q: "What are the penalties for not filing?", a: "Civil penalties of up to $591/day and criminal penalties of up to $10,000 and 2 years imprisonment for willful failure to file." },
+    { q: "Is the BOI report public?", a: "No. BOI data is held in a secure FinCEN database accessible only to authorized federal, state and law enforcement agencies." },
+  ],
   "boi-report": [
     { q: "What is a BOI report?", a: "Under the US Corporate Transparency Act, most US LLCs and corporations must file a Beneficial Ownership Information (BOI) report with FinCEN disclosing each owner with 25%+ stake or substantial control." },
     { q: "When is the BOI report due?", a: "New entities formed in 2024+ must file within 90 days of formation. Existing entities had until 1 January 2025. Updates must be filed within 30 days of any ownership change." },
     { q: "What are the penalties for not filing?", a: "Civil penalties of up to $591/day and criminal penalties of up to $10,000 and 2 years imprisonment for willful failure to file." },
     { q: "Is the BOI report public?", a: "No. BOI data is held in a secure FinCEN database accessible only to authorized federal, state and law enforcement agencies." },
+  ],
+  "annual-tax-filing": [
+    { q: "What tax forms must a non-resident US LLC file annually?", a: "Single-member foreign-owned LLCs are required to file IRS Form 5472 and Form 1120 annually to report transactions between the LLC and its foreign owner, even with zero US-sourced income." },
+    { q: "What is the penalty for late Form 5472 filing?", a: "The IRS enforces a minimum penalty of $25,000 for failing to file or late filing of Form 5472." },
+    { q: "When is the annual US LLC tax return due?", a: "For calendar-year LLCs, federal tax filings are due by April 15th (or October 15th with an approved extension)." },
+    { q: "Do you handle state annual reports as well?", a: "Yes. We prepare and file state franchise taxes and annual reports across Wyoming, Delaware, Florida, and other states." },
   ],
 };
 

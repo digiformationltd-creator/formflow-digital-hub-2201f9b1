@@ -69,6 +69,7 @@ const App = () => (
           <Route path="/uk-services/ltd-id-verification" element={<LtdIdVerification />} />
           <Route path="/uk-services/registered-office-address" element={<RegisteredOfficeAddress />} />
           <Route path="/uk-services/utr-codes" element={<UtrCodes />} />
+          <Route path="/uk-services/utr-number" element={<UtrCodes />} />
           {/* Aliases under /ltd-formation-services */}
           <Route path="/ltd-formation-services" element={<UKLtdFormation />} />
           <Route path="/ltd-formation-services/uk-ltd-formation" element={<UKLtdFormation />} />
