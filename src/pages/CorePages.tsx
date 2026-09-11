@@ -1792,64 +1792,68 @@ export const Privacy = () => {
         <div className="container mx-auto px-4 max-w-3xl">
           <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight mb-8">Privacy Policy</h2>
 
-          <LegalSection num="1" title="Introduction">
-            <p>Digiformation Ltd ("we", "our", "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, store and protect your personal information when you use our website and services related to:</p>
+          <LegalSection num="1" title="Introduction & Statutory Entity">
+            <p><strong>Digiformation Ltd</strong> (Company No. <strong>16994903</strong>, registered in England and Wales, Registered Office: <em>Office 1006, 85 Dunstall Hill, Wolverhampton, West Midlands, WV6 0SR, United Kingdom</em>) ("we", "our", "us") is committed to protecting your privacy and complying with the UK Data Protection Act 2018 and UK GDPR. This Privacy Policy explains how we collect, use, store and protect your personal information when you use our website and services related to:</p>
             <ul className="list-disc pl-5 mt-2 space-y-1">
-              <li>UK LTD Company Registration</li>
-              <li>US LLC Formation</li>
+              <li>UK LTD Company Registration & Statutory Filings</li>
+              <li>US LLC Formation & State Compliance</li>
               <li>Registered Office & Business Address Services</li>
-              <li>Annual Filing, ID Verification & Compliance Support</li>
+              <li>Director Identity Verification under ECCT Act 2023</li>
+              <li>Business Banking Application Guidance & Tech Integration</li>
+              <li>Bespoke Software, AI Agents & Web Development</li>
             </ul>
-            <p className="mt-2">By using our website, you agree to this policy.</p>
+            <p className="mt-2">By accessing our website or engaging our services, you acknowledge and agree to this policy.</p>
           </LegalSection>
 
           <LegalSection num="2" title="Information We Collect">
-            <p><strong>Personal Information:</strong> name, email, phone/WhatsApp, address, passport/ID (for verification), company details.</p>
-            <p><strong>Business Information:</strong> company name, shareholders, directors, registered address, nature of business.</p>
-            <p><strong>Technical Data:</strong> IP address, browser type, device info, cookies, pages visited.</p>
+            <p><strong>Personal Identification:</strong> Full legal name, date of birth, nationality, residential address, email address, WhatsApp/phone number, passport/national ID copy (for mandatory KYC/ECCT Act 2023 identity verification).</p>
+            <p><strong>Corporate & Business Information:</strong> Proposed company name, share capital distribution, director/shareholder registers, registered office selection, standard industry classification (SIC) codes, and nature of business operations.</p>
+            <p><strong>Technical & Usage Data:</strong> IP address, browser type and version, operating system, referrer URL, pages viewed, and session telemetry collected via secure cookies.</p>
           </LegalSection>
 
-          <LegalSection num="3" title="How We Use Your Information">
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Register and manage your company</li>
-              <li>Process ID verification</li>
-              <li>Provide compliance & annual filing services</li>
-              <li>Respond to inquiries & support</li>
-              <li>Improve our website & services</li>
-              <li>Meet legal and regulatory requirements</li>
+          <LegalSection num="3" title="Legal Basis & How We Use Your Information">
+            <p>We process your personal and corporate data under strict lawful bases (Contract Performance, Legal Obligation, and Legitimate Interest):</p>
+            <ul className="list-disc pl-5 mt-2 space-y-1">
+              <li>Executing incorporation e-filings with Companies House (UK) and US State Secretariats</li>
+              <li>Fulfilling statutory identity verification obligations under the Economic Crime and Corporate Transparency Act 2023</li>
+              <li>Delivering registered office mail handling and statutory notice forwarding</li>
+              <li>Managing client support inquiries, order fulfillment, and billing communication</li>
+              <li>Maintaining audit trails required by UK anti-money laundering (AML) and corporate governance regulations</li>
             </ul>
           </LegalSection>
 
-          <LegalSection num="4" title="Data Protection & Security">
-            <p>We implement secure systems and encryption to protect your data. Only authorised staff can access sensitive information.</p>
+          <LegalSection num="4" title="Data Security & Retention">
+            <p>We implement enterprise-grade SSL/TLS encryption, strictly partitioned databases, and multi-factor access controls. Sensitive identity documents are stored in encrypted object stores and accessed solely by authorized compliance personnel. Data is retained strictly for statutory compliance retention periods or until service termination where legally permitted.</p>
           </LegalSection>
 
-          <LegalSection num="5" title="Data Sharing">
-            <p>We do not sell or rent your data. We may share limited information with:</p>
+          <LegalSection num="5" title="Third-Party Disclosure">
+            <p>We do not sell, rent, or monetize your personal information. Information is shared strictly when required to deliver contractual services:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Government authorities (Companies House, IRS, etc.)</li>
-              <li>Payment processors</li>
-              <li>Legal or compliance partners</li>
-            </ul>
-            <p>(Only when required to deliver services.)</p>
-          </LegalSection>
-
-          <LegalSection num="6" title="Cookies">
-            <p>Our website uses cookies to improve user experience, track website performance and remember preferences. You may disable cookies from your browser settings.</p>
-          </LegalSection>
-
-          <LegalSection num="7" title="Your Rights">
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Request access to your data</li>
-              <li>Ask for correction or deletion</li>
-              <li>Withdraw consent</li>
-              <li>Request data portability</li>
+              <li>Government & Statutory Registries (Companies House UK, HM Revenue & Customs, IRS, FinCEN, State Secretariats)</li>
+              <li>Regulated Payment Gateways (Stripe, PayPal) for encrypted transaction processing</li>
+              <li>Authorized Corporate Service Provider (ACSP) compliance platforms</li>
             </ul>
           </LegalSection>
 
-          <LegalSection num="8" title="Contact for Privacy">
+          <LegalSection num="6" title="Cookies & Analytics">
+            <p>Our website utilizes necessary functional cookies and privacy-preserving performance telemetry to enhance user navigation and remember preferences. You can adjust cookie preferences in your browser settings at any time.</p>
+          </LegalSection>
+
+          <LegalSection num="7" title="Your Statutory Rights">
+            <p>Under UK GDPR and applicable data protection regulations, you possess the right to:</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Request access to your personal data held by Digiformation Ltd</li>
+              <li>Request rectification of inaccurate or incomplete corporate data</li>
+              <li>Request erasure of personal data (subject to mandatory statutory retention rules)</li>
+              <li>Object to or restrict data processing, and request data portability</li>
+            </ul>
+          </LegalSection>
+
+          <LegalSection num="8" title="Data Protection Contact">
+            <p>For data access requests, compliance queries, or privacy inquiries:</p>
             <p>📧 Email: <a className="text-primary hover:underline" href="mailto:info@digiformation.co.uk">info@digiformation.co.uk</a></p>
-            <p>📲 WhatsApp: +92 316 446 7464</p>
+            <p>📲 WhatsApp / Support: +92 316 446 7464</p>
+            <p>🏢 Postal: Digiformation Ltd, Office 1006, 85 Dunstall Hill, Wolverhampton, West Midlands, WV6 0SR, UK</p>
           </LegalSection>
         </div>
       </section>
@@ -1859,53 +1863,48 @@ export const Privacy = () => {
         <div className="container mx-auto px-4 max-w-3xl">
           <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight mb-8">Terms of Service</h2>
 
-          <LegalSection num="1" title="Services">
-            <p>Digiformation Ltd provides:</p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>UK LTD & US LLC Registration</li>
-              <li>Address Services</li>
-              <li>Annual Filings</li>
-              <li>ID Verification</li>
-              <li>Business Support Services</li>
-            </ul>
-            <p className="mt-2">We are not a law firm or tax advisor. We provide administrative and filing assistance only.</p>
+          <LegalSection num="1" title="Nature of Services & Regulatory Disclaimers">
+            <p><strong>Digiformation Ltd</strong> provides administrative company formation, registered address management, statutory compliance support, bespoke software engineering, AI agent development, and web development services.</p>
+            <div className="my-3 p-4 rounded-xl glass border border-amber-500/30 text-sm space-y-2">
+              <p><strong>⚖️ Legal & Solicitor Disclaimer:</strong> Digiformation Ltd is a corporate filing agent and software technology provider. We are not a law firm, solicitors, or certified legal advocates. Information provided on this website is for general informational guidance only and does not constitute formal legal advice.</p>
+              <p><strong>💳 Banking & Payment Gateway Disclaimer:</strong> Digiformation Ltd assists clients with application documentation, compliance requirements, and corporate introductions. We do not provide banking accounts directly. Bank account approvals, credit facilities, and merchant accounts remain subject to the independent underwriting, KYC, AML, and discretionary approval of the respective regulated financial institution (e.g. Wise, Tide, Payoneer, Stripe, Airwallex, Revolut).</p>
+              <p><strong>📊 Tax & Accounting Disclaimer:</strong> General tax timelines (such as Corporation Tax, UTR, Form 5472, BOI) provided on this site are informational and do not substitute for formal advice from a qualified Chartered Accountant (ACA/ACCA) or CPA.</p>
+            </div>
           </LegalSection>
 
-          <LegalSection num="2" title="User Responsibilities">
+          <LegalSection num="2" title="Client Warranties & Identity Verification">
+            <p>By purchasing services, you warrant and agree that:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Provide accurate information</li>
-              <li>Not use our services for illegal purposes</li>
-              <li>Complete ID verification when required</li>
+              <li>All information, passport details, and corporate declarations submitted are true, accurate, and up to date.</li>
+              <li>You will complete all required identity verification steps under the UK Economic Crime and Corporate Transparency Act 2023.</li>
+              <li>You will not use Digiformation Ltd services or addresses for unlawful purposes, money laundering, fraud, or sanctioned business activities.</li>
             </ul>
           </LegalSection>
 
-          <LegalSection num="3" title="Payments & Refunds">
+          <LegalSection num="3" title="Fees, Payments & Refund Policy">
             <ul className="list-disc pl-5 space-y-1">
-              <li>All fees must be paid in advance</li>
-              <li>Registration fees are non-refundable once processing begins</li>
-              <li>Service charges are non-refundable after submission to authorities</li>
+              <li>All service fees, government filing charges, and address subscription fees are payable in advance.</li>
+              <li><strong>Statutory Filing Fees:</strong> Government filing fees (e.g., Companies House incorporation fee, State filing fee) are strictly non-refundable once an application has been electronically dispatched or submitted to authorities.</li>
+              <li><strong>Software & Development Services:</strong> Custom software, AI agents, and web design packages are delivered in accordance with agreed specifications. Initial deposits are non-refundable once architectural work or coding commences.</li>
+              <li><strong>Address Subscriptions:</strong> Registered office address subscriptions may be cancelled prior to annual renewal upon providing proof of address change filed at Companies House.</li>
             </ul>
           </LegalSection>
 
-          <LegalSection num="4" title="Processing Time">
-            <p>Timeframes depend on government authorities. We are not responsible for delays caused by third parties.</p>
+          <LegalSection num="4" title="Filing Timelines & Third-Party Dependencies">
+            <p>While standard UK LTD formations are typically processed within 24 to 48 working hours, actual registration timeframes are subject to Companies House and US State Department operational queues. Digiformation Ltd is not liable for delays caused by government server maintenance, manual scrutiny, or regulatory backlogs.</p>
           </LegalSection>
 
           <LegalSection num="5" title="Limitation of Liability">
-            <p>Digiformation Ltd is not liable for government rejections, legal/tax penalties or business losses.</p>
+            <p>To the maximum extent permitted by applicable law, Digiformation Ltd, its directors, and employees shall not be liable for indirect, punitive, or consequential damages resulting from government application rejections, third-party banking account decisions, or late filing penalties incurred through client delay in providing documentation.</p>
           </LegalSection>
 
-          <LegalSection num="6" title="Account Termination">
-            <p>We may suspend services if false information is provided, the service is misused, or laws are violated.</p>
-          </LegalSection>
-
-          <LegalSection num="7" title="Changes to Terms">
-            <p>We may update this policy at any time. Continued use of our website means you accept the changes.</p>
+          <LegalSection num="6" title="Governing Law & Jurisdiction">
+            <p>These Terms of Service and any dispute or claim arising out of them shall be governed by and construed in accordance with the laws of England and Wales. The courts of England and Wales shall have exclusive jurisdiction to settle any dispute.</p>
           </LegalSection>
 
           <div className="mt-10 text-center">
             <Button asChild variant="hero" size="lg" className="rounded-full">
-              <Link to="/contact">Contact Us <ArrowRight className="w-4 h-4" /></Link>
+              <Link to="/contact">Contact Our Support Team <ArrowRight className="w-4 h-4" /></Link>
             </Button>
           </div>
         </div>

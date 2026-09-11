@@ -44,7 +44,7 @@ const pillars = [
     icon: CreditCard,
     title: "Global Banking & Payment Gateways",
     href: "/banks-payment-solutions",
-    desc: "Guaranteed business banking application support across 16+ verified institutions including Stripe, PayPal, Wise, Payoneer, Tide, and Airwallex.",
+    desc: "End-to-end business banking application guidance and compliance preparation across 16+ verified institutions including Stripe, PayPal, Wise, Payoneer, Tide, and Airwallex.",
   },
   {
     icon: Code2,
