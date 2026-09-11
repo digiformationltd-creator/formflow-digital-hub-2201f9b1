@@ -400,7 +400,7 @@ const Auth = () => {
           <p className="text-center text-xs opacity-70 mt-5">
             Need help? Email{" "}
             <a href="mailto:info@digiformation.co.uk" className="underline">
-              info@digiformation.uk
+              info@digiformation.co.uk
             </a>
           </p>
         </div>

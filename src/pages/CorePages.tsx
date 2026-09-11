@@ -1826,7 +1826,7 @@ export const Privacy = () => {
           </LegalSection>
 
           <LegalSection num="8" title="Contact for Privacy">
-            <p>📧 Email: <a className="text-primary hover:underline" href="mailto:info@digiformation.co.uk">info@digiformation.uk</a></p>
+            <p>📧 Email: <a className="text-primary hover:underline" href="mailto:info@digiformation.co.uk">info@digiformation.co.uk</a></p>
             <p>📲 WhatsApp: +92 316 446 7464</p>
           </LegalSection>
         </div>
