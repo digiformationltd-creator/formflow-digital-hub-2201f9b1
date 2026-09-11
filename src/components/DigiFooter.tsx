@@ -106,6 +106,11 @@ const DigiFooter = () => {
         {/* Brand */}
         <div className="flex flex-col items-center text-center sm:items-start sm:text-left sm:col-span-2 lg:col-span-1 h-full">
           <img src={logo} alt="Digiformation Ltd logo — trusted UK Limited Company & US LLC formation worldwide" className="h-24 w-auto object-contain mb-4" />
+          <div className="text-xs text-muted-foreground mb-4">
+            <span className="font-semibold text-foreground">Digiformation Ltd</span><br />
+            Company No. 16994903<br />
+            Registered in England &amp; Wales
+          </div>
           <div className="mt-auto w-full">
             <div className="text-xs uppercase tracking-[0.18em] font-semibold mb-3 opacity-90">Connect With Us</div>
             <div className="grid grid-cols-4 gap-2 w-full max-w-[200px] sm:max-w-none">
@@ -129,43 +134,66 @@ const DigiFooter = () => {
           </div>
         </div>
 
-        {/* Services */}
+        {/* Formation & Banking */}
         <div>
           <div className="text-xs uppercase tracking-[0.18em] font-semibold mb-4 opacity-90">
-            Quick Links
+            Corporate &amp; Banking
           </div>
           <ul className="space-y-2 text-sm">
-            <li><Link to="/uk-services" className="hover:text-primary transition">UK Services</Link></li>
-            <li><Link to="/usa-services" className="hover:text-primary transition">USA Services</Link></li>
-            <li><Link to="/banks-payment-solutions" className="hover:text-primary transition">Banks & Payment Solutions</Link></li>
-            <li><Link to="/uk-compliance" className="hover:text-primary transition">UK Compliance</Link></li>
-            <li><Link to="/software-development" className="hover:text-primary transition">Software & AI Agents</Link></li>
+            <li><Link to="/uk-services" className="hover:text-primary transition">UK Company Formation</Link></li>
+            <li><Link to="/usa-services" className="hover:text-primary transition">USA LLC Formation</Link></li>
+            <li><Link to="/banks-payment-solutions" className="hover:text-primary transition">Banks &amp; Payment Gateways</Link></li>
+            <li><Link to="/uk-compliance" className="hover:text-primary transition">UK Compliance &amp; UTR</Link></li>
+            <li><Link to="/packages" className="hover:text-primary transition">Packages &amp; Pricing</Link></li>
+          </ul>
+        </div>
+
+        {/* Software & AI Products */}
+        <div>
+          <div className="text-xs uppercase tracking-[0.18em] font-semibold mb-4 opacity-90">
+            Software &amp; AI
+          </div>
+          <ul className="space-y-2 text-sm">
+            <li><Link to="/software-development" className="hover:text-primary transition">Software Development</Link></li>
+            <li><Link to="/ai-agents" className="hover:text-primary transition">AI Agents &amp; Automation</Link></li>
+            <li>
+              <a href="https://digibizos.co.uk/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition inline-flex items-center gap-1">
+                Digi Biz OS <span className="text-[10px] px-1.5 py-0.2 rounded bg-primary/20 text-primary">SaaS</span>
+              </a>
+            </li>
             <li><Link to="/web-development" className="hover:text-primary transition">Web Development</Link></li>
-            <li><Link to="/packages" className="hover:text-primary transition">Packages & Pricing</Link></li>
-            <li><Link to="/#contact" className="hover:text-primary transition">Contact</Link></li>
+            <li><Link to="/3d-interactive-animated-web" className="hover:text-primary transition">3D Interactive Web</Link></li>
           </ul>
         </div>
 
-        {/* Company */}
+        {/* Company & Governance */}
         <div>
           <div className="text-xs uppercase tracking-[0.18em] font-semibold mb-4 opacity-90">
-            Company
+            Company &amp; Trust
           </div>
           <ul className="space-y-2 text-sm">
-            <li><Link to="/#about" className="hover:text-primary transition">About Us</Link></li>
-            <li><Link to="/blog" className="hover:text-primary transition">Blog</Link></li>
-            <li><Link to="/faq" className="hover:text-primary transition">FAQ</Link></li>
-            
-            <li><Link to="/#contact" className="hover:text-primary transition">Contact</Link></li>
+            <li><Link to="/about" className="hover:text-primary transition">About DigiFormation</Link></li>
+            <li>
+              <a
+                href="https://find-and-update.company-information.service.gov.uk/officers/iIzC9R8zKXH6lyWTWCDaT3_gK4E/appointments"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-primary transition inline-flex items-center gap-1"
+              >
+                Founder Directorships (71+)
+              </a>
+            </li>
+            <li><Link to="/blog" className="hover:text-primary transition">Blog &amp; Knowledge Base</Link></li>
+            <li><Link to="/faq" className="hover:text-primary transition">Frequently Asked Questions</Link></li>
             <li><Link to="/privacy-policy" className="hover:text-primary transition">Privacy Policy</Link></li>
-            <li><Link to="/terms" className="hover:text-primary transition">Terms & Conditions</Link></li>
+            <li><Link to="/terms" className="hover:text-primary transition">Terms &amp; Conditions</Link></li>
           </ul>
         </div>
 
-        {/* Contact */}
+        {/* Contact & Registered Office */}
         <div>
           <div className="text-xs uppercase tracking-[0.18em] font-semibold mb-4 opacity-90">
-            Get in Touch
+            Registered Office
           </div>
           <ul className="space-y-3 text-sm">
             <li className="flex items-start gap-3">

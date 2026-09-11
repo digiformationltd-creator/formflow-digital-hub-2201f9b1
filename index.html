@@ -100,7 +100,7 @@
             "@id": "https://www.digiformation.co.uk/#organization",
             "name": "Digiformation Ltd",
             "legalName": "Digiformation Ltd",
-            "alternateName": ["DigiFormation", "DigiFormation UK"],
+            "alternateName": ["DigiFormation", "DigiFormation UK", "DigiFormation Ltd"],
             "url": "https://www.digiformation.co.uk/",
             "logo": {
               "@type": "ImageObject",
@@ -112,11 +112,32 @@
             "foundingDate": "2022",
             "taxID": "16994903",
             "identifier": "16994903",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Office 1006, 85 Dunstall Hill",
+              "addressLocality": "Wolverhampton",
+              "postalCode": "WV6 0SR",
+              "addressCountry": "GB"
+            },
             "founder": {
               "@type": "Person",
+              "@id": "https://www.digiformation.co.uk/#founder",
               "name": "Muhammad Haroon",
               "jobTitle": "Founder & Technical Director",
-              "sameAs": "https://www.linkedin.com/in/muhammad-haroon-9a9945366"
+              "sameAs": [
+                "https://www.linkedin.com/in/muhammad-haroon-9a9945366",
+                "https://find-and-update.company-information.service.gov.uk/officers/iIzC9R8zKXH6lyWTWCDaT3_gK4E/appointments"
+              ]
+            },
+            "owns": {
+              "@type": "SoftwareApplication",
+              "@id": "https://digibizos.co.uk/#product",
+              "name": "Digi Biz OS",
+              "applicationCategory": "BusinessApplication",
+              "operatingSystem": "Web, Cloud, Cross-Platform",
+              "url": "https://digibizos.co.uk/",
+              "description": "AI-powered all-in-one Business Operating System featuring AI assistants, CRM, invoicing, project management, and automated workflow pipelines.",
+              "developer": { "@id": "https://www.digiformation.co.uk/#organization" }
             },
             "areaServed": ["GB","US","PK","IN","AE","BD","MA","NG","SA","QA","KW","EG","Worldwide"],
             "knowsLanguage": ["en","ur","hi","ar"],
@@ -125,7 +146,8 @@
               "https://x.com/Digiformation00",
               "https://www.instagram.com/digiformationltd?igsh=ejBoMmFsOXFpMmdw",
               "https://www.facebook.com/share/1D676UBQw5/",
-              "https://www.youtube.com/@digiformation"
+              "https://www.youtube.com/@digiformationltd",
+              "https://find-and-update.company-information.service.gov.uk/company/16994903"
             ],
             "contactPoint": [{
               "@type": "ContactPoint",
@@ -172,6 +194,16 @@
               "Digi Biz OS ERP / CRM",
               "3D Web Development"
             ]
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://digibizos.co.uk/#product",
+            "name": "Digi Biz OS",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web, Cloud",
+            "url": "https://digibizos.co.uk/",
+            "description": "AI-powered all-in-one Business Operating System unifying CRM, invoicing, client portal, and automated workflow pipelines.",
+            "developer": { "@id": "https://www.digiformation.co.uk/#organization" }
           }
         ]
       }
