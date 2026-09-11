@@ -113,6 +113,7 @@ const App = () => (
           <Route path="/software-and-ai" element={<SoftwareDevelopment />} />
           <Route path="/ai-agents" element={<SoftwareDevelopment />} />
           <Route path="/web-development" element={<WebDevelopment />} />
+          <Route path="/3d-interactive-animated-web" element={<WebDevelopment />} />
           <Route path="/client-area" element={<ClientArea />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
