@@ -18,14 +18,14 @@ const setMeta = (name: string, content: string) => {
 const BlogIndex = () => {
   useEffect(() => {
     document.title =
-      "Digiformation Blog 2026 — UK LTD & US LLC Guides";
+      "Digiformation Blog 2026 — Global Business, Web Development & Formation Guides";
     setMeta(
       "description",
-      "Expert 2026 guides for non-resident founders: UK LTD & US LLC formation, Stripe, PayPal, Wise, Tide, Amazon FBA, Shopify and compliance."
+      "Authoritative 2026 guides for international founders: UK LTD & US LLC formation, Web Development (React, Shopify, 3D WebGL), Stripe, PayPal, Banking, and Compliance."
     );
     setMeta(
       "keywords",
-      "Digiformation blog, UK LTD blog 2026, US LLC blog, Stripe non resident, PayPal worldwide, Payoneer guide, Wise business, WorldFirst, Amazon FBA UK, eBay seller, Shopify worldwide, BOI report, EIN ITIN, Companies House ID verification"
+      "Digiformation blog, UK LTD blog 2026, US LLC blog, web development blog, React vs Shopify, Headless CMS guide, 3D website development, Core Web Vitals 2026, Stripe non resident, PayPal worldwide, Payoneer guide, Wise business, WorldFirst, Amazon FBA UK, eBay seller, Shopify worldwide, BOI report, EIN ITIN, Companies House ID verification"
     );
     setMeta("robots", "index, follow, max-snippet:-1, max-image-preview:large");
     const setProp = (p: string, c: string) => {
@@ -34,7 +34,7 @@ const BlogIndex = () => {
       el.setAttribute("content", c);
     };
     setProp("og:title", document.title);
-    setProp("og:description", "Expert 2026 guides for non-resident founders worldwide — UK LTD & US LLC formation, banking, payment gateways and compliance.");
+    setProp("og:description", "Authoritative 2026 guides for international founders worldwide — UK LTD & US LLC formation, Web Development, banking, payment gateways and compliance.");
     setProp("og:type", "website");
     setProp("og:url", "https://www.digiformation.co.uk/blog");
     setMeta("twitter:card", "summary_large_image");
@@ -64,8 +64,7 @@ const BlogIndex = () => {
               The <em className="not-italic text-gradient">Digiformation</em> Blog
             </h1>
             <p className="mt-8 text-lg md:text-xl leading-relaxed max-w-2xl opacity-90">
-              Practical guides on UK LTD &amp; US LLC formation, PayPal, Stripe, Payoneer, Wise, WorldFirst, Tide and the rest of the global business stack —
-              written for Pakistani entrepreneurs and e-commerce sellers.
+              Forensic guides on UK LTD &amp; US LLC formation, modern Web Development (React, Shopify, 3D WebGL, Headless CMS), payment infrastructure, banking, and statutory compliance — engineered for global founders and growing businesses.
             </p>
           </div>
         </div>
