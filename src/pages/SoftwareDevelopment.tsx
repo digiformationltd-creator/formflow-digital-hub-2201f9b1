@@ -154,7 +154,17 @@ export default function SoftwareDevelopment() {
           },
           {
             "@type": "Offer",
-            name: "Custom CRM / ERP & Business Software Development",
+            name: "Custom CRM Software Development",
+            price: "Custom Quote",
+          },
+          {
+            "@type": "Offer",
+            name: "Custom ERP & Business Operations Systems",
+            price: "Custom Quote",
+          },
+          {
+            "@type": "Offer",
+            name: "Bespoke Business Process Automation",
             price: "Custom Quote",
           },
         ],
@@ -1217,7 +1227,15 @@ export default function SoftwareDevelopment() {
 
 const faqs = [
   {
-    q: "What is the difference between Digi Biz OS and Custom Software Development?",
+    q: "What is custom CRM development and why choose it over off-the-shelf SaaS?",
+    a: "Custom CRM development creates a bespoke customer relationship management platform engineered around your proprietary sales pipeline, data models, and team workflow. Unlike off-the-shelf SaaS platforms (like Salesforce or HubSpot) that impose per-user monthly subscriptions, generic schemas, and feature bloat, a custom CRM gives your business 100% data ownership, zero recurring seat fees, and seamless integration with your internal databases, WhatsApp, and invoicing.",
+  },
+  {
+    q: "Can our custom CRM integrate with WhatsApp, Stripe, and accounting software?",
+    a: "Yes. We engineer direct API connections and webhook pipelines for WhatsApp Business (automated messaging and lead capture), Stripe/PayPal (payment tracking and subscription alerts), and accounting tools (Xero, QuickBooks, or custom invoicing engines).",
+  },
+  {
+    q: "What is the difference between Digi Biz OS and Custom CRM / Software Development?",
     a: "Digi Biz OS is a ready-made, desktop AI business operating system for Windows that you can purchase (£50 lifetime license) and run immediately. Custom Software Development is our bespoke engineering service where DigiFormation builds tailored web applications, CRMs, ERPs, or custom AI agents specifically designed around your company's proprietary workflow.",
   },
   {
