@@ -939,7 +939,7 @@ const softwareDevPackages: DetailPkg[] = [
     note: "Autonomous AI Desktop Operating System",
     tone: "from-indigo-500/25 to-indigo-500/5",
     ring: "ring-indigo-400/60",
-    link: "https://digibizos.co.uk/",
+    link: "https://www.digibizos.co.uk/",
     features: [
       "Universal Voice AI Assistant (JARVIS-style)",
       "Multi-agent autonomous concurrent execution",
@@ -1522,11 +1522,12 @@ const webProcess = [
 const techStack = ["WordPress", "Shopify", "React", "Next.js", "Figma", "Tailwind CSS", "Vite", "TypeScript"];
 
 const webFaqs = [
-  { q: "How long does a website take?", a: "A standard business website takes 4–6 weeks. E-commerce or custom builds typically take 8–12 weeks depending on scope." },
-  { q: "What CMS should I use?", a: "We recommend WordPress for content-heavy sites, Shopify for e-commerce, and headless React/Next.js when you need maximum performance and flexibility." },
-  { q: "What about hosting?", a: "We can host on Vercel, Netlify, or your preferred provider. We handle SSL, CDN configuration, and ongoing performance monitoring." },
-  { q: "Will my site be SEO-ready?", a: "Yes. Every site we build ships with semantic HTML, schema markup, optimised meta tags, sitemap.xml and Core Web Vitals tuning." },
-  { q: "Do you offer ongoing support?", a: "Absolutely — choose from monthly maintenance plans covering updates, backups, security patches and content edits." },
+  { q: "What is the difference between a custom React/Next.js website and WordPress or Shopify?", a: "Custom React and Next.js websites deliver lightning-fast loading speeds (sub-second LCP), custom UI animations, complete database flexibility, and zero plugin vulnerability bloat. Shopify and WordPress are ideal when you require off-the-shelf blogging or standard retail e-commerce management. DigiFormation builds both custom React web applications and optimized Shopify/WordPress storefronts." },
+  { q: "Can DigiFormation integrate 3D animations, WebGL, and Three.js into our website?", a: "Yes. We engineer interactive 3D models, WebGL / Three.js spatial canvases, particle shaders, and smooth scroll-driven Framer Motion animations tailored to elevate brand prestige and engagement without compromising Core Web Vitals or mobile responsiveness." },
+  { q: "How long does a website take to build?", a: "A standard business website takes 2–4 weeks. Custom React applications, complex e-commerce, or 3D interactive builds typically take 4–8 weeks depending on scope and specifications." },
+  { q: "What CMS options do you offer for custom websites?", a: "We integrate headless CMS platforms (such as Sanity, Strapi, or custom Supabase/PostgreSQL backends) for React sites, as well as native Shopify and WordPress administration for standard content publishing." },
+  { q: "What about hosting, SSL, and ongoing maintenance?", a: "We handle deployment on high-performance edge networks (Vercel, Netlify, Cloudflare), configure custom domains and SSL, and offer monthly maintenance covering updates, backups, security, and content additions." },
+  { q: "Will my website be optimized for SEO and mobile?", a: "Yes. Every website we build ships with semantic HTML5, valid JSON-LD schema markup, optimized metadata, automatic XML sitemaps, responsive layout testing, and Core Web Vitals optimization." },
 ];
 
 export const WebDevelopment = () => {
