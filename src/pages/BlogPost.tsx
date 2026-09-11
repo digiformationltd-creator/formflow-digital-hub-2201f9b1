@@ -133,6 +133,7 @@ const BlogPost = () => {
             <ul className="space-y-2 text-sm">
               <li><Link to="/uk-services/uk-ltd-formation" className="text-primary hover:underline">→ UK LTD Formation</Link></li>
               <li><Link to="/usa-services/us-llc-formation" className="text-primary hover:underline">→ US LLC Formation</Link></li>
+              <li><Link to="/software-development" className="text-primary hover:underline">→ Software Development &amp; AI Agents (from £10)</Link></li>
               <li><Link to="/web-development" className="text-primary hover:underline">→ Web Development &amp; E-Commerce (from £30)</Link></li>
               <li><Link to="/3d-interactive-animated-web" className="text-primary hover:underline">→ 3D &amp; Interactive Web Development (£180)</Link></li>
               <li><Link to="/banks-payment-solutions" className="text-primary hover:underline">→ Banks &amp; Payment Solutions</Link></li>
