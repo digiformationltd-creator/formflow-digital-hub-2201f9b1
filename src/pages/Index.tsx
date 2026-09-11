@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { useSeo } from "@/lib/seo";
 import DigiNav from "@/components/DigiNav";
 import DigiHero from "@/components/DigiHero";
 import QuickStartWidget from "@/components/QuickStartWidget";
@@ -19,90 +19,14 @@ import DigiFooter from "@/components/DigiFooter";
 const Index = () => {
   useScrollReveal();
 
-  useEffect(() => {
-    document.title =
-      "Digiformation Ltd | UK LTD & US LLC Formation";
-
-    const setMeta = (name: string, content: string, attr: "name" | "property" = "name") => {
-      let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
-      if (!el) {
-        el = document.createElement("meta");
-        el.setAttribute(attr, name);
-        document.head.appendChild(el);
-      }
-      el.setAttribute("content", content);
-    };
-
-    const description =
-      "Fast UK LTD & US LLC formation with business banking and payment gateways — Stripe, PayPal, Wise, Tide. Trusted by 300+ founders.";
-
-    setMeta("description", description);
-    setMeta(
-      "keywords",
-      "Digiformation, Digiformation Ltd, Digiformation UK, UK LTD formation, US LLC formation, register UK company, register US LLC, Companies House registration, Delaware LLC, Wyoming LLC, EIN number, ITIN number, BOI report, UK UTR, VAT registration, PayPal account, Payoneer account, Stripe account, Wise business account, WorldFirst account, Tide business banking, Airwallex, PingPong, Mollie, Wallester Visa card, Sunrate, ZionPe, payment gateway setup UK, payment gateway setup Pakistan, Amazon seller LLC, eBay seller LTD, Shopify Stripe setup"
-    );
-    setMeta("og:title", "Digiformation Ltd | UK LTD & US LLC Formation", "property");
-    setMeta("og:description", description, "property");
-    setMeta("og:type", "website", "property");
-    setMeta("twitter:title", "Digiformation Ltd | UK LTD & US LLC Formation");
-    setMeta("twitter:description", description);
-
-    // Canonical
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.rel = "canonical";
-      document.head.appendChild(canonical);
-    }
-    canonical.href = "https://www.digiformation.co.uk/";
-
-    // JSON-LD schema
-    const schemas = [
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        name: "Digiformation Ltd",
-        url: "https://www.digiformation.co.uk",
-        description,
-        sameAs: [],
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: "Digiformation Ltd",
-        url: "https://www.digiformation.co.uk",
-        potentialAction: {
-          "@type": "SearchAction",
-          target: `https://www.digiformation.co.uk/blog?q={search_term_string}`,
-          "query-input": "required name=search_term_string",
-        },
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        name: "Digiformation Ltd",
-        url: "https://www.digiformation.co.uk",
-        priceRange: "$$",
-        areaServed: ["United Kingdom", "United States", "Worldwide"],
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "Service",
-        serviceType: "Company Formation",
-        provider: { "@type": "Organization", name: "Digiformation Ltd" },
-        areaServed: ["United Kingdom", "United States"],
-      },
-    ];
-
-    let scriptEl = document.getElementById("home-jsonld") as HTMLScriptElement | null;
-    if (!scriptEl) {
-      scriptEl = document.createElement("script");
-      scriptEl.id = "home-jsonld";
-      scriptEl.type = "application/ld+json";
-      document.head.appendChild(scriptEl);
-    }
-    scriptEl.text = JSON.stringify(schemas);
-  }, []);
+  useSeo({
+    title: "UK LTD & US LLC Formation, Global Banking & AI Software Development | DigiFormation",
+    description:
+      "Official DigiFormation platform — Fully-managed UK Limited Company & US LLC formation for non-residents worldwide, international business banking, Stripe/PayPal gateways, custom software, CRM/ERP development, and AI agents.",
+    keywords:
+      "register UK limited company online, US LLC formation non resident, UK LTD formation 2026, Companies House ID verification, EIN without SSN, ITIN application, BOI report FinCEN, UK UTR HMRC, VAT registration UK, business bank account non resident, Stripe non resident, PayPal worldwide, Payoneer Wise WorldFirst Tide Airwallex Mercury, Delaware LLC Wyoming LLC, Amazon FBA UK LTD, Shopify Stripe worldwide, software development UK, AI agents, WhatsApp AI agent, CRM development, ERP development, Digi Biz OS, 3D web development",
+    path: "/",
+  });
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
