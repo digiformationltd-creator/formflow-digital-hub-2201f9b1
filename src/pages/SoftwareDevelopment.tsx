@@ -146,9 +146,31 @@ export default function SoftwareDevelopment() {
       },
     });
 
+    const cleanupProduct = injectJsonLd("digibizos-product-jsonld", {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "Digi Biz OS",
+      operatingSystem: "Windows 10, Windows 11",
+      applicationCategory: "BusinessApplication",
+      offers: {
+        "@type": "Offer",
+        price: "50",
+        priceCurrency: "GBP",
+        url: "https://digibizos.co.uk/",
+      },
+      creator: {
+        "@type": "Organization",
+        name: "Digiformation Ltd",
+        url: "https://digiformation.co.uk",
+      },
+      description:
+        "All-in-one AI-powered desktop Business Operating System featuring universal voice AI control, autonomous multi-agent execution, DIGI CRM, WhatsApp integration, and creative video studio.",
+    });
+
     return () => {
       cleanupFaq();
       cleanupService();
+      cleanupProduct();
     };
   }, []);
 
@@ -157,49 +179,56 @@ export default function SoftwareDevelopment() {
       id: "os-dashboard",
       title: "Universal AI Business OS",
       tag: "Main Dashboard",
-      desc: "Live system dashboard with real-time AI reasoning, multi-module status, and universal voice control across all operations.",
+      badge: "Desktop Core",
+      desc: "Central command center with real-time neural reasoning, multi-module live telemetry, and universal voice control across all enterprise operations.",
       image: osDashboard,
     },
     {
       id: "os-crm",
       title: "DIGI CRM & Pipeline Intelligence",
       tag: "CRM & Contacts",
-      desc: "Customer lifecycle intelligence, active deal pipelines, company accounts, and long-term business memory.",
+      badge: "Customer Hub",
+      desc: "Full customer lifecycle intelligence, multi-stage sales pipeline, company account tracking, deal forecasting, and contextual customer memory.",
       image: osCrm,
     },
     {
       id: "os-agent-search",
       title: "Autonomous Multi-Agent Platform",
-      tag: "Agentic AI",
-      desc: "Specialized autonomous agents collaborating concurrently for research, execution, data verification, and task handling.",
+      tag: "Agentic Swarm",
+      badge: "Autonomous AI",
+      desc: "Specialized AI agents working concurrently on research, data scraping, document verification, lead enrichment, and end-to-end task execution.",
       image: osAgentSearch,
     },
     {
       id: "os-whatsapp",
       title: "WhatsApp Automated CRM",
-      tag: "Messaging CRM",
-      desc: "Integrated WhatsApp business communication, contact threads, automated message flows, and client conversation history.",
+      tag: "WhatsApp CRM",
+      badge: "Direct Messaging",
+      desc: "Direct WhatsApp business sync, customer threads, automated message flows, auto-responder rules, and full client conversation archiving.",
       image: osWhatsapp,
     },
     {
       id: "os-studio",
       title: "Digi Studio Creative AI Suite",
       tag: "Media & Studio",
-      desc: "AI video generation, voice synthesis, avatar presentation, transcript extraction, and media processing directly on desktop.",
+      badge: "Content Engine",
+      desc: "AI video generation, neural voice synthesis, avatar presentations, transcript extraction, and automated social media asset generation.",
       image: osStudio,
     },
     {
       id: "os-code",
       title: "Digi Code Studio & Developer Hub",
-      tag: "Developer Suite",
-      desc: "Built-in developer workstation with code generation, terminal controls, Git synchronization, and tool scripting.",
+      tag: "Developer Hub",
+      badge: "Code & Scripts",
+      desc: "Built-in developer workstation with intelligent code generation, terminal controls, Git synchronization, and automated MCP tool scripting.",
       image: osCode,
     },
     {
       id: "os-skills",
       title: "Skills & Universal MCP Tools",
       tag: "Tools & MCP",
-      desc: "Extensible Model Context Protocol (MCP) toolchain connecting local neural models, screen inspection, cameras, and system tools.",
+      badge: "Universal Toolchain",
+      desc: "Extensible Model Context Protocol (MCP) toolchain connecting local neural models, screen inspection, vision cameras, and system executables.",
       image: osSkills,
     },
   ];
@@ -207,43 +236,37 @@ export default function SoftwareDevelopment() {
   return (
     <Layout>
       {/* SECTION 1 — HERO */}
-      <section className="relative overflow-hidden bg-gradient-hero border-b border-border/60">
+      <section className="relative overflow-hidden bg-gradient-hero">
         <div className="absolute inset-0 grid-pattern opacity-40 pointer-events-none" />
-        <div className="absolute -top-40 right-0 w-[600px] h-[600px] rounded-full bg-cyan-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-40 left-0 w-[500px] h-[500px] rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
+        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-primary/10 blur-3xl animate-pulse-glow pointer-events-none" />
+        <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-accent/10 blur-3xl animate-pulse-glow pointer-events-none" />
 
-        <div className="container mx-auto px-4 py-16 md:py-24 relative">
-          <div className="grid lg:grid-cols-[1.15fr_1fr] gap-12 lg:gap-16 items-center">
+        <div className="container mx-auto px-4 py-12 md:py-20 relative">
+          <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 lg:gap-14 items-center">
             <div className="max-w-3xl">
               {/* Eyebrow badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass border border-cyan-500/30 mb-6 backdrop-blur-md">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                <span className="text-[11px] font-mono uppercase tracking-[0.16em] text-cyan-300 font-semibold">
-                  DigiFormation Software & AI Division
+              <div className="inline-flex items-center gap-3 mb-6">
+                <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                  Software & AI Engineering
                 </span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.06] tracking-tight text-white">
-                Software Development & <span className="text-gradient">AI Agents</span> for Modern Businesses
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight">
+                Software Development & <em className="not-italic text-gradient">AI Agents</em> for Modern Businesses
               </h1>
 
-              <p className="mt-6 text-base sm:text-lg opacity-90 leading-relaxed text-white/90">
-                DigiFormation engineers bespoke business software, autonomous AI agents, CRM/ERP platforms, and intelligent automation systems. We are also the creator of <strong className="text-cyan-300 font-semibold">Digi Biz OS</strong> — our flagship AI-powered desktop Business Operating System.
+              <p className="mt-8 text-lg md:text-xl leading-relaxed max-w-2xl opacity-90">
+                DigiFormation engineers bespoke business software, autonomous AI agents, CRM & ERP platforms, and custom workflow automation. We are also the creator of <strong className="font-semibold text-white">Digi Biz OS</strong> — our flagship AI desktop Business Operating System.
               </p>
 
               {/* Dual Primary CTAs */}
-              <div className="mt-8 flex flex-wrap items-center gap-4">
-                <a
-                  href={DIGI_BIZ_OS_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full font-display text-sm font-bold bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-500 text-slate-950 shadow-[0_0_24px_rgba(47,224,200,0.35)] hover:shadow-[0_0_32px_rgba(47,224,200,0.5)] hover:scale-[1.02] transition-all"
-                >
-                  <img src={logoClean} alt="Digi Biz OS Logo" className="w-5 h-5 rounded-full object-cover" />
-                  Get Digi Biz OS <ExternalLink className="w-4 h-4" />
-                </a>
-
-                <Button asChild variant="outline" size="lg" className="rounded-full glass border-white/20 hover:bg-white/10 text-white">
+              <div className="mt-10 flex flex-col sm:flex-row gap-4">
+                <Button asChild variant="hero" size="lg" className="rounded-full">
+                  <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer">
+                    Get Digi Biz OS <ExternalLink className="w-4 h-4 ml-1" />
+                  </a>
+                </Button>
+                <Button asChild variant="ghostGlow" size="lg" className="rounded-full">
                   <a href="#custom-software">
                     Build Custom Software <ArrowRight className="w-4 h-4 ml-1" />
                   </a>
@@ -251,63 +274,61 @@ export default function SoftwareDevelopment() {
               </div>
 
               {/* Key capabilities tag strip */}
-              <div className="mt-10 pt-6 border-t border-border/40 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-medium text-white/80">
+              <div className="mt-12 pt-6 border-t border-border/60 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-medium">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                  <span>Custom CRM & ERP</span>
+                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                  <span className="opacity-90">Custom CRM & ERP</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                  <span>Custom AI Agents</span>
+                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                  <span className="opacity-90">Custom AI Agents</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                  <span>Business Automation</span>
+                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                  <span className="opacity-90">Business Automation</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                  <span>Digi Biz OS Creator</span>
+                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                  <span className="opacity-90">Digi Biz OS Creator</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                  <span>WhatsApp AI Agents</span>
+                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                  <span className="opacity-90">WhatsApp AI Agents</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                  <span>Universal MCP & Voice</span>
+                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                  <span className="opacity-90">Universal MCP & Voice</span>
                 </div>
               </div>
             </div>
 
             {/* Hero Visual Preview */}
             <div className="relative">
-              <div className="relative rounded-3xl p-3 glass border border-cyan-500/30 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)]">
-                <div className="relative rounded-2xl overflow-hidden bg-slate-950 aspect-[16/10] group">
-                  <img
-                    src={osDashboard}
-                    alt="Digi Biz OS Main AI Desktop Dashboard developed by DigiFormation"
-                    className="w-full h-full object-cover object-top transition duration-500 group-hover:scale-[1.02]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent pointer-events-none" />
+              <div className="relative rounded-2xl overflow-hidden glass shadow-elegant aspect-[16/10] border border-border/60">
+                <img
+                  src={osDashboard}
+                  alt="Digi Biz OS Main AI Desktop Dashboard developed by DigiFormation"
+                  className="w-full h-full object-cover object-top"
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-transparent pointer-events-none" />
 
-                  {/* Floating badge */}
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3 p-3 rounded-xl glass border border-white/10 backdrop-blur-xl">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <div>
-                        <div className="text-xs font-bold text-white">DIGI BIZ OS Windows 10 & 11</div>
-                        <div className="text-[10px] text-white/70">Autonomous AI Operating System</div>
-                      </div>
+                {/* Floating pill badge */}
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3 p-3 rounded-xl glass border border-border/60">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                    <div>
+                      <div className="text-xs font-bold">DIGI BIZ OS • Windows 10 & 11</div>
+                      <div className="text-[10px] opacity-70">Autonomous AI Operating System</div>
                     </div>
-                    <a
-                      href={DIGI_BIZ_OS_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1 rounded-full text-[11px] font-semibold bg-cyan-400/20 text-cyan-300 hover:bg-cyan-400/30 transition flex items-center gap-1 shrink-0"
-                    >
-                      Visit Product <ExternalLink className="w-3 h-3" />
-                    </a>
                   </div>
+                  <a
+                    href={DIGI_BIZ_OS_URL}
+                    target="_blank",
+                    rel="noopener noreferrer"
+                    className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 shrink-0"
+                  >
+                    Visit Product <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
               </div>
             </div>
@@ -316,29 +337,28 @@ export default function SoftwareDevelopment() {
       </section>
 
       {/* SECTION 2 — DIGI BIZ OS FEATURED PRODUCT SHOWCASE */}
-      <section className="py-16 md:py-24 border-b border-border/60 relative">
+      <section className="py-14 md:py-20 border-t border-border/60 relative overflow-hidden">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass border border-cyan-500/20 text-xs font-mono uppercase text-cyan-300 mb-3">
-                <Sparkles className="w-3.5 h-3.5" /> Featured Flagship Product
+              <div className="inline-flex items-center gap-3 mb-3">
+                <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                  Flagship Product
+                </span>
               </div>
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white">
-                Meet <span className="text-gradient">Digi Biz OS</span>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+                Meet <em className="not-italic text-gradient">Digi Biz OS</em>
               </h2>
-              <p className="mt-3 text-base md:text-lg opacity-85 max-w-2xl text-white/90">
+              <p className="mt-4 text-base md:text-lg opacity-80 max-w-2xl">
                 An AI-powered Business Operating System designed to bring business operations, multi-agent automation, voice control, CRM, and intelligent workflows into one unified desktop environment.
-              </p>
+              </p
             </div>
 
-            <a
-              href={DIGI_BIZ_OS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-display text-sm font-bold bg-cyan-400/20 text-cyan-300 border border-cyan-400/40 hover:bg-cyan-400/30 transition self-start md:self-auto"
-            >
-              Explore Digi Biz OS <ExternalLink className="w-4 h-4" />
-            </a>
+            <Button asChild variant="hero" size="lg" className="rounded-full self-start md:self-auto shrink-0">
+              <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer">
+                Explore Digi Biz OS <ExternalLink className="w-4 h-4 ml-1" />
+              </a>
+            </Button>
           </div>
 
           {/* Interactive Showcase Tabs */}
@@ -347,10 +367,10 @@ export default function SoftwareDevelopment() {
               <button
                 key={slide.id}
                 onClick={() => setActiveSlide(idx)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                   activeSlide === idx
-                    ? "bg-cyan-500 text-slate-950 shadow-[0_0_16px_rgba(47,224,200,0.4)]"
-                    : "glass text-white/70 hover:text-white hover:bg-white/10"
+                    ? "bg-gradient-brand text-primary-foreground shadow-glow"
+                    : "glass text-white/80 hover:text-white hover:bg-primary/10"
                 }`}
               >
                 {slide.tag}
@@ -359,9 +379,9 @@ export default function SoftwareDevelopment() {
           </div>
 
           {/* Active Showcase Card */}
-          <div className="glass rounded-3xl p-6 md:p-8 border border-white/15 bg-gradient-to-b from-card/80 to-card/40">
+          <div className="glass glass-tint-indigo rounded-3xl p-6 md:p-8 border border-border/60 shadow-elegant">
             <div className="grid lg:grid-cols-[1.3fr_1fr] gap-8 items-center">
-              <div className="relative rounded-2xl overflow-hidden bg-slate-950 border border-white/10 aspect-[16/10] shadow-2xl">
+              <div className="relative rounded-2xl overflow-hidden glass aspect-[16/10] border border-border/60 shadow-2xl">
                 <img
                   src={showcaseSlides[activeSlide].image}
                   alt={`${showcaseSlides[activeSlide].title} - Digi Biz OS`}
@@ -369,27 +389,24 @@ export default function SoftwareDevelopment() {
                 />
               </div>
 
-              <div className="space-y-5">
-                <div className="inline-block px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-cyan-400/15 text-cyan-300 border border-cyan-400/30">
-                  {showcaseSlides[activeSlide].tag}
+              <div className="space-y-4">
+                <div className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-primary/20 text-primary border border-primary/30">
+                  {showcaseSlides[activeSlide].badge}
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-white">
+                <h3 className="text-2xl md:text-3xl font-bold">
                   {showcaseSlides[activeSlide].title}
                 </h3>
-                <p className="text-sm md:text-base opacity-85 leading-relaxed text-white/80">
+                <p className="text-sm md:text-base opacity-90 leading-relaxed">
                   {showcaseSlides[activeSlide].desc}
                 </p>
 
                 <div className="pt-4 border-t border-border/40 flex flex-wrap items-center gap-4">
-                  <a
-                    href={DIGI_BIZ_OS_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition"
-                  >
-                    Get Digi Biz OS (£50 Lifetime) <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                  <span className="text-xs text-white/60">Zero monthly SaaS subscriptions</span>
+                  <Button asChild variant="hero" size="default" className="rounded-full">
+                    <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer">
+                      Get Digi Biz OS (£50 Lifetime) <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                    </a>
+                  </Button>
+                  <span className="text-xs opacity-70">Zero monthly SaaS subscriptions</span>
                 </div>
               </div>
             </div>
@@ -398,119 +415,127 @@ export default function SoftwareDevelopment() {
       </section>
 
       {/* SECTION 3 — WHAT DIGI BIZ OS CAN DO (Verified Features) */}
-      <section className="py-16 md:py-24 border-b border-border/60 bg-muted/10">
+      <section className="py-14 md:py-20 border-t border-border/60">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-[11px] uppercase tracking-[0.2em] font-mono text-cyan-300">Verified Platform Capabilities</span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mt-3">
-              What <span className="text-gradient">Digi Biz OS</span> Brings to Your Desktop
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-3 mb-3">
+              <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                Verified Capabilities
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+              What <em className="not-italic text-gradient">Digi Biz OS</em> Brings to Your Desktop
             </h2>
-            <p className="mt-4 text-base opacity-85 text-white/80">
+            <p className="opacity-80 mt-4 text-base md:text-lg">
               Engineered with an active neural reasoning engine, universal voice assistance, and deep business workflow integrations.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="glass rounded-2xl p-6 border border-white/10 hover:border-cyan-400/40 transition-all group">
-              <div className="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center text-cyan-300 mb-4 group-hover:scale-110 transition-transform">
-                <Mic className="w-5 h-5" />
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="glass glass-tint-cyan rounded-2xl p-6 hover:-translate-y-1 hover:shadow-elegant transition-all flex flex-col justify-between">
+              <div>
+                <Mic className="w-8 h-8 text-primary mb-4" />
+                <h3 className="font-display text-lg font-bold mb-2">Universal Voice AI Control</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed">
+                  JARVIS-style voice assistant embedded in every prompt box and module. Control software, trigger automations, and query data hands-free.
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Universal Voice AI Control</h3>
-              <p className="text-xs opacity-80 leading-relaxed text-white/80">
-                JARVIS-style voice assistant embedded in every prompt box and module. Control software, trigger automations, and query data hands-free.
-              </p>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 hover:border-cyan-400/40 transition-all group">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/15 flex items-center justify-center text-purple-300 mb-4 group-hover:scale-110 transition-transform">
-                <Bot className="w-5 h-5" />
+            <div className="glass glass-tint-indigo rounded-2xl p-6 hover:-translate-y-1 hover:shadow-elegant transition-all flex flex-col justify-between">
+              <div>
+                <Bot className="w-8 h-8 text-primary mb-4" />
+                <h3 className="font-display text-lg font-bold mb-2">Multi-Agent Execution</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed">
+                  Specialized autonomous agents collaborating concurrently for research, execution, data verification, and task handling.
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Multi-Agent Execution</h3>
-              <p className="text-xs opacity-80 leading-relaxed text-white/80">
-                Specialized autonomous agents collaborating concurrently for research, execution, data verification, and task handling.
-              </p>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 hover:border-cyan-400/40 transition-all group">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-300 mb-4 group-hover:scale-110 transition-transform">
-                <Database className="w-5 h-5" />
+            <div className="glass glass-tint-green rounded-2xl p-6 hover:-translate-y-1 hover:shadow-elegant transition-all flex flex-col justify-between">
+              <div>
+                <Database className="w-8 h-8 text-primary mb-4" />
+                <h3 className="font-display text-lg font-bold mb-2">DIGI CRM & Pipeline</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed">
+                  Complete contact management, active deals pipeline, company accounts, notes, and long-term customer context memory.
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">DIGI CRM & Pipeline</h3>
-              <p className="text-xs opacity-80 leading-relaxed text-white/80">
-                Complete contact management, active deals pipeline, company accounts, notes, and long-term customer context memory.
-              </p>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 hover:border-cyan-400/40 transition-all group">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-300 mb-4 group-hover:scale-110 transition-transform">
-                <MessageSquare className="w-5 h-5" />
+            <div className="glass glass-tint-sky rounded-2xl p-6 hover:-translate-y-1 hover:shadow-elegant transition-all flex flex-col justify-between">
+              <div>
+                <MessageSquare className="w-8 h-8 text-primary mb-4" />
+                <h3 className="font-display text-lg font-bold mb-2">WhatsApp CRM Integration</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed">
+                  Automated WhatsApp customer threads, campaign broadcasts, and direct client conversation logging inside the OS.
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">WhatsApp CRM Integration</h3>
-              <p className="text-xs opacity-80 leading-relaxed text-white/80">
-                Automated WhatsApp customer threads, campaign broadcasts, and direct client conversation logging inside the OS.
-              </p>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 hover:border-cyan-400/40 transition-all group">
-              <div className="w-10 h-10 rounded-xl bg-rose-500/15 flex items-center justify-center text-rose-300 mb-4 group-hover:scale-110 transition-transform">
-                <Sparkles className="w-5 h-5" />
+            <div className="glass glass-tint-pink rounded-2xl p-6 hover:-translate-y-1 hover:shadow-elegant transition-all flex flex-col justify-between">
+              <div>
+                <Sparkles className="w-8 h-8 text-primary mb-4" />
+                <h3 className="font-display text-lg font-bold mb-2">Digi Studio Creative AI</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed">
+                  Integrated video editing, voice synthesis, avatar presentations, transcript extraction, and media rendering on desktop.
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Digi Studio Creative AI</h3>
-              <p className="text-xs opacity-80 leading-relaxed text-white/80">
-                Integrated video editing, voice synthesis, avatar presentations, transcript extraction, and media rendering on desktop.
-              </p>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 hover:border-cyan-400/40 transition-all group">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-300 mb-4 group-hover:scale-110 transition-transform">
-                <Cpu className="w-5 h-5" />
+            <div className="glass glass-tint-gold rounded-2xl p-6 hover:-translate-y-1 hover:shadow-elegant transition-all flex flex-col justify-between">
+              <div>
+                <Cpu className="w-8 h-8 text-primary mb-4" />
+                <h3 className="font-display text-lg font-bold mb-2">Universal MCP & Skills</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed">
+                  Extensible Model Context Protocol (MCP) toolchain allowing AI models to interact with local databases, cameras, and system tools.
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Universal MCP & Skills</h3>
-              <p className="text-xs opacity-80 leading-relaxed text-white/80">
-                Extensible Model Context Protocol (MCP) toolchain allowing AI models to interact with local databases, cameras, and system tools.
-              </p>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 hover:border-cyan-400/40 transition-all group">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/15 flex items-center justify-center text-sky-300 mb-4 group-hover:scale-110 transition-transform">
-                <Monitor className="w-5 h-5" />
+            <div className="glass glass-tint-mustard rounded-2xl p-6 hover:-translate-y-1 hover:shadow-elegant transition-all flex flex-col justify-between">
+              <div>
+                <Monitor className="w-8 h-8 text-primary mb-4" />
+                <h3 className="font-display text-lg font-bold mb-2">Desktop Workstation OS</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed">
+                  Optimized for Windows 10 & 11. Run local models or cloud APIs with complete privacy and seamless local file processing.
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Desktop Workstation OS</h3>
-              <p className="text-xs opacity-80 leading-relaxed text-white/80">
-                Optimized for Windows 10 & 11. Run local models or cloud APIs with complete privacy and seamless local file processing.
-              </p>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 hover:border-cyan-400/40 transition-all group">
-              <div className="w-10 h-10 rounded-xl bg-teal-500/15 flex items-center justify-center text-teal-300 mb-4 group-hover:scale-110 transition-transform">
-                <ShieldCheck className="w-5 h-5" />
+            <div className="glass glass-tint-orange rounded-2xl p-6 hover:-translate-y-1 hover:shadow-elegant transition-all flex flex-col justify-between">
+              <div>
+                <ShieldCheck className="w-8 h-8 text-primary mb-4" />
+                <h3 className="font-display text-lg font-bold mb-2">Zero Monthly SaaS Fees</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed">
+                  One-time purchase model (£50). Own your business operating system without perpetual monthly subscription lock-ins.
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Zero Monthly SaaS Fees</h3>
-              <p className="text-xs opacity-80 leading-relaxed text-white/80">
-                One-time purchase model (£50). Own your business operating system without perpetual monthly subscription lock-ins.
-              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* SECTION 4 — WHY DIGIFORMATION BUILT IT */}
-      <section className="py-16 md:py-20 border-b border-border/60 relative">
+      <section className="py-14 md:py-20 border-t border-border/60">
         <div className="container mx-auto px-4 max-w-5xl">
-          <div className="glass rounded-3xl p-8 md:p-12 border border-cyan-500/30 bg-gradient-to-br from-card/90 via-card/70 to-card/50">
+          <div className="glass glass-tint-indigo rounded-3xl p-8 md:p-12 border border-border/60">
             <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="w-20 h-20 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center shrink-0">
-                <Building2 className="w-10 h-10 text-cyan-300" />
+              <div className="w-20 h-20 rounded-2xl glass flex items-center justify-center shrink-0">
+                <Building2 className="w-10 h-10 text-primary" />
               </div>
               <div className="space-y-3">
-                <span className="text-[11px] font-mono uppercase tracking-[0.18em] text-cyan-300">The Creator Behind The Product</span>
-                <h3 className="text-2xl md:text-3xl font-bold text-white">
+                <div className="inline-flex items-center gap-2">
+                  <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                    The Creator Behind The Product
+                  </span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold">
                   Why DigiFormation Engineered Digi Biz OS
                 </h3>
-                <p className="text-sm md:text-base opacity-85 leading-relaxed text-white/90">
+                <p className="text-sm md:text-base opacity-90 leading-relaxed">
                   As an international corporate services provider managing UK company formations, US LLCs, compliance deadlines, and thousands of client documents daily, DigiFormation needed an operating system capable of autonomous multi-agent reasoning, CRM intelligence, and instant workflow automation.
                 </p>
-                <p className="text-sm md:text-base opacity-85 leading-relaxed text-white/90">
+                <p className="text-sm md:text-base opacity-90 leading-relaxed">
                   Rather than paying fragmented monthly fees to dozens of separate SaaS vendors, we engineered <strong>Digi Biz OS</strong> — combining our real-world corporate operational experience with cutting-edge agentic software engineering. Today, we make this same operating system available to businesses worldwide.
                 </p>
               </div>
@@ -520,208 +545,268 @@ export default function SoftwareDevelopment() {
       </section>
 
       {/* SECTION 5 — CUSTOM SOFTWARE DEVELOPMENT */}
-      <section id="custom-software" className="py-16 md:py-24 border-b border-border/60">
+      <section id="custom-software" className="py-14 md:py-20 border-t border-border/60">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="max-w-3xl mb-14">
-            <span className="text-[11px] uppercase tracking-[0.2em] font-mono text-cyan-300">Bespoke Engineering</span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mt-3">
-              Need Custom Software Built for <span className="text-gradient">Your Business</span>?
-            </h2>
-            <p className="mt-4 text-base md:text-lg opacity-85 text-white/90">
-              When ready-made software doesn’t fit your exact workflow, DigiFormation designs and engineers custom business systems, CRMs, ERPs, and automation platforms tailored specifically to your company’s requirements.
-            </p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+            <div>
+              <div className="inline-flex items-center gap-3 mb-3">
+                <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                  Bespoke Engineering
+                </span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+                Need Custom Software Built for <em className="not-italic text-gradient">Your Business</em>?
+              </h2>
+              <p className="mt-4 text-base md:text-lg opacity-80 max-w-2xl">
+                When ready-made software doesn’t fit your exact workflow, DigiFormation designs and engineers custom business systems, CRMs, ERPs, and automation platforms tailored specifically to your company’s requirements.
+              </p>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="glass rounded-2xl p-7 border border-white/10 hover:border-white/20 transition">
-              <Database className="w-8 h-8 text-cyan-400 mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Custom CRM Systems</h3>
-              <p className="text-sm opacity-80 leading-relaxed text-white/80 mb-4">
-                Tailored customer relationship platforms with bespoke sales pipelines, automated deal tracking, WhatsApp/email triggers, and client portals.
-              </p>
-              <ul className="space-y-1.5 text-xs text-white/70">
-                <li className="flex items-center gap-1.5">• Multi-stage deal pipelines</li>
-                <li className="flex items-center gap-1.5">• Automated lead capture & attribution</li>
-                <li className="flex items-center gap-1.5">• Client portal & document distribution</li>
-              </ul>
-            </div>
-
-            <div className="glass rounded-2xl p-7 border border-white/10 hover:border-white/20 transition">
-              <Layers className="w-8 h-8 text-purple-400 mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Custom ERP & Management Systems</h3>
-              <p className="text-sm opacity-80 leading-relaxed text-white/80 mb-4">
-                End-to-end Enterprise Resource Planning systems for inventory, order processing, team workload, billing, and operational compliance.
-              </p>
-              <ul className="space-y-1.5 text-xs text-white/70">
-                <li className="flex items-center gap-1.5">• Centralized order & invoice generation</li>
-                <li className="flex items-center gap-1.5">• Role-based permissions & admin security</li>
-                <li className="flex items-center gap-1.5">• Inventory & service catalog tracking</li>
-              </ul>
-            </div>
-
-            <div className="glass rounded-2xl p-7 border border-white/10 hover:border-white/20 transition">
-              <Workflow className="w-8 h-8 text-emerald-400 mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Business Workflow Automation</h3>
-              <p className="text-sm opacity-80 leading-relaxed text-white/80 mb-4">
-                Automate repetitive manual operations: instant PDF generation, automatic transactional mailers, webhook integrations, and scheduled syncs.
-              </p>
-              <ul className="space-y-1.5 text-xs text-white/70">
-                <li className="flex items-center gap-1.5">• Webhook & API data pipelines</li>
-                <li className="flex items-center gap-1.5">• Automated compliance deadline alerts</li>
-                <li className="flex items-center gap-1.5">• Transactional notifications (Email/WhatsApp)</li>
-              </ul>
-            </div>
-
-            <div className="glass rounded-2xl p-7 border border-white/10 hover:border-white/20 transition">
-              <Monitor className="w-8 h-8 text-sky-400 mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">Internal Dashboards & Platforms</h3>
-              <p className="text-sm opacity-80 leading-relaxed text-white/80 mb-4">
-                High-performance administrative dashboards with real-time analytics, revenue KPI monitoring, and customer telemetry.
-              </p>
-              <ul className="space-y-1.5 text-xs text-white/70">
-                <li className="flex items-center gap-1.5">• Real-time financial & revenue analytics</li>
-                <li className="flex items-center gap-1.5">• Data export & backup utilities</li>
-                <li className="flex items-center gap-1.5">• Multi-tenant or single-tenant setups</li>
-              </ul>
-            </div>
-
-            <div className="glass rounded-2xl p-7 border border-white/10 hover:border-white/20 transition">
-              <Brain className="w-8 h-8 text-amber-400 mb-4" />
-              <h3 className="text-xl font-bold text-white mb-2">AI-Powered Business Software</h3>
-              <p className="text-sm opacity-80 leading-relaxed text-white/80 mb-4">
-                Embed intelligent AI models directly into your business workflows for document parsing, intelligent search, and autonomous data extraction.
-              </p>
-              <ul className="space-y-1.5 text-xs text-white/70">
-                <li className="flex items-center gap-1.5">• Intelligent document OCR & verification</li>
-                <li className="flex items-center gap-1.5">• Natural language search & data querying</li>
-                <li className="flex items-center gap-1.5">• Custom fine-tuned internal assistants</li>
-              </ul>
-            </div>
-
-            <div className="glass rounded-2xl p-7 border border-white/10 hover:border-white/20 transition flex flex-col justify-between">
+            <div className="glass rounded-2xl p-7 flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div>
-                <Code2 className="w-8 h-8 text-teal-400 mb-4" />
-                <h3 className="text-xl font-bold text-white mb-2">Modern Technology Stack</h3>
-                <p className="text-sm opacity-80 leading-relaxed text-white/80 mb-4">
+                <Database className="w-8 h-8 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2">Custom CRM Systems</h3>
+                <p className="text-sm opacity-85 leading-relaxed mb-4">
+                  Tailored customer relationship platforms with bespoke sales pipelines, automated deal tracking, WhatsApp/email triggers, and client portals.
+                </p>
+                <ul className="space-y-2 text-xs opacity-90">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Multi-stage deal pipelines</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Automated lead capture & attribution</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Client portal & document distribution</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="glass rounded-2xl p-7 flex flex-col justify-between hover:-translate-y-1 transition-transform">
+              <div>
+                <Layers className="w-8 h-8 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2">Custom ERP & Management Systems</h3>
+                <p className="text-sm opacity-85 leading-relaxed mb-4">
+                  End-to-end Enterprise Resource Planning systems for inventory, order processing, team workload, billing, and operational compliance.
+                </p>
+                <ul className="space-y-2 text-xs opacity-90">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Centralized order & invoice generation</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Role-based permissions & admin security</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Inventory & service catalog tracking</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="glass rounded-2xl p-7 flex flex-col justify-between hover:-translate-y-1 transition-transform">
+              <div>
+                <Workflow className="w-8 h-8 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2">Business Workflow Automation</h3>
+                <p className="text-sm opacity-85 leading-relaxed mb-4">
+                  Automate repetitive manual operations: instant PDF generation, automatic transactional mailers, webhook integrations, and scheduled syncs.
+                </p>
+                <ul className="space-y-2 text-xs opacity-90">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Webhook & API data pipelines</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Automated compliance deadline alerts</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Transactional notifications (Email/WhatsApp)</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="glass rounded-2xl p-7 flex flex-col justify-between hover:-translate-y-1 transition-transform">
+              <div>
+                <Monitor className="w-8 h-8 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2">Internal Dashboards & Platforms</h3>
+                <p className="text-sm opacity-85 leading-relaxed mb-4">
+                  High-performance administrative dashboards with real-time analytics, revenue KPI monitoring, and customer telemetry.
+                </p>
+                <ul className="space-y-2 text-xs opacity-90">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Real-time financial & revenue analytics</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Data export & backup utilities</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Multi-tenant or single-tenant setups</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="glass rounded-2xl p-7 flex flex-col justify-between hover:-translate-y-1 transition-transform">
+              <div>
+                <Brain className="w-8 h-8 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2">AI-Powered Business Software</h3>
+                <p className="text-sm opacity-85 leading-relaxed mb-4">
+                  Embed intelligent AI models directly into your business workflows for document parsing, intelligent search, and autonomous data extraction.
+                </p>
+                <ul className="space-y-2 text-xs opacity-90">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Intelligent document OCR & verification</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Natural language search & data querying</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Custom fine-tuned internal assistants</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="glass rounded-2xl p-7 flex flex-col justify-between hover:-translate-y-1 transition-transform">
+              <div>
+                <Code2 className="w-8 h-8 text-primary mb-4" />
+                <h3 className="text-xl font-bold mb-2">Modern Technology Stack</h3>
+                <p className="text-sm opacity-85 leading-relaxed mb-4">
                   Built with enterprise-grade technologies: React, TypeScript, Next.js, Node.js, Python, PostgreSQL, Supabase, and Deno Edge Runtimes.
                 </p>
+                <div className="pt-2">
+                  <Button asChild variant="hero" className="rounded-full w-full">
+                    <Link to="/contact?service=custom-software">
+                      Discuss Your Project <ArrowRight className="w-4 h-4 ml-1" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
-
-              <Button asChild variant="hero" className="rounded-full w-full mt-4">
-                <Link to="/contact?service=custom-software">
-                  Discuss Your Project <ArrowRight className="w-4 h-4 ml-1" />
-                </Link>
-              </Button>
             </div>
           </div>
         </div>
       </section>
 
       {/* SECTION 6 — CUSTOM AI AGENTS FOR YOUR BUSINESS */}
-      <section className="py-16 md:py-24 border-b border-border/60 bg-muted/10">
+      <section className="py-14 md:py-20 border-t border-border/60">
         <div className="container mx-auto px-4 max-w-7xl">
           <div className="grid lg:grid-cols-[1.1fr_1fr] gap-12 items-center">
             <div>
-              <span className="text-[11px] uppercase tracking-[0.2em] font-mono text-cyan-300">Agentic Engineering</span>
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mt-3">
-                AI Agents Built Around <span className="text-gradient">Your Business Workflow</span>
+              <div className="inline-flex items-center gap-3 mb-3">
+                <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                  Agentic Engineering
+                </span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+                AI Agents Built Around <em className="not-italic text-gradient">Your Workflow</em>
               </h2>
-              <p className="mt-4 text-base opacity-85 text-white/90 leading-relaxed">
+              <p className="mt-4 text-base md:text-lg opacity-85 leading-relaxed">
                 We engineer autonomous and assistive AI agents trained on your specific business processes, catalog, and rules. Instead of static chatbots, our agents perform actions, collect requirements, and integrate directly with your existing tools.
               </p>
 
               {/* Real World Workflow Example */}
-              <div className="mt-6 glass rounded-2xl p-6 border border-cyan-500/20 bg-card/60">
-                <div className="text-xs font-mono uppercase tracking-wider text-cyan-300 font-semibold mb-2">
+              <div className="mt-6 glass glass-tint-cyan rounded-2xl p-6">
+                <div className="text-xs uppercase tracking-[0.18em] font-semibold text-primary mb-2">
                   Example Use Case: Custom WhatsApp Agent
                 </div>
-                <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+                <p className="text-xs sm:text-sm opacity-90 leading-relaxed">
                   A bespoke tailoring business or service provider can deploy a custom WhatsApp AI Agent that automatically answers pricing questions, collects customer measurements/specifications, provides service availability, logs the enquiry into a CRM, and notifies the business owner instantly.
                 </p>
               </div>
 
               <div className="mt-8 grid sm:grid-cols-2 gap-4">
-                <div className="glass rounded-xl p-4 border border-white/10">
-                  <Bot className="w-5 h-5 text-cyan-400 mb-2" />
-                  <div className="text-sm font-bold text-white">WhatsApp & Chat Agents</div>
-                  <div className="text-xs text-white/70 mt-1">24/7 client communication & lead capture.</div>
+                <div className="glass rounded-xl p-4">
+                  <Bot className="w-5 h-5 text-primary mb-2" />
+                  <div className="text-sm font-bold">WhatsApp & Chat Agents</div>
+                  <div className="text-xs opacity-70 mt-1">24/7 client communication & lead capture.</div>
                 </div>
-                <div className="glass rounded-xl p-4 border border-white/10">
-                  <Mic className="w-5 h-5 text-purple-400 mb-2" />
-                  <div className="text-sm font-bold text-white">Voice AI Assistants</div>
-                  <div className="text-xs text-white/70 mt-1">Conversational phone and desktop voice agents.</div>
+                <div className="glass rounded-xl p-4">
+                  <Mic className="w-5 h-5 text-primary mb-2" />
+                  <div className="text-sm font-bold">Voice AI Assistants</div>
+                  <div className="text-xs opacity-70 mt-1">Conversational phone and desktop voice agents.</div>
                 </div>
-                <div className="glass rounded-xl p-4 border border-white/10">
-                  <ShieldCheck className="w-5 h-5 text-emerald-400 mb-2" />
-                  <div className="text-sm font-bold text-white">Support & FAQ Agents</div>
-                  <div className="text-xs text-white/70 mt-1">Instant issue resolution & ticket creation.</div>
+                <div className="glass rounded-xl p-4">
+                  <ShieldCheck className="w-5 h-5 text-primary mb-2" />
+                  <div className="text-sm font-bold">Support & FAQ Agents</div>
+                  <div className="text-xs opacity-70 mt-1">Instant issue resolution & ticket creation.</div>
                 </div>
-                <div className="glass rounded-xl p-4 border border-white/10">
-                  <Workflow className="w-5 h-5 text-amber-400 mb-2" />
-                  <div className="text-sm font-bold text-white">Internal Operations Agents</div>
-                  <div className="text-xs text-white/70 mt-1">Data extraction, email drafting & reporting.</div>
+                <div className="glass rounded-xl p-4">
+                  <Workflow className="w-5 h-5 text-primary mb-2" />
+                  <div className="text-sm font-bold">Internal Operations Agents</div>
+                  <div className="text-xs opacity-70 mt-1">Data extraction, email drafting & reporting.</div>
                 </div>
               </div>
             </div>
 
             {/* SECTION 7 — SMALL ENTRY PACKAGE: CUSTOM WHATSAPP AI AGENT (£10) */}
             <div className="relative">
-              <div className="glass rounded-3xl p-8 border-2 border-cyan-400/50 bg-gradient-to-b from-cyan-500/15 via-card to-card shadow-[0_0_40px_rgba(47,224,200,0.15)] relative">
-                <div className="inline-block px-3.5 py-1 rounded-full bg-cyan-400 text-slate-950 text-xs font-bold uppercase tracking-wider mb-4">
+              <div className="relative glass rounded-3xl p-7 ring-1 ring-cyan-400/60 bg-gradient-to-b from-cyan-500/25 to-indigo-500/5 flex flex-col hover:-translate-y-1 transition-all">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-brand text-[10px] font-bold uppercase tracking-widest whitespace-nowrap text-white">
                   Entry-Level Custom Agent Offer
                 </div>
 
-                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+                <div className="text-xs uppercase tracking-[0.18em] font-semibold opacity-80">Starter AI Agent Package</div>
+                <h3 className="text-2xl font-bold mt-1 mb-2 leading-snug">
                   Custom WhatsApp AI Agent
                 </h3>
-                <p className="text-xs text-white/70 mb-4">
-                  Get a custom WhatsApp AI Agent designed around your business workflow.
-                </p>
 
-                <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-xs uppercase tracking-widest text-white/60">Starting from</span>
-                  <span className="text-4xl sm:text-5xl font-bold text-cyan-300">£10</span>
+                <div className="mt-2 flex items-baseline gap-1">
+                  <span className="text-[10px] opacity-70 uppercase tracking-widest mr-2">Starting from</span>
+                  <span className="font-display text-5xl font-bold text-gradient">£10</span>
                 </div>
 
-                <ul className="space-y-3 mb-8 text-xs sm:text-sm text-white/90">
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                    <span>Configured for your business service & common FAQs</span>
+                <ul className="mt-6 space-y-3 flex-1">
+                  <li className="flex items-start gap-2.5 text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="opacity-90">Configured for your business service & common FAQs</span>
                   </li>
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                    <span>Automated customer greetings & enquiry detail collection</span>
+                  <li className="flex items-start gap-2.5 text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="opacity-90">Automated customer greetings & enquiry detail collection</span>
                   </li>
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                    <span>Custom system prompt & brand tone alignment</span>
+                  <li className="flex items-start gap-2.5 text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="opacity-90">Custom system prompt & brand tone alignment</span>
                   </li>
-                  <li className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                    <span>Setup guidance & deployment walk-through</span>
+                  <li className="flex items-start gap-2.5 text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="opacity-90">Setup guidance & deployment walk-through</span>
                   </li>
                 </ul>
 
-                <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-[11px] text-white/70 mb-6 leading-relaxed">
+                <div className="p-3 rounded-xl glass text-[11px] opacity-80 mt-6 leading-relaxed">
                   * Note: Entry package includes standard FAQ & workflow prompt setup. Advanced API integrations, multi-step backend pipelines, and custom database training are quoted based on requirements.
                 </div>
 
-                <div className="space-y-2.5">
-                  <a
-                    href={WHATSAPP_CONTACT_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full font-display text-sm font-bold bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition shadow-lg"
-                  >
-                    Get WhatsApp AI Agent (£10) <ArrowRight className="w-4 h-4" />
-                  </a>
+                <div className="mt-7 space-y-2.5">
+                  <Button asChild variant="hero" size="lg" className="rounded-full w-full">
+                    <a href={WHATSAPP_CONTACT_URL} target="_blank" rel="noopener noreferrer">
+                      Get WhatsApp AI Agent (£10) <ArrowRight className="w-4 h-4 ml-1" />
+                    </a>
+                  </Button>
 
-                  <Link
-                    to="/contact?service=whatsapp-ai-agent"
-                    className="w-full inline-flex items-center justify-center px-4 py-2.5 text-xs text-white/70 hover:text-white transition"
-                  >
-                    Or contact via web enquiry form →
-                  </Link>
+                  <Button asChild variant="ghostGlow" size="sm" className="rounded-full w-full">
+                    <Link to="/contact?service=whatsapp-ai-agent">
+                      Or contact via web enquiry form →
+                    </Link
+                  </Button>
                 </div>
               </div>
             </div>
@@ -730,112 +815,116 @@ export default function SoftwareDevelopment() {
       </section>
 
       {/* SECTION 8 — SOFTWARE DEVELOPMENT CAPABILITIES GRID */}
-      <section className="py-16 md:py-24 border-b border-border/60">
+      <section className="py-14 md:py-20 border-t border-border/60">
         <div className="container mx-auto px-4 max-w-7xl">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
             <div>
-              <span className="text-[11px] uppercase tracking-[0.2em] font-mono text-cyan-300">Capabilities & Engagement</span>
-              <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mt-3">
+              <div className="inline-flex items-center gap-3 mb-3">
+                <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                  Capabilities & Engagement
+                </span>
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
                 Software Engineering Capabilities
               </h2>
-              <p className="mt-3 text-base opacity-85 text-white/80 max-w-2xl">
+              <p className="mt-3 text-base opacity-80 max-w-2xl">
                 Every business has unique complexity. We provide transparent, requirement-based project scoping rather than arbitrary commoditized pricing.
               </p>
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="glass rounded-2xl p-6 border border-white/10 flex flex-col justify-between">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="glass glass-tint-cyan rounded-2xl p-6 flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div>
-                <div className="text-xs font-mono uppercase text-cyan-300 mb-1">Service 01</div>
-                <h3 className="text-xl font-bold text-white mb-2">Bespoke CRM Engineering</h3>
-                <p className="text-xs sm:text-sm text-white/75 leading-relaxed mb-4">
+                <div className="text-[10px] uppercase tracking-widest font-mono text-primary mb-2">Service 01</div>
+                <h3 className="font-display text-lg font-bold mb-2">Bespoke CRM Engineering</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed mb-4">
                   Custom client databases, multi-channel lead intake, invoicing modules, and client document sharing.
                 </p>
               </div>
               <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                <span className="text-xs font-semibold text-white/60">Pricing: Custom Quote</span>
-                <Link to="/contact?service=crm-development" className="text-xs font-bold text-cyan-300 hover:underline flex items-center gap-1">
+                <span className="text-xs font-semibold opacity-70">Pricing: Custom Quote</span>
+                <Link to="/contact?service=crm-development" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
                   Enquire <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 flex flex-col justify-between">
+            <div className="glass glass-tint-purple rounded-2xl p-6 flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div>
-                <div className="text-xs font-mono uppercase text-purple-300 mb-1">Service 02</div>
-                <h3 className="text-xl font-bold text-white mb-2">ERP & Operational Platforms</h3>
-                <p className="text-xs sm:text-sm text-white/75 leading-relaxed mb-4">
+                <div className="text-[10px] uppercase tracking-widest font-mono text-primary mb-2">Service 02</div>
+                <h3 className="font-display text-lg font-bold mb-2">ERP & Operational Platforms</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed mb-4">
                   Comprehensive management systems for inventory, fulfillment, order pipelines, and corporate compliance.
                 </p>
               </div>
               <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                <span className="text-xs font-semibold text-white/60">Pricing: Custom Quote</span>
-                <Link to="/contact?service=erp-development" className="text-xs font-bold text-purple-300 hover:underline flex items-center gap-1">
+                <span className="text-xs font-semibold opacity-70">Pricing: Custom Quote</span>
+                <Link to="/contact?service=erp-development" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
                   Enquire <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 flex flex-col justify-between">
+            <div className="glass glass-tint-green rounded-2xl p-6 flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div>
-                <div className="text-xs font-mono uppercase text-emerald-300 mb-1">Service 03</div>
-                <h3 className="text-xl font-bold text-white mb-2">Autonomous AI Agents</h3>
-                <p className="text-xs sm:text-sm text-white/75 leading-relaxed mb-4">
+                <div className="text-[10px] uppercase tracking-widest font-mono text-primary mb-2">Service 03</div>
+                <h3 className="font-display text-lg font-bold mb-2">Autonomous AI Agents</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed mb-4">
                   Multi-agent systems with MCP tools, local/cloud LLMs, webhooks, and intelligent task execution.
                 </p>
               </div>
               <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                <span className="text-xs font-semibold text-white/60">Pricing: Custom Quote</span>
-                <Link to="/contact?service=ai-agents" className="text-xs font-bold text-emerald-300 hover:underline flex items-center gap-1">
+                <span className="text-xs font-semibold opacity-70">Pricing: Custom Quote</span>
+                <Link to="/contact?service=ai-agents" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
                   Enquire <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 flex flex-col justify-between">
+            <div className="glass glass-tint-gold rounded-2xl p-6 flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div>
-                <div className="text-xs font-mono uppercase text-amber-300 mb-1">Service 04</div>
-                <h3 className="text-xl font-bold text-white mb-2">Voice AI & Call Assistants</h3>
-                <p className="text-xs sm:text-sm text-white/75 leading-relaxed mb-4">
+                <div className="text-[10px] uppercase tracking-widest font-mono text-primary mb-2">Service 04</div>
+                <h3 className="font-display text-lg font-bold mb-2">Voice AI & Call Assistants</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed mb-4">
                   Interactive real-time voice agents for customer intake, phone receptionist duties, and internal commands.
                 </p>
               </div>
               <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                <span className="text-xs font-semibold text-white/60">Pricing: Custom Quote</span>
-                <Link to="/contact?service=voice-ai" className="text-xs font-bold text-amber-300 hover:underline flex items-center gap-1">
+                <span className="text-xs font-semibold opacity-70">Pricing: Custom Quote</span>
+                <Link to="/contact?service=voice-ai" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
                   Enquire <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 flex flex-col justify-between">
+            <div className="glass glass-tint-sky rounded-2xl p-6 flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div>
-                <div className="text-xs font-mono uppercase text-sky-300 mb-1">Service 05</div>
-                <h3 className="text-xl font-bold text-white mb-2">Business Process Automation</h3>
-                <p className="text-xs sm:text-sm text-white/75 leading-relaxed mb-4">
+                <div className="text-[10px] uppercase tracking-widest font-mono text-primary mb-2">Service 05</div>
+                <h3 className="font-display text-lg font-bold mb-2">Business Process Automation</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed mb-4">
                   Automate invoice delivery, PDF document compilation, cross-platform database syncs, and email queues.
                 </p>
               </div>
               <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                <span className="text-xs font-semibold text-white/60">Pricing: Custom Quote</span>
-                <Link to="/contact?service=automation" className="text-xs font-bold text-sky-300 hover:underline flex items-center gap-1">
+                <span className="text-xs font-semibold opacity-70">Pricing: Custom Quote</span>
+                <Link to="/contact?service=automation" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
                   Enquire <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
-            <div className="glass rounded-2xl p-6 border border-white/10 flex flex-col justify-between">
+            <div className="glass glass-tint-orange rounded-2xl p-6 flex flex-col justify-between hover:-translate-y-1 transition-transform">
               <div>
-                <div className="text-xs font-mono uppercase text-teal-300 mb-1">Service 06</div>
-                <h3 className="text-xl font-bold text-white mb-2">Digi Biz OS Integration</h3>
-                <p className="text-xs sm:text-sm text-white/75 leading-relaxed mb-4">
+                <div className="text-[10px] uppercase tracking-widest font-mono text-primary mb-2">Service 06</div>
+                <h3 className="font-display text-lg font-bold mb-2">Digi Biz OS Integration</h3>
+                <p className="text-xs sm:text-sm opacity-85 leading-relaxed mb-4">
                   Custom plugin and MCP skill development for the Digi Biz OS desktop platform.
                 </p>
               </div>
               <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                <span className="text-xs font-semibold text-white/60">Ready-Made: £50</span>
-                <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-teal-300 hover:underline flex items-center gap-1">
+                <span className="text-xs font-semibold opacity-70">Ready-Made: £50</span>
+                <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
                   Get OS <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
@@ -845,57 +934,58 @@ export default function SoftwareDevelopment() {
       </section>
 
       {/* SECTION 9 — DUAL CONVERSION CLOSING CTA */}
-      <section className="py-20 md:py-28 relative overflow-hidden bg-gradient-hero">
+      <section className="py-14 md:py-20 relative overflow-hidden bg-gradient-hero">
         <div className="absolute inset-0 grid-pattern opacity-30 pointer-events-none" />
         <div className="container mx-auto px-4 max-w-6xl relative">
-          <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="text-[11px] uppercase tracking-[0.2em] font-mono text-cyan-300">Choose Your Path</span>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mt-3">
-              Ready to Build Smarter <span className="text-gradient">Business Software</span>?
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-3 mb-3">
+              <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                Choose Your Path
+              </span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
+              Ready to Build Smarter <em className="not-italic text-gradient">Business Software</em>?
             </h2>
-            <p className="mt-4 text-base opacity-90 text-white/90">
+            <p className="mt-4 text-base opacity-80">
               Whether you need our ready-made AI operating system or bespoke custom software development, DigiFormation has you covered.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Path A: Ready-Made */}
-            <div className="glass rounded-3xl p-8 border border-cyan-500/40 bg-gradient-to-b from-cyan-500/10 to-card/60 flex flex-col justify-between">
+            <div className="relative glass rounded-3xl p-8 ring-1 ring-cyan-400/60 bg-gradient-to-b from-cyan-500/25 to-indigo-500/5 flex flex-col justify-between hover:-translate-y-1 transition-all">
               <div>
-                <div className="inline-block px-3 py-1 rounded-full text-xs font-mono uppercase bg-cyan-400/20 text-cyan-300 mb-4">
+                <div className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gradient-brand text-white mb-4">
                   Path A — Ready-Made Software
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Get Digi Biz OS</h3>
-                <p className="text-sm opacity-85 text-white/80 leading-relaxed mb-6">
+                <h3 className="text-2xl font-bold mb-2">Get Digi Biz OS</h3>
+                <p className="text-sm opacity-85 leading-relaxed mb-6">
                   Deploy our autonomous AI desktop operating system on your Windows machine today. Universal voice control, built-in CRM, multi-agent workflows, and zero monthly fees.
                 </p>
-                <div className="text-2xl font-bold text-cyan-300 mb-6">
-                  £50 <span className="text-xs font-normal text-white/60">/ Lifetime License</span>
+                <div className="text-3xl font-bold text-gradient mb-6">
+                  £50 <span className="text-xs font-normal opacity-70">/ Lifetime License</span>
                 </div>
               </div>
 
-              <a
-                href={DIGI_BIZ_OS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full font-display text-sm font-bold bg-cyan-400 text-slate-950 hover:bg-cyan-300 transition shadow-[0_0_20px_rgba(47,224,200,0.3)]"
-              >
-                Explore Digi Biz OS <ExternalLink className="w-4 h-4" />
-              </a>
+              <Button asChild variant="hero" size="lg" className="rounded-full w-full">
+                <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer">
+                  Explore Digi Biz OS <ExternalLink className="w-4 h-4 ml-1" />
+                </a>
+              </Button>
             </div>
 
             {/* Path B: Custom Development */}
-            <div className="glass rounded-3xl p-8 border border-white/20 bg-gradient-to-b from-white/10 to-card/60 flex flex-col justify-between">
+            <div className="relative glass rounded-3xl p-8 ring-1 ring-border/60 bg-gradient-to-b from-card/80 to-card/40 flex flex-col justify-between hover:-translate-y-1 transition-all">
               <div>
-                <div className="inline-block px-3 py-1 rounded-full text-xs font-mono uppercase bg-white/10 text-white/80 mb-4">
+                <div className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-primary/20 text-primary border border-primary/30 mb-4">
                   Path B — Custom Development
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Request Custom Software</h3>
-                <p className="text-sm opacity-85 text-white/80 leading-relaxed mb-6">
+                <h3 className="text-2xl font-bold mb-2">Request Custom Software</h3>
+                <p className="text-sm opacity-85 leading-relaxed mb-6">
                   Have a specific business workflow, CRM, ERP, or custom AI agent in mind? Tell our software engineering team about your project for a tailored consultation.
                 </p>
-                <div className="text-2xl font-bold text-white mb-6">
-                  Custom Scoping <span className="text-xs font-normal text-white/60">/ Tailored to Your Needs</span>
+                <div className="text-3xl font-bold text-gradient mb-6">
+                  Custom Scoping <span className="text-xs font-normal opacity-70">/ Tailored to Your Needs</span>
                 </div>
               </div>
 
@@ -910,12 +1000,16 @@ export default function SoftwareDevelopment() {
       </section>
 
       {/* SECTION 10 — FAQ */}
-      <section className="py-16 md:py-24 border-t border-border/60">
+      <section className="py-14 md:py-20 border-t border-border/60">
         <div className="container mx-auto px-4 max-w-4xl">
-          <div className="mb-12">
-            <span className="text-[11px] uppercase tracking-[0.2em] font-mono text-cyan-300">Questions & Answers</span>
-            <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mt-3">
-              Frequently Asked Questions
+          <div className="mb-10 text-center max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-3 mb-3">
+              <span className="text-xs uppercase tracking-[0.18em] font-semibold text-primary">
+                Questions & Answers
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+              Frequently Asked <em className="not-italic text-gradient">Questions</em>
             </h2>
           </div>
 
@@ -923,18 +1017,17 @@ export default function SoftwareDevelopment() {
             {faqs.map((f, i) => {
               const isOpen = openFaq === i;
               return (
-                <button
+                <div
                   key={f.q}
-                  type="button"
                   onClick={() => setOpenFaq(isOpen ? null : i)}
-                  className="w-full text-left glass rounded-2xl p-6 transition-all hover:border-white/25"
+                  className="w-full text-left glass rounded-2xl p-6 transition-all hover:bg-secondary/40 cursor-pointer"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <h3 className="font-display text-base sm:text-lg font-semibold text-white">{f.q}</h3>
-                    <ChevronDown className={`w-5 h-5 mt-0.5 text-cyan-400 transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}`} />
+                    <h3 className="font-display text-base sm:text-lg font-semibold">{f.q}</h3>
+                    <ChevronDown className={`w-5 h-5 mt-0.5 text-primary transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}`} />
                   </div>
-                  {isOpen && <p className="mt-4 text-xs sm:text-sm opacity-85 leading-relaxed text-white/80">{f.a}</p>}
-                </button>
+                  {isOpen && <p className="mt-4 text-xs sm:text-sm opacity-85 leading-relaxed">{f.a}</p>}
+                </div>
               );
             })}
           </div>
