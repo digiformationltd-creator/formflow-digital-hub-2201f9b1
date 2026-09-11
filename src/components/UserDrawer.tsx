@@ -116,7 +116,7 @@ const UserDrawer = () => {
             </Button>
           )}
 
-          {user.email?.toLowerCase() !== "info@digiformation.uk" && (
+          {(user.email?.toLowerCase() !== "info@digiformation.co.uk" && user.email?.toLowerCase() !== "info@digiformation.uk") && (
             <>
               <div className="text-[10px] uppercase tracking-widest opacity-60 px-3 mb-2">My Dashboard</div>
               {dashSections.map((s) => {

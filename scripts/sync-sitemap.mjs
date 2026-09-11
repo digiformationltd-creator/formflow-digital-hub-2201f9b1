@@ -23,7 +23,7 @@ function buildBlock(slugs) {
   const urls = slugs
     .map(
       (s) =>
-        `  <url><loc>https://digiformation.uk/blog/${s}</loc><lastmod>${TODAY}</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>`
+        `  <url><loc>https://www.digiformation.co.uk/blog/${s}</loc><lastmod>${TODAY}</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>`
     )
     .join("\n");
   return `${MARK_START}\n${urls}\n${MARK_END}`;
@@ -44,6 +44,9 @@ function refreshLastmod(xml) {
 
 function syncSitemap() {
   let xml = fs.readFileSync(SITEMAP, "utf8");
+  // Replace any old domain occurrences
+  xml = xml.replace(/https:\/\/(www\.)?digiformation\.uk/g, 'https://www.digiformation.co.uk');
+
   const slugs = getSlugs();
   const block = buildBlock(slugs);
 
@@ -59,7 +62,7 @@ function syncSitemap() {
   xml = refreshLastmod(xml);
 
   fs.writeFileSync(SITEMAP, xml);
-  console.log(`✓ sitemap.xml synced (${slugs.length} blog posts, lastmod=${TODAY})`);
+  console.log(`✓ sitemap.xml synced (${slugs.length} blog posts, domain=https://www.digiformation.co.uk, lastmod=${TODAY})`);
 }
 
 syncSitemap();

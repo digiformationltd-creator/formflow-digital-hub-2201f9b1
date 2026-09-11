@@ -87,7 +87,7 @@ const setMeta = (title: string, description: string, keywords?: string) => {
     canonical.setAttribute("rel", "canonical");
     document.head.appendChild(canonical);
   }
-  canonical.setAttribute("href", "https://digiformation.co.uk/software-development");
+  canonical.setAttribute("href", "https://www.digiformation.co.uk/software-development");
 };
 
 const injectJsonLd = (id: string, schema: object) => {

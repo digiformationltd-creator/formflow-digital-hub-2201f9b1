@@ -1,0 +1,13 @@
+# DigiFormation 301 Permanent Redirects & Routing Rules
+# Domain Migration: digiformation.uk -> digiformation.co.uk
+https://digiformation.uk/*   https://www.digiformation.co.uk/:splat   301!
+https://www.digiformation.uk/*   https://www.digiformation.co.uk/:splat   301!
+http://digiformation.co.uk/*   https://www.digiformation.co.uk/:splat   301!
+https://digiformation.co.uk/*   https://www.digiformation.co.uk/:splat   301!
+
+# Internal Canonical Path Redirects
+/pricing   /packages   301
+/pricing/   /packages   301
+
+# SPA fallback
+/*   /index.html   200

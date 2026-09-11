@@ -100,7 +100,7 @@ const SAMPLE: Record<string, string> = {
   director_name: "Jane Smith",
   confirmation_due: "2026-09-15",
   accounts_due: "2026-12-31",
-  website: "https://digiformation.uk",
+  website: "https://www.digiformation.co.uk",
   email: "client@example.com",
   phone: "+44 20 1234 5678",
   current_date: new Date().toISOString().slice(0, 10),

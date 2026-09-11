@@ -172,7 +172,7 @@ const UKLtdFormation = () => {
       canonical.setAttribute("rel", "canonical");
       document.head.appendChild(canonical);
     }
-    canonical.setAttribute("href", `${window.location.origin}/uk-services/uk-ltd-formation`);
+    canonical.setAttribute("href", "https://www.digiformation.co.uk/uk-services/uk-ltd-formation");
 
     const schemaId = "ld-uk-ltd-formation";
     document.getElementById(schemaId)?.remove();

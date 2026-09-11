@@ -34,7 +34,7 @@ const BlogPost = () => {
     setProp("og:title", post.metaTitle);
     setProp("og:description", post.metaDescription);
     setProp("og:type", "article");
-    setProp("og:url", `${window.location.origin}/blog/${post.slug}`);
+    setProp("og:url", `https://www.digiformation.co.uk/blog/${post.slug}`);
     setProp("article:published_time", post.date);
     setProp("article:section", post.category);
     setMeta("twitter:card", "summary_large_image");
@@ -47,7 +47,7 @@ const BlogPost = () => {
       canonical.rel = "canonical";
       document.head.appendChild(canonical);
     }
-    canonical.href = `${window.location.origin}/blog/${post.slug}`;
+    canonical.href = `https://www.digiformation.co.uk/blog/${post.slug}`;
 
     const id = "blogpost-jsonld";
     document.getElementById(id)?.remove();

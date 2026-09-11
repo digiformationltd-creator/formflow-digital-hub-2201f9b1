@@ -62,7 +62,7 @@ const NotFound = () => {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full">
-                <a href="mailto:Info@digiformation.uk">
+                <a href="mailto:info@digiformation.co.uk">
                   <Mail className="w-4 h-4" /> Email Us
                 </a>
               </Button>

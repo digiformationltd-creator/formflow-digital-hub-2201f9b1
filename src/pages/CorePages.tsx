@@ -93,7 +93,7 @@ const setMeta = (title: string, description: string, keywords?: string) => {
     canonical.rel = "canonical";
     document.head.appendChild(canonical);
   }
-  canonical.href = window.location.origin + window.location.pathname;
+  canonical.href = `https://www.digiformation.co.uk${window.location.pathname}`;
 };
 
 const injectJsonLd = (id: string, data: object) => {
@@ -154,11 +154,11 @@ export const Contact = () => {
       "@context": "https://schema.org",
       "@type": "ContactPage",
       name: "Contact Digiformation Ltd",
-      url: "https://digiformation.uk/contact",
+      url: "https://www.digiformation.co.uk/contact",
       mainEntity: {
         "@type": "Organization",
         name: "Digiformation Ltd",
-        email: "Info@digiformation.uk",
+        email: "info@digiformation.co.uk",
         telephone: "+92-316-446-7464",
         address: {
           "@type": "PostalAddress",
@@ -170,7 +170,7 @@ export const Contact = () => {
         contactPoint: [{
           "@type": "ContactPoint",
           contactType: "customer support",
-          email: "Info@digiformation.uk",
+          email: "info@digiformation.co.uk",
           telephone: "+92-316-446-7464",
           availableLanguage: ["English", "Urdu"],
           areaServed: ["GB", "US", "PK", "Worldwide"],
@@ -1826,7 +1826,7 @@ export const Privacy = () => {
           </LegalSection>
 
           <LegalSection num="8" title="Contact for Privacy">
-            <p>📧 Email: <a className="text-primary hover:underline" href="mailto:info@digiformation.uk">info@digiformation.uk</a></p>
+            <p>📧 Email: <a className="text-primary hover:underline" href="mailto:info@digiformation.co.uk">info@digiformation.uk</a></p>
             <p>📲 WhatsApp: +92 316 446 7464</p>
           </LegalSection>
         </div>

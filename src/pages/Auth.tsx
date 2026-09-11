@@ -37,7 +37,8 @@ const Auth = () => {
 
   const destinationForEmail = (email?: string | null) => {
     if (redirectTo && redirectTo.startsWith("/")) return redirectTo;
-    return email?.toLowerCase() === "info@digiformation.uk" ? "/admin" : "/dashboard";
+    const em = email?.toLowerCase();
+    return (em === "info@digiformation.co.uk" || em === "info@digiformation.uk") ? "/admin" : "/dashboard";
   };
 
   const handleGoogle = async () => {
@@ -109,7 +110,8 @@ const Auth = () => {
       return toast.error(msg);
     }
     toast.success("Welcome back!");
-    const admin = ev.data.toLowerCase() === "info@digiformation.uk" ? await checkAdminSession() : null;
+    const isAdmEmail = ev.data.toLowerCase() === "info@digiformation.co.uk" || ev.data.toLowerCase() === "info@digiformation.uk";
+    const admin = isAdmEmail ? await checkAdminSession() : null;
     const dest = admin?.ok ? "/admin" : destinationForEmail(ev.data);
     navigate(dest, { replace: true });
   };
@@ -397,7 +399,7 @@ const Auth = () => {
 
           <p className="text-center text-xs opacity-70 mt-5">
             Need help? Email{" "}
-            <a href="mailto:info@digiformation.uk" className="underline">
+            <a href="mailto:info@digiformation.co.uk" className="underline">
               info@digiformation.uk
             </a>
           </p>

@@ -5,7 +5,7 @@ export type AdminSessionResult =
   | { ok: true; user: User; isAdmin: true }
   | { ok: false; reason: "signed_out" | "not_admin" | "refresh_failed" | "role_check_failed" };
 
-const OWNER_EMAIL = "info@digiformation.uk";
+const OWNER_EMAILS = ["info@digiformation.co.uk", "info@digiformation.uk"];
 
 export const isOwnerEmail = (email?: string | null) =>
   email?.toLowerCase() === OWNER_EMAIL;

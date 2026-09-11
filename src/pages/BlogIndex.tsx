@@ -36,7 +36,7 @@ const BlogIndex = () => {
     setProp("og:title", document.title);
     setProp("og:description", "Expert 2026 guides for non-resident founders worldwide — UK LTD & US LLC formation, banking, payment gateways and compliance.");
     setProp("og:type", "website");
-    setProp("og:url", `${window.location.origin}/blog`);
+    setProp("og:url", "https://www.digiformation.co.uk/blog");
     setMeta("twitter:card", "summary_large_image");
     setMeta("twitter:title", document.title);
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
@@ -45,7 +45,7 @@ const BlogIndex = () => {
       canonical.rel = "canonical";
       document.head.appendChild(canonical);
     }
-    canonical.href = `${window.location.origin}/blog`;
+    canonical.href = "https://www.digiformation.co.uk/blog";
   }, []);
 
   const categories = Array.from(new Set(blogPosts.map((p) => p.category)));

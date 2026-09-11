@@ -54,7 +54,7 @@ const Index = () => {
       canonical.rel = "canonical";
       document.head.appendChild(canonical);
     }
-    canonical.href = window.location.origin + "/";
+    canonical.href = "https://www.digiformation.co.uk/";
 
     // JSON-LD schema
     const schemas = [
@@ -62,7 +62,7 @@ const Index = () => {
         "@context": "https://schema.org",
         "@type": "Organization",
         name: "Digiformation Ltd",
-        url: window.location.origin,
+        url: "https://www.digiformation.co.uk",
         description,
         sameAs: [],
       },
@@ -70,10 +70,10 @@ const Index = () => {
         "@context": "https://schema.org",
         "@type": "WebSite",
         name: "Digiformation Ltd",
-        url: window.location.origin,
+        url: "https://www.digiformation.co.uk",
         potentialAction: {
           "@type": "SearchAction",
-          target: `${window.location.origin}/?q={search_term_string}`,
+          target: `https://www.digiformation.co.uk/blog?q={search_term_string}`,
           "query-input": "required name=search_term_string",
         },
       },
@@ -81,7 +81,7 @@ const Index = () => {
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
         name: "Digiformation Ltd",
-        url: window.location.origin,
+        url: "https://www.digiformation.co.uk",
         priceRange: "$$",
         areaServed: ["United Kingdom", "United States", "Worldwide"],
       },

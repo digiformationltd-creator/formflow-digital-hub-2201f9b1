@@ -174,7 +174,8 @@ const Dashboard = () => {
           });
           return;
         }
-        if (session.user.email?.toLowerCase() === "info@digiformation.uk") {
+        const uEmail = session.user.email?.toLowerCase();
+        if (uEmail === "info@digiformation.co.uk" || uEmail === "info@digiformation.uk") {
           navigate("/admin", { replace: true });
           return;
         }
@@ -278,7 +279,8 @@ const Dashboard = () => {
       setTickets(ticketRows || []);
       setManagedClients((managedRows as any[]) || []);
 
-      setIsAdmin(user.email?.toLowerCase() === "info@digiformation.uk" || !!role);
+      const uEmail = user.email?.toLowerCase();
+      setIsAdmin(uEmail === "info@digiformation.co.uk" || uEmail === "info@digiformation.uk" || !!role);
       setLoading(false);
     })();
     return () => { cancelled = true; };
