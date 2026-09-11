@@ -1247,6 +1247,10 @@ const faqs = [
     a: "Digi Biz OS is a ready-made, desktop AI business operating system for Windows that you can purchase (£50 lifetime license) and run immediately. Custom Software Development is our bespoke engineering service where DigiFormation builds tailored web applications, CRMs, ERPs, or custom AI agents specifically designed around your company's proprietary workflow.",
   },
   {
+    q: "How does a WhatsApp AI Agent work and what can it automate for my business?",
+    a: "A WhatsApp AI Agent connects to your WhatsApp Business channel using custom system instructions trained on your specific service catalog, pricing rules, and FAQs. Operating 24/7, it automatically greets prospective clients, qualifies leads, collects required order specifications, logs customer details into your CRM, and hands off complex or high-value inquiries directly to human team members.",
+  },
+  {
     q: "What does the £10 Custom WhatsApp AI Agent package include?",
     a: "The £10 package is an entry-level offer designed to get your business started with a custom-prompted WhatsApp AI Agent. It includes prompt engineering for your business FAQs, automated greeting, customer requirement intake, and deployment instructions. Advanced custom API integrations, real-time database syncs, or custom software backends are scoped individually.",
   },
