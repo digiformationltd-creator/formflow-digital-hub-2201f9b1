@@ -1227,6 +1227,10 @@ export default function SoftwareDevelopment() {
 
 const faqs = [
   {
+    q: "What is the difference between custom CRM and custom ERP software?",
+    a: "CRM (Customer Relationship Management) focuses externally on customer acquisition, lead capture, sales pipelines, communication threads (like WhatsApp), and client support. ERP (Enterprise Resource Planning) focuses internally on overall business operations—inventory tracking, order fulfillment, invoicing/accounting workflows, role-based security, and cross-department operations. DigiFormation designs both standalone systems and unified CRM+ERP platforms where a customer lead flows seamlessly into fulfillment and accounting.",
+  },
+  {
     q: "What is custom CRM development and why choose it over off-the-shelf SaaS?",
     a: "Custom CRM development creates a bespoke customer relationship management platform engineered around your proprietary sales pipeline, data models, and team workflow. Unlike off-the-shelf SaaS platforms (like Salesforce or HubSpot) that impose per-user monthly subscriptions, generic schemas, and feature bloat, a custom CRM gives your business 100% data ownership, zero recurring seat fees, and seamless integration with your internal databases, WhatsApp, and invoicing.",
   },
