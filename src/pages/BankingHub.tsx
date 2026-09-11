@@ -155,6 +155,47 @@ const BankingHub = () => {
           )}
         </div>
       </section>
+
+      {/* Educational & Differentiation Section */}
+      <section className="py-12 border-t border-border/40 bg-muted/10">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="text-xs uppercase tracking-[0.18em] opacity-70 mb-2">Infrastructure Guide</div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Understanding Your Business Financial Stack</h2>
+          <div className="grid md:grid-cols-3 gap-6 mb-10">
+            <div className="glass glass-tint-purple rounded-2xl p-6">
+              <Building2 className="w-8 h-8 text-primary mb-4" />
+              <h3 className="font-bold text-lg mb-2">Business Accounts & EMIs</h3>
+              <p className="text-sm opacity-80 leading-relaxed">
+                Platforms like Tide, Wise, and Airwallex provide dedicated IBANs, UK Sort Codes, or US ACH routing numbers to hold funds, pay suppliers, and handle operational payroll.
+              </p>
+            </div>
+            <div className="glass glass-tint-purple rounded-2xl p-6">
+              <CreditCard className="w-8 h-8 text-primary mb-4" />
+              <h3 className="font-bold text-lg mb-2">Payment Gateways</h3>
+              <p className="text-sm opacity-80 leading-relaxed">
+                Services like Stripe, PayPal, and Mollie process credit/debit card transactions directly from your e-commerce store, SaaS portal, or invoices into your settlement account.
+              </p>
+            </div>
+            <div className="glass glass-tint-purple rounded-2xl p-6">
+              <Globe2 className="w-8 h-8 text-primary mb-4" />
+              <h3 className="font-bold text-lg mb-2">Cross-Border FX & Cards</h3>
+              <p className="text-sm opacity-80 leading-relaxed">
+                Specialized providers like WorldFirst, Sunrate, and Wallester offer multi-currency FX conversion, corporate expense cards, and low-fee global disbursements.
+              </p>
+            </div>
+          </div>
+
+          {/* Regulatory & Underwriting Disclaimer */}
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-6 text-xs leading-relaxed opacity-80">
+            <p className="font-semibold uppercase tracking-wider mb-2 text-foreground/90">
+              Regulatory Notice &amp; Application Transparency
+            </p>
+            <p>
+              DigiFormation Ltd is a corporate service provider, company formation agent, and business onboarding facilitator. DigiFormation Ltd is <strong>not</strong> a bank, electronic money institution (EMI), credit broker, or payment services provider. We provide application preparation, document formatting, KYC verification guidance, and liaison assistance. All bank account openings, payment gateway activations, merchant underwriting evaluations, and credit limits are subject to the independent verification and sole discretion of the respective regulated financial institutions.
+            </p>
+          </div>
+        </div>
+      </section>
     </Layout>
   );
 };

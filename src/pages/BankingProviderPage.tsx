@@ -143,6 +143,20 @@ const BankingProviderPage = () => {
         </div>
       </section>
 
+      {/* Regulatory & Underwriting Notice */}
+      <section className="py-8 border-t border-border/60 bg-muted/5">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="rounded-xl border border-border/60 bg-background/60 p-5 text-xs leading-relaxed opacity-80">
+            <p className="font-semibold uppercase tracking-wider mb-1.5 text-foreground/90">
+              Disclaimer &amp; Provider Approval Authority
+            </p>
+            <p>
+              DigiFormation Ltd provides application assistance, document verification, and KYC guidance for {provider.name}. DigiFormation Ltd is not a bank, electronic money institution, or payment processor. Account approval, underwriting decisions, onboarding timelines, and feature availability are strictly determined by {provider.name} in accordance with applicable financial regulations.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <RecommendedGuides
         title="Banking & Payments Guides"
         categories={["Banking", "Stripe", "PayPal"]}
