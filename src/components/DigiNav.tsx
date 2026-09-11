@@ -146,6 +146,7 @@ const DigiNav = () => {
                 </div>
               </div>
             ))}
+            <NavLink to="/software-development" className="text-sm hover:opacity-80 transition">Software & AI</NavLink>
             <NavLink to="/web-development" className="text-sm hover:opacity-80 transition">Web Dev</NavLink>
             <NavLink to="/blog" className="text-sm hover:opacity-80 transition">Blog</NavLink>
 
@@ -250,6 +251,9 @@ const DigiNav = () => {
               </div>
             ))}
             <div className="border-t border-border/40 mt-1 pt-1">
+              <Link to="/software-development" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10">
+                Software & AI Agents
+              </Link>
               <Link to="/web-development" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10">
                 Web Dev
               </Link>

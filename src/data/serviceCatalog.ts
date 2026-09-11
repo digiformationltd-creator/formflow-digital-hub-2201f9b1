@@ -234,6 +234,22 @@ const WEB_DEV_ENTRIES: CatalogEntry[] = [
     currency: "GBP",
     category: "Web Development",
   },
+  {
+    slug: "web-3d-animated",
+    name: "3D & Animated Website",
+    description: "Interactive 3D WebGL / Three.js website with scroll-driven animations and high conversion architecture.",
+    price: 180,
+    currency: "GBP",
+    category: "Web Development",
+  },
+  {
+    slug: "custom-whatsapp-ai-agent",
+    name: "Custom WhatsApp AI Agent",
+    description: "Custom WhatsApp AI agent for lead qualification, FAQ handling, product recommendations and live human escalation.",
+    price: 10,
+    currency: "GBP",
+    category: "Digital Services",
+  },
 ];
 
 export const SERVICE_CATALOG: CatalogEntry[] = [

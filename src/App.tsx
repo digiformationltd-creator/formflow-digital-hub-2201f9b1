@@ -9,6 +9,7 @@ import { DynamicServicePage } from "./pages/DynamicServicePage";
 import { UKServicesHub, UKComplianceHub, USAServicesHub } from "./pages/SectionHubs";
 import BankingHub from "./pages/BankingHub";
 import { About, Contact, Pricing, FAQ, ClientArea, WebDevelopment, Privacy, Terms } from "./pages/CorePages";
+import SoftwareDevelopment from "./pages/SoftwareDevelopment";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import { InsightPage, InsightsIndex } from "./pages/InsightPage";
@@ -108,6 +109,9 @@ const App = () => (
           <Route path="/usa-services/:slug" element={<DynamicServicePage />} />
 
           {/* Core pages */}
+          <Route path="/software-development" element={<SoftwareDevelopment />} />
+          <Route path="/software-and-ai" element={<SoftwareDevelopment />} />
+          <Route path="/ai-agents" element={<SoftwareDevelopment />} />
           <Route path="/web-development" element={<WebDevelopment />} />
           <Route path="/client-area" element={<ClientArea />} />
           <Route path="/about" element={<About />} />

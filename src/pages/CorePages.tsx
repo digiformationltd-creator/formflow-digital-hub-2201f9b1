@@ -891,6 +891,26 @@ const webDevPackages: DetailPkg[] = [
       "14 days post-launch support",
     ],
   },
+  {
+    name: "3D & Animated Website",
+    price: "£180",
+    badge: "Interactive 3D",
+    note: "Next-Gen 3D & WebGL Experience",
+    tone: "from-cyan-500/25 to-indigo-500/5",
+    ring: "ring-cyan-400/60",
+    link: "/contact?service=3d-animated-website",
+    features: [
+      "Custom 3D model integration & WebGL / Three.js canvas",
+      "Interactive 3D product showcase & spatial scenes",
+      "Framer Motion advanced scroll-driven storytelling",
+      "Smooth 60+ FPS shader effects & particle systems",
+      "High-converting cinematic landing page architecture",
+      "Responsive performance optimization across mobile & desktop",
+      "Interactive micro-interactions, sound effects & custom cursor",
+      "Full SEO optimization, schema markup & lightning fast asset loading",
+      "60 days post-launch support & updates",
+    ],
+  },
 ];
 
 

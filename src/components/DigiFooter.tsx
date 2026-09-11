@@ -137,6 +137,7 @@ const DigiFooter = () => {
             <li><Link to="/usa-services" className="hover:text-primary transition">USA Services</Link></li>
             <li><Link to="/banks-payment-solutions" className="hover:text-primary transition">Banks & Payment Solutions</Link></li>
             <li><Link to="/uk-compliance" className="hover:text-primary transition">UK Compliance</Link></li>
+            <li><Link to="/software-development" className="hover:text-primary transition">Software & AI Agents</Link></li>
             <li><Link to="/web-development" className="hover:text-primary transition">Web Development</Link></li>
             <li><Link to="/#services" className="hover:text-primary transition">Packages</Link></li>
             <li><Link to="/#contact" className="hover:text-primary transition">Contact</Link></li>
