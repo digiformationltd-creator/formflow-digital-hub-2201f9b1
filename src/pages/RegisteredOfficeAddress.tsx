@@ -115,7 +115,7 @@ const whoNeeds = [
 ];
 
 const related = [
-  { name: "Company Name & Address Change", path: "/uk-compliance/change-of-company-name", description: "Update your registered name, office, or director details with Companies House.", icon: "change-service" as const },
+  { name: "Company Name & Address Change", path: "/uk-compliance/company-name-change", description: "Update your registered name, office, or director details with Companies House.", icon: "change-service" as const },
   { name: "LTD ID Verification", path: "/uk-services/ltd-id-verification", description: "Mandatory identity verification for directors and persons with significant control.", icon: "id-verify" as const },
   { name: "UTR Registration", path: "/uk-services/utr-codes", description: "Get your Unique Taxpayer Reference for HMRC tax filings.", icon: "utr" as const },
 ];

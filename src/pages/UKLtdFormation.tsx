@@ -426,7 +426,7 @@ const UKLtdFormation = () => {
           { name: "LTD ID Verification", path: "/uk-services/ltd-id-verification", description: "Mandatory Companies House identity verification for directors and PSCs.", icon: "id-verify" },
           { name: "Business Bank Account", path: "/banks-payment-solutions", description: "Open Tide, Wise or Airwallex accounts paired with your new UK LTD.", icon: "banking" },
           { name: "Stripe & PayPal Setup", path: "/banks-payment-solutions", description: "Connect global payment gateways to your UK company in days.", icon: "payments" },
-          { name: "Change of Company Details", path: "/uk-compliance/change-of-company-name", description: "Update name, address, or directors at Companies House.", icon: "change-service" },
+          { name: "Change of Company Details", path: "/uk-compliance/company-name-change", description: "Update name, address, or directors at Companies House.", icon: "change-service" },
         ]}
       />
       <RecommendedGuides

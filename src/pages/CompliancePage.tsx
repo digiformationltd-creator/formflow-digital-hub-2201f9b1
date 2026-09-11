@@ -7,7 +7,7 @@ import { useSeo } from "@/lib/seo";
 import NotFound from "./NotFound";
 
 const trust = [
-  { icon: Building2, label: "Companies House Approved" },
+  { icon: Building2, label: "Companies House Compliant" },
   { icon: Clock, label: "Fast Turnaround" },
   { icon: ShieldCheck, label: "100% Compliance" },
   { icon: FileCheck, label: "Documents Included" },
@@ -129,6 +129,17 @@ const CompliancePage = () => {
         </div>
       </section>
 
+      {/* REGULATORY DISCLAIMER */}
+      <section className="py-8 border-t border-border/40 text-xs opacity-70">
+        <div className="container mx-auto px-4 max-w-4xl text-center space-y-2">
+          <p>
+            <strong>Regulatory Disclaimer:</strong> DigiFormation Ltd provides company secretarial, administrative corporate filing, and document support services. DigiFormation Ltd is not a law firm, chartered accountancy practice, or a government agency and does not provide formal legal, statutory audit, or regulated tax advice.
+          </p>
+          <p>
+            All statutory returns are submitted directly to Companies House and HMRC on behalf of company officers in accordance with UK statutory compliance requirements.
+          </p>
+        </div>
+      </section>
     </Layout>
   );
 };
