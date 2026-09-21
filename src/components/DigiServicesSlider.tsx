@@ -12,6 +12,8 @@ import {
   FileText,
   Globe,
   Hash,
+  Code2,
+  Layers,
   type LucideIcon,
 } from "lucide-react";
 
@@ -33,6 +35,8 @@ const services: Service[] = [
   { num: "06", icon: FileText, category: "UK Compliance", title: "Company Annual Filing", desc: "Confirmation statements, annual accounts filing and all statutory returns submitted to Companies House on time.", href: "/uk-services/company-annual-filing" },
   { num: "07", icon: Globe, category: "Technology", title: "Web Development", desc: "Professional websites, landing pages, and e-commerce solutions for your UK or US business — concept to launch.", href: "/web-development" },
   { num: "08", icon: Hash, category: "USA Services", title: "EIN Number Registration", desc: "Get your US Employer Identification Number (EIN) from the IRS. Required for US business banking and tax compliance.", href: "/usa-services/ein-number" },
+  { num: "09", icon: Code2, category: "Software & AI", title: "Software & AI Agents", desc: "Custom CRM/ERP platforms, business automation workflows, WhatsApp AI agents, and Digi Biz OS integration engineered for scale.", href: "/software-development" },
+  { num: "10", icon: Layers, category: "3D & WebGL", title: "3D & Interactive Websites", desc: "Hardware-accelerated Three.js 3D web experiences, smooth scroll-driven interactive animation, and immersive product showcases.", href: "/3d-interactive-animated-web" },
 ];
 
 const total = services.length;
@@ -172,7 +176,18 @@ const DigiServicesSlider = () => {
               const rel = Math.abs(relIndex(idx));
               const opacity = isActive ? 1 : rel === 1 ? 0.7 : rel === 2 ? 0.35 : 0.1;
               const scale = isActive ? 1 : 0.9;
-              const tints = ["glass-tint-mustard","glass-tint-green","glass-tint-sky","glass-tint-purple","glass-tint-pink","glass-tint-orange","glass-tint-teal","glass-tint-brown"];
+              const tints = [
+                "glass-tint-mustard",
+                "glass-tint-green",
+                "glass-tint-sky",
+                "glass-tint-purple",
+                "glass-tint-pink",
+                "glass-tint-orange",
+                "glass-tint-teal",
+                "glass-tint-gold",
+                "glass-tint-indigo",
+                "glass-tint-cyan",
+              ];
               const tint = tints[idx % tints.length];
               return (
                 <article
