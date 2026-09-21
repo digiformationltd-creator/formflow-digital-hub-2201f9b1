@@ -10,7 +10,6 @@ import {
   Landmark,
   Wallet,
   FileText,
-  Globe,
   Hash,
   Code2,
   Layers,
@@ -33,10 +32,9 @@ const services: Service[] = [
   { num: "04", icon: Landmark, category: "USA Formation", title: "US LLC Formation", desc: "Register a US LLC remotely. Access PayPal, Stripe, Amazon, and the US market without being physically present.", href: "/usa-services/us-llc-formation" },
   { num: "05", icon: Wallet, category: "Banking", title: "Banks & Payment Solutions", desc: "Tide, Airwallex, Wise, Payoneer, Stripe, PayPal, WorldFirst, Sunrate, Zyla, Mollie, Wallester & more.", href: "/banks-payment-solutions/stripe" },
   { num: "06", icon: FileText, category: "UK Compliance", title: "Company Annual Filing", desc: "Confirmation statements, annual accounts filing and all statutory returns submitted to Companies House on time.", href: "/uk-services/company-annual-filing" },
-  { num: "07", icon: Globe, category: "Technology", title: "Web Development", desc: "Professional websites, landing pages, and e-commerce solutions for your UK or US business — concept to launch.", href: "/web-development" },
-  { num: "08", icon: Hash, category: "USA Services", title: "EIN Number Registration", desc: "Get your US Employer Identification Number (EIN) from the IRS. Required for US business banking and tax compliance.", href: "/usa-services/ein-number" },
-  { num: "09", icon: Code2, category: "Software & AI", title: "Software & AI Agents", desc: "Custom CRM/ERP platforms, business automation workflows, WhatsApp AI agents, and Digi Biz OS integration engineered for scale.", href: "/software-development" },
-  { num: "10", icon: Layers, category: "3D & WebGL", title: "3D & Interactive Websites", desc: "Hardware-accelerated Three.js 3D web experiences, smooth scroll-driven interactive animation, and immersive product showcases.", href: "/3d-interactive-animated-web" },
+  { num: "07", icon: Hash, category: "USA Services", title: "EIN Number Registration", desc: "Get your US Employer Identification Number (EIN) from the IRS. Required for US business banking and tax compliance.", href: "/usa-services/ein-number" },
+  { num: "08", icon: Code2, category: "Software & AI", title: "Software & AI Agents", desc: "Custom CRM/ERP platforms, business automation workflows, WhatsApp AI agents, and Digi Biz OS integration engineered for scale.", href: "/software-development" },
+  { num: "09", icon: Layers, category: "3D & WebGL", title: "3D & Interactive Websites", desc: "Hardware-accelerated Three.js 3D web experiences, smooth scroll-driven interactive animation, and immersive product showcases.", href: "/3d-interactive-animated-web" },
 ];
 
 const total = services.length;
