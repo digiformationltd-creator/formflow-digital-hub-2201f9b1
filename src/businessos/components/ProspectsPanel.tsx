@@ -80,8 +80,8 @@ export default function ProspectsPanel() {
   const callControl = async (prospect_id: string, action: string, extra: any = {}) => {
     const { data: sess } = await supabase.auth.getSession();
     const token = sess.session?.access_token;
-    if (!token) { toast({ title: "Sign-in required", variant: "destructive" }); return null; }
-    const res = await fetch(`https://ltxopeehtajwxpbwbqfr.supabase.co/functions/v1/prospect-campaign-control`, {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const res = await fetch(`${supabaseUrl}/functions/v1/prospect-campaign-control`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ prospect_id, action, ...extra }),
@@ -106,7 +106,8 @@ export default function ProspectsPanel() {
     const token = sess.session?.access_token;
     if (!token) { toast({ title: "Sign-in required", variant: "destructive" }); return; }
     toast({ title: "Running AI qualifier…" });
-    const res = await fetch(`https://ltxopeehtajwxpbwbqfr.supabase.co/functions/v1/qualify-prospects`, {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const res = await fetch(`${supabaseUrl}/functions/v1/qualify-prospects`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: "{}",

@@ -91,7 +91,8 @@ export default function SequencesPanel() {
   const control = async (prospect_id: string, action: "stop" | "replied" | "restart") => {
     setBusy(prospect_id + ":" + action);
     const { data: { session } } = await supabase.auth.getSession();
-    const res = await fetch(`https://ltxopeehtajwxpbwbqfr.supabase.co/functions/v1/prospect-campaign-control`, {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const res = await fetch(`${supabaseUrl}/functions/v1/prospect-campaign-control`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
