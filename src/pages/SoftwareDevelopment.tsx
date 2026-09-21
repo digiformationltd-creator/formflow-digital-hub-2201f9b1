@@ -205,7 +205,7 @@ export default function SoftwareDevelopment() {
       title: "Universal AI Business Dashboard",
       tag: "Main Dashboard",
       badge: "Desktop Core",
-      desc: "Central command center with real-time neural reasoning status, multi-module telemetry, quick launch shortcuts, and universal voice control across all enterprise operations.",
+      desc: "Central command center featuring the complete 11 Core Apps suite (Live Tracking, Digi AI, Digi Code, Digi CRM, Digi Intelligence, Digi WhatsApp, Digi Flow, Digi Studio, Digi Models, Digi Marketing, Digi Connectors), real-time neural reasoning, and live transcript streaming.",
       image: osDashboard,
     },
     {
