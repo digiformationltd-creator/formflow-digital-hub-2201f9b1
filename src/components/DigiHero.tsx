@@ -1,22 +1,84 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Code2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import GlowingEarth from "@/components/GlowingEarth";
 
 const headlines = [
-  { pre: "Establish Your", accent: "UK or US", post: "Business in Days" },
-  { pre: "", accent: "500+", post: "Companies Successfully Registered" },
-  { pre: "Banking, Payments &", accent: "Compliance", post: "— All In One Place" },
+  { pre: "Establish Your", accent: "UK & US Company", post: "in Days" },
+  { pre: "Bespoke", accent: "Software & Web Development", post: "for Global Scale" },
+  { pre: "Over", accent: "500+ Companies", post: "Successfully Formed Worldwide" },
+  { pre: "Next-Gen", accent: "AI Agents & 3D Interactive Web", post: "Solutions" },
+  { pre: "Banking, Payments &", accent: "Corporate Compliance", post: "— All In One Place" },
 ];
 
 const DigiHero = () => {
-  const [i, setI] = useState(0);
+  const [headlineIndex, setHeadlineIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  const currentHeadline = headlines[headlineIndex];
+
+  // Pre-calculate full headline string and split points
+  const { fullText, preEnd, accentEnd } = useMemo(() => {
+    const pre = currentHeadline.pre ? `${currentHeadline.pre} ` : "";
+    const accent = currentHeadline.accent;
+    const post = currentHeadline.post ? ` ${currentHeadline.post}` : "";
+    const full = `${pre}${accent}${post}`;
+    return {
+      fullText: full,
+      preEnd: pre.length,
+      accentEnd: pre.length + accent.length,
+    };
+  }, [currentHeadline]);
+
+  // Typewriter effect state loop
   useEffect(() => {
-    const id = setInterval(() => setI((v) => (v + 1) % headlines.length), 4000);
-    return () => clearInterval(id);
-  }, []);
+    // Check if user prefers reduced motion
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setCharIndex(fullText.length);
+      const timer = setInterval(() => {
+        setHeadlineIndex((prev) => (prev + 1) % headlines.length);
+      }, 4000);
+      return () => clearInterval(timer);
+    }
+
+    let timeout: NodeJS.Timeout;
+
+    if (!isDeleting) {
+      // Typing phase
+      if (charIndex < fullText.length) {
+        timeout = setTimeout(() => {
+          setCharIndex((prev) => prev + 1);
+        }, 42); // Typing speed
+      } else {
+        // Finished typing full sentence — pause before deleting
+        timeout = setTimeout(() => {
+          setIsDeleting(true);
+        }, 2400); // 2.4s pause on full text
+      }
+    } else {
+      // Deleting phase
+      if (charIndex > 0) {
+        timeout = setTimeout(() => {
+          setCharIndex((prev) => prev - 1);
+        }, 22); // Fast delete speed
+      } else {
+        // Finished deleting — switch to next headline
+        timeout = setTimeout(() => {
+          setIsDeleting(false);
+          setHeadlineIndex((prev) => (prev + 1) % headlines.length);
+        }, 350);
+      }
+    }
+
+    return () => clearTimeout(timeout);
+  }, [charIndex, isDeleting, fullText.length, headlines.length]);
+
+  // Slice segments based on current typed character count
+  const displayedPre = fullText.slice(0, Math.min(charIndex, preEnd));
+  const displayedAccent = charIndex > preEnd ? fullText.slice(preEnd, Math.min(charIndex, accentEnd)) : "";
+  const displayedPost = charIndex > accentEnd ? fullText.slice(accentEnd, charIndex) : "";
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-hero">
@@ -30,8 +92,12 @@ const DigiHero = () => {
       <GlowingEarth />
 
       <div className="container mx-auto px-4 py-20 relative z-10 text-center">
-        <div className="inline-flex glass rounded-full px-5 py-2 mt-10 md:mt-20 mb-10 animate-fade-up">
-          <span className="text-[11px] uppercase tracking-widest">UK & US Company Formation • Banking • Compliance</span>
+        {/* Top Feature Pill Badge */}
+        <div className="inline-flex items-center gap-2 glass rounded-full px-5 py-2 mt-8 md:mt-16 mb-8 border border-primary/30 animate-fade-up">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[11px] sm:text-xs uppercase tracking-widest font-semibold text-foreground/90">
+            Company Formation • Software Engineering • Web Development • AI Agents • Banking
+          </span>
         </div>
 
         <div className="relative">
@@ -39,14 +105,30 @@ const DigiHero = () => {
           <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[200%] rounded-[50%] bg-[radial-gradient(ellipse_at_center,hsl(var(--primary)/0.55)_0%,hsl(var(--accent)/0.25)_30%,transparent_70%)] blur-3xl animate-hero-glow" />
           <div aria-hidden className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[130%] rounded-full bg-[radial-gradient(circle,hsl(var(--accent)/0.45),transparent_70%)] blur-2xl animate-hero-glow-slow" />
 
-          <h1 className="relative text-5xl md:text-7xl lg:text-[5.5rem] font-bold leading-[1.05] mb-8 min-h-[1.2em] animate-fade-up" style={{ animationDelay: "0.1s" }}>
-            <span key={i} className="block animate-headline-slide will-change-transform">
-              {headlines[i].pre && <>{headlines[i].pre} </>}
-              <span className="headline-accent-shimmer">{headlines[i].accent}</span>
-              {headlines[i].post && <> {headlines[i].post}</>}
+          {/* Animated Typewriter Main Title */}
+          <h1
+            className="relative text-4xl sm:text-6xl md:text-7xl lg:text-[5.2rem] font-bold leading-[1.08] mb-8 min-h-[3.6em] sm:min-h-[2.5em] lg:min-h-[2.2em] flex items-center justify-center animate-fade-up"
+            style={{ animationDelay: "0.1s" }}
+            aria-label={fullText}
+          >
+            <span className="sr-only">{fullText}</span>
+            <span aria-hidden="true" className="inline">
+              {displayedPre}
+              {displayedAccent && (
+                <span className="headline-accent-shimmer text-gradient">
+                  {displayedAccent}
+                </span>
+              )}
+              {displayedPost}
+              {/* Glowing Typewriter Cursor */}
+              <span
+                className="inline-block w-[3px] md:w-[4px] h-[0.85em] ml-1.5 align-middle bg-primary animate-pulse rounded-full shadow-[0_0_14px_hsl(var(--primary))]"
+                aria-hidden="true"
+              />
             </span>
           </h1>
         </div>
+
         <style>{`
           @keyframes hero-glow {
             0%, 100% { opacity: 0.85; transform: translate(-50%, -50%) scale(1); }
@@ -63,19 +145,26 @@ const DigiHero = () => {
           }
         `}</style>
 
-        <p className="text-lg md:text-xl max-w-3xl mx-auto mb-10 leading-relaxed animate-fade-up" style={{ animationDelay: "0.2s" }}>
-          Fast, transparent and fully supported company formation, banking, payments, compliance and web services for entrepreneurs worldwide.
+        {/* Narrative Subtitle mentioning Software & Web Development */}
+        <p className="text-base sm:text-lg md:text-xl max-w-3xl mx-auto mb-10 leading-relaxed opacity-90 animate-fade-up" style={{ animationDelay: "0.2s" }}>
+          From UK &amp; US corporate formation and verified business banking to bespoke software engineering, modern web development, and autonomous AI agents — DigiFormation delivers the complete infrastructure you need to launch and scale globally.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up" style={{ animationDelay: "0.3s" }}>
-          <Button asChild variant="hero" size="lg" className="rounded-full">
+        {/* Primary Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-up" style={{ animationDelay: "0.3s" }}>
+          <Button asChild variant="hero" size="lg" className="rounded-full w-full sm:w-auto">
             <Link to="/uk-services/uk-ltd-formation/choose-jurisdiction">
-              Register Your UK Company <ArrowRight className="w-4 h-4" />
+              Register UK Company <ArrowRight className="w-4 h-4 ml-1" />
             </Link>
           </Button>
-          <Button asChild variant="hero" size="lg" className="rounded-full">
+          <Button asChild variant="hero" size="lg" className="rounded-full w-full sm:w-auto">
             <Link to="/usa-services/us-llc-formation/choose-state">
-              Register Your USA Company <ArrowRight className="w-4 h-4" />
+              Register USA Company <ArrowRight className="w-4 h-4 ml-1" />
+            </Link>
+          </Button>
+          <Button asChild variant="ghostGlow" size="lg" className="rounded-full w-full sm:w-auto">
+            <Link to="/software-development">
+              <Code2 className="w-4 h-4 mr-1 text-primary" /> Software &amp; Web Dev
             </Link>
           </Button>
         </div>
