@@ -83,7 +83,7 @@ const stats = [
   { value: "16994903", label: "Companies House Registered Company No.", sub: "England & Wales Jurisdiction" },
   { value: "71+", label: "UK Companies Under Founder Directorship", sub: "Publicly Verified on Companies House" },
   { value: "8+", label: "Years of Industry Experience", sub: "Corporate Law, Banking & Engineering" },
-  { value: "300+", label: "Entrepreneurs & Businesses Launched", sub: "Across 60+ Global Jurisdictions" },
+  { value: "500+", label: "Entrepreneurs & Businesses Launched", sub: "Across 60+ Global Jurisdictions" },
 ];
 
 export const About = () => {

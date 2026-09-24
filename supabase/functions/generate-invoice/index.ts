@@ -595,6 +595,10 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    // Service-role client — declared up-front because the per-IP rate-limit and
+    // the duplicate checks below use it BEFORE the old declaration point (that
+    // ordering threw "Cannot access 'admin' before initialization" — a TDZ bug).
+    const admin = createClient(supabaseUrl, serviceKey)
 
     // Auth is OPTIONAL — guests still get a PDF + signed URL for the email,
     // but only authenticated users get rows inserted into client_orders/invoices.
@@ -640,7 +644,6 @@ Deno.serve(async (req) => {
       })
     }
 
-    const admin = createClient(supabaseUrl, serviceKey)
     const customerEmail = body.customer.email.trim().toLowerCase()
 
     // ---------------- Idempotency / duplicate-prevention ----------------

@@ -9,7 +9,7 @@ const COMPANIES_HOUSE_URL =
 const stats = [
   { icon: Building2, value: "71+", label: "UK Companies Registered Under His Name" },
   { icon: Award, value: "8+", label: "Years of Industry Experience" },
-  { icon: ShieldCheck, value: "300+", label: "Clients Served Worldwide" },
+  { icon: ShieldCheck, value: "500+", label: "Clients Served Worldwide" },
 ];
 
 const DigiAbout = () => (

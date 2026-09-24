@@ -7,7 +7,7 @@ const reasons = [
   { icon: ShieldCheck, title: "Full Compliance", desc: "UTR, EIN/ITIN, ID verification, annual filings and tax compliance — all handled by certified specialists.", tint: "glass-tint-sky" },
   { icon: Globe2, title: "Global Expertise", desc: "Supporting entrepreneurs across multiple jurisdictions with deep local regulatory knowledge.", tint: "glass-tint-purple" },
   { icon: Headphones, title: "Dedicated Support", desc: "Personalized account managers for every client — real humans, fast responses, no ticket queues.", tint: "glass-tint-pink" },
-  { icon: Award, title: "Proven Success", desc: "Over 300 companies registered globally with a 98% client retention rate.", tint: "glass-tint-orange" },
+  { icon: Award, title: "Proven Success", desc: "Over 500 companies registered globally with a 98% client retention rate.", tint: "glass-tint-orange" },
 ];
 
 const DigiWhyChoose = () => (

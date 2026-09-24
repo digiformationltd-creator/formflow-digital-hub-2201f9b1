@@ -16,7 +16,7 @@ const rotatingHeadlines = [
 
 const trustSignals = [
   { icon: Building2, label: "Registered Agent Network" },
-  { icon: Users, label: "300+ U.S. LLCs Formed" },
+  { icon: Users, label: "500+ U.S. LLCs Formed" },
   { icon: Star, label: "99% Formation Success Rate" },
   { icon: Lock, label: "Secure IRS & State Filing" },
   { icon: ShieldCheck, label: "Dedicated Client Support" },
