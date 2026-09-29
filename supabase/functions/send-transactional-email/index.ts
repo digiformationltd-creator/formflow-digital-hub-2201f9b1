@@ -225,7 +225,7 @@ Deno.serve(async (req) => {
       if (field in templateData && !isSafeUrl(templateData[field])) {
         console.warn('Blocked anon template URL injection', { templateName, field })
         return new Response(
-          JSON.stringify({ error: `Invalid ${field}: must be a digiformation.uk URL` }),
+          JSON.stringify({ error: `Invalid ${field}: must be a digiformation.co.uk URL` }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
         )
       }
@@ -553,74 +553,69 @@ Deno.serve(async (req) => {
       ? template.subject(templateData)
       : template.subject
 
-  // 5. Enqueue the pre-rendered email for async processing by the dispatcher.
-  // The dispatcher (process-email-queue) handles sending, retries, and rate-limit backoff.
-
-  // Log pending BEFORE enqueue so we have a record even if enqueue crashes
+  // 5. Send directly over the owner's Hostinger SMTP (denomailer). This replaces
+  //    the old Lovable dispatcher (enqueue_email → process-email-queue →
+  //    LOVABLE_SEND_URL), which died when the site left Lovable. Synchronous —
+  //    no pgmq/cron dependency.
   await supabase.from('email_send_log').insert({
     message_id: messageId,
-      triggered_by_user_id: authUserId,
-      triggered_by_ip: clientIp,
-      order_id: orderId,
-      invoice_id: invoiceId,
-      ticket_id: ticketId,
-      client_user_id: clientUserId,
-      trigger_source: triggerSource,
+    triggered_by_user_id: authUserId,
+    triggered_by_ip: clientIp,
+    order_id: orderId,
+    invoice_id: invoiceId,
+    ticket_id: ticketId,
+    client_user_id: clientUserId,
+    trigger_source: triggerSource,
     template_name: templateName,
     recipient_email: effectiveRecipient,
     status: 'pending',
   })
 
-  const { error: enqueueError } = await supabase.rpc('enqueue_email', {
-    queue_name: 'transactional_emails',
-    payload: {
-      message_id: messageId,
+  const SMTP_HOST = Deno.env.get('SMTP_HOST') || 'smtp.hostinger.com'
+  const SMTP_PORT = Number(Deno.env.get('SMTP_PORT') || '465')
+  const SMTP_USER = Deno.env.get('SMTP_USER') || FROM_EMAIL
+  const SMTP_PASS = Deno.env.get('SMTP_PASS') || ''
+
+  try {
+    if (!SMTP_PASS) throw new Error('SMTP_PASS secret not configured')
+    const { SMTPClient } = await import('https://deno.land/x/denomailer@1.6.0/mod.ts')
+    const client = new SMTPClient({
+      connection: {
+        hostname: SMTP_HOST,
+        port: SMTP_PORT,
+        tls: SMTP_PORT === 465,               // 465 = implicit TLS; 587 = STARTTLS
+        auth: { username: SMTP_USER, password: SMTP_PASS },
+      },
+    })
+    await client.send({
+      // From aligns with the authenticated mailbox so SPF/DKIM/DMARC pass.
+      from: `${SITE_NAME} <${SMTP_USER}>`,
       to: effectiveRecipient,
-      from: `${SITE_NAME} <${FROM_EMAIL}>`,
-      sender_domain: SENDER_DOMAIN,
       subject: resolvedSubject,
       html,
-      text: plainText,
-      purpose: 'transactional',
-      label: templateName,
-      idempotency_key: idempotencyKey,
-      unsubscribe_token: unsubscribeToken,
-      queued_at: new Date().toISOString(),
-    },
-  })
-
-  if (enqueueError) {
-    console.error('Failed to enqueue email', {
-      error: enqueueError,
-      templateName,
-      effectiveRecipient,
+      content: plainText || 'This email requires an HTML-capable client.',
+      ...(unsubscribeToken
+        ? { headers: { 'List-Unsubscribe': `<https://${FROM_DOMAIN}/unsubscribe?token=${unsubscribeToken}>` } }
+        : {}),
     })
-
-    await supabase.from('email_send_log').insert({
-      message_id: messageId,
-      triggered_by_user_id: authUserId,
-      triggered_by_ip: clientIp,
-      order_id: orderId,
-      invoice_id: invoiceId,
-      ticket_id: ticketId,
-      client_user_id: clientUserId,
-      trigger_source: triggerSource,
-      template_name: templateName,
-      recipient_email: effectiveRecipient,
-      status: 'failed',
-      error_message: 'Failed to enqueue email',
-    })
-
-    return new Response(JSON.stringify({ error: 'Failed to enqueue email' }), {
-      status: 500,
+    await client.close()
+  } catch (sendErr) {
+    const msg = String((sendErr as any)?.message || sendErr).slice(0, 300)
+    console.error('SMTP send failed', { error: msg, templateName, effectiveRecipient })
+    await supabase.from('email_send_log')
+      .update({ status: 'failed', error_message: msg })
+      .eq('message_id', messageId)
+    return new Response(JSON.stringify({ error: 'Email send failed', detail: msg.slice(0, 160) }), {
+      status: 502,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
 
-  console.log('Transactional email enqueued', { templateName, effectiveRecipient })
+  await supabase.from('email_send_log').update({ status: 'sent' }).eq('message_id', messageId)
+  console.log('Transactional email sent via Hostinger SMTP', { templateName, effectiveRecipient })
 
   return new Response(
-    JSON.stringify({ success: true, queued: true }),
+    JSON.stringify({ success: true, sent: true }),
     {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

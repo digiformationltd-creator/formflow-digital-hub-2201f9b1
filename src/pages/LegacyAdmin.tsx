@@ -991,12 +991,12 @@ const EmailsSection = ({
     await supabase.functions.invoke("send-transactional-email", {
       body: {
         templateName: template,
-        recipientEmail: "info@digiformation.uk",
+        recipientEmail: "info@digiformation.co.uk",
         idempotencyKey: `${template}-${c.id}-${Date.now()}-admin`,
         templateData: { ...templateData, customerName: `[ADMIN COPY] ${clientName || ""} <${clientEmail}>` },
       },
     });
-    if (error) toast.error(error.message); else toast.success(`${label} reminder sent (${daysRemaining} days remaining) — admin copy sent to info@digiformation.uk`);
+    if (error) toast.error(error.message); else toast.success(`${label} reminder sent (${daysRemaining} days remaining) — admin copy sent to info@digiformation.co.uk`);
   };
 
   const sendAddressReminder = async (a: any) => {
@@ -1011,12 +1011,12 @@ const EmailsSection = ({
     await supabase.functions.invoke("send-transactional-email", {
       body: {
         templateName: "address-renewal-reminder",
-        recipientEmail: "info@digiformation.uk",
+        recipientEmail: "info@digiformation.co.uk",
         idempotencyKey: `address-renewal-${a.id}-${Date.now()}-admin`,
         templateData: { ...templateData, customerName: `[ADMIN COPY] ${clientName || ""} <${clientEmail}>` },
       },
     });
-    if (error) toast.error(error.message); else toast.success(`Address renewal reminder sent (${daysRemaining} days remaining) — admin copy sent to info@digiformation.uk`);
+    if (error) toast.error(error.message); else toast.success(`Address renewal reminder sent (${daysRemaining} days remaining) — admin copy sent to info@digiformation.co.uk`);
   };
 
   const pendingOrders = orders.filter(o => !/complete/i.test(o.status || ""));
@@ -1208,7 +1208,7 @@ const CompanyFormSection = ({
     await supabase.functions.invoke("send-transactional-email", {
       body: {
         templateName: template,
-        recipientEmail: "info@digiformation.uk",
+        recipientEmail: "info@digiformation.co.uk",
         idempotencyKey: `${template}-${c.id}-${Date.now()}-admin`,
         templateData: { ...templateData, customerName: `[ADMIN COPY] ${clientName || ""} <${clientEmail}>` },
       },
@@ -1233,7 +1233,7 @@ const CompanyFormSection = ({
     await supabase.functions.invoke("send-transactional-email", {
       body: {
         templateName: "address-renewal-reminder",
-        recipientEmail: "info@digiformation.uk",
+        recipientEmail: "info@digiformation.co.uk",
         idempotencyKey: `address-renewal-co-${c.id}-${Date.now()}-admin`,
         templateData: { ...templateData, customerName: `[ADMIN COPY] ${clientName || ""} <${clientEmail}>` },
       },

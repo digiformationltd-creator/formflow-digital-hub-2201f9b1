@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const OWNER_EMAIL = "info@digiformation.uk";
+const OWNER_EMAILS = ["info@digiformation.co.uk", "info@digiformation.uk"];
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
       .eq("role", "admin")
       .maybeSingle();
 
-    if (requesterEmail !== OWNER_EMAIL && !role) {
+    if (!OWNER_EMAILS.includes(String(requesterEmail || "").toLowerCase()) && !role) {
       return json({ error: "Admin access required" }, 403);
     }
 

@@ -4,8 +4,8 @@ import {
 } from 'npm:@react-email/components@0.0.22'
 
 export const SITE_NAME = 'Digiformation Ltd'
-export const SITE_URL = 'www.digiformation.uk'
-export const LOGO_URL = 'https://www.digiformation.uk/digiformation-logo.png'
+export const SITE_URL = 'www.digiformation.co.uk'
+export const LOGO_URL = 'https://www.digiformation.co.uk/digiformation-logo.png'
 
 // Grey + white palette (softer than pure black)
 export const INK = '#4b5563'        // headings, accents — medium grey
