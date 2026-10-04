@@ -235,6 +235,7 @@ const DigiServicesSlider = () => {
                   <Link
                     to={s.href}
                     onClick={(e) => { if (!isActive) e.preventDefault(); }}
+                    aria-label={`Explore ${s.title}`}
                     className={`inline-flex items-center gap-2 mt-3 text-[11px] font-semibold uppercase tracking-[0.1em] hover:gap-3 transition-all ${
                       isActive ? "opacity-100" : "opacity-0 pointer-events-none"
                     }`}
@@ -248,14 +249,20 @@ const DigiServicesSlider = () => {
           </div>
         </div>
 
-        <div className="flex gap-2 justify-center mt-8">
+        <div className="flex gap-1 justify-center mt-8 items-center">
           {services.map((_, i) => (
             <button
               key={i}
               onClick={() => setActive(i)}
               aria-label={`Slide ${i + 1}`}
-              className={`h-1.5 rounded-full transition-all ${i === active ? "w-7 bg-primary" : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/60"}`}
-            />
+              className="p-3 -m-1.5 inline-flex items-center justify-center focus:outline-none"
+            >
+              <span
+                className={`h-1.5 rounded-full transition-all block ${
+                  i === active ? "w-7 bg-primary" : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/60"
+                }`}
+              />
+            </button>
           ))}
         </div>
 

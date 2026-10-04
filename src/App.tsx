@@ -1,45 +1,57 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
-import { DynamicServicePage } from "./pages/DynamicServicePage";
-import { UKServicesHub, UKComplianceHub, USAServicesHub } from "./pages/SectionHubs";
-import BankingHub from "./pages/BankingHub";
-import About from "./pages/About";
-import { Contact, Pricing, FAQ, ClientArea, WebDevelopment, Privacy, Terms } from "./pages/CorePages";
-import SoftwareDevelopment from "./pages/SoftwareDevelopment";
-import BlogIndex from "./pages/BlogIndex";
-import BlogPost from "./pages/BlogPost";
-import { InsightPage, InsightsIndex } from "./pages/InsightPage";
-import UKLtdFormation from "./pages/UKLtdFormation";
-import UkLtdChooseJurisdiction from "./pages/UkLtdChooseJurisdiction";
-import UkLtdCheckout from "./pages/UkLtdCheckout";
-import LtdIdVerification from "./pages/LtdIdVerification";
-import LtdIdVerificationCheckout from "./pages/LtdIdVerificationCheckout";
-import RegisteredOfficeAddress from "./pages/RegisteredOfficeAddress";
-import UtrCodes from "./pages/UtrCodes";
-import CompliancePage from "./pages/CompliancePage";
-import UKChangeServices from "./pages/UKChangeServices";
-import UsaLlcFormation from "./pages/UsaLlcFormation";
-import UsaLlcChooseState from "./pages/UsaLlcChooseState";
-import UsaLlcCheckout from "./pages/UsaLlcCheckout";
-import UsaServicePage from "./pages/UsaServicePage";
-import BankingProviderPage from "./pages/BankingProviderPage";
-import BankingCheckout from "./pages/BankingCheckout";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import AIAssistant from "./components/AIAssistant";
 import ScrollToTop from "./components/ScrollToTop";
 import RecoveryRedirect from "./components/RecoveryRedirect";
 import AttributionTracker from "./components/AttributionTracker";
-import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
-import ResetPassword from "./pages/ResetPassword";
-import Admin from "./pages/Admin";
-import Unsubscribe from "./pages/Unsubscribe";
-import Checkout from "./pages/Checkout";
+
+// Lazy-loaded routes for performance & minimal initial bundle
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+const DynamicServicePage = lazy(() => import("./pages/DynamicServicePage").then((m) => ({ default: m.DynamicServicePage })));
+const UKServicesHub = lazy(() => import("./pages/SectionHubs").then((m) => ({ default: m.UKServicesHub })));
+const UKComplianceHub = lazy(() => import("./pages/SectionHubs").then((m) => ({ default: m.UKComplianceHub })));
+const USAServicesHub = lazy(() => import("./pages/SectionHubs").then((m) => ({ default: m.USAServicesHub })));
+const BankingHub = lazy(() => import("./pages/BankingHub"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/CorePages").then((m) => ({ default: m.Contact })));
+const Pricing = lazy(() => import("./pages/CorePages").then((m) => ({ default: m.Pricing })));
+const FAQ = lazy(() => import("./pages/CorePages").then((m) => ({ default: m.FAQ })));
+const ClientArea = lazy(() => import("./pages/CorePages").then((m) => ({ default: m.ClientArea })));
+const WebDevelopment = lazy(() => import("./pages/CorePages").then((m) => ({ default: m.WebDevelopment })));
+const Privacy = lazy(() => import("./pages/CorePages").then((m) => ({ default: m.Privacy })));
+const Terms = lazy(() => import("./pages/CorePages").then((m) => ({ default: m.Terms })));
+const SoftwareDevelopment = lazy(() => import("./pages/SoftwareDevelopment"));
+const BlogIndex = lazy(() => import("./pages/BlogIndex"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const InsightPage = lazy(() => import("./pages/InsightPage").then((m) => ({ default: m.InsightPage })));
+const InsightsIndex = lazy(() => import("./pages/InsightPage").then((m) => ({ default: m.InsightsIndex })));
+const UKLtdFormation = lazy(() => import("./pages/UKLtdFormation"));
+const UkLtdChooseJurisdiction = lazy(() => import("./pages/UkLtdChooseJurisdiction"));
+const UkLtdCheckout = lazy(() => import("./pages/UkLtdCheckout"));
+const LtdIdVerification = lazy(() => import("./pages/LtdIdVerification"));
+const LtdIdVerificationCheckout = lazy(() => import("./pages/LtdIdVerificationCheckout"));
+const RegisteredOfficeAddress = lazy(() => import("./pages/RegisteredOfficeAddress"));
+const UtrCodes = lazy(() => import("./pages/UtrCodes"));
+const CompliancePage = lazy(() => import("./pages/CompliancePage"));
+const UKChangeServices = lazy(() => import("./pages/UKChangeServices"));
+const UsaLlcFormation = lazy(() => import("./pages/UsaLlcFormation"));
+const UsaLlcChooseState = lazy(() => import("./pages/UsaLlcChooseState"));
+const UsaLlcCheckout = lazy(() => import("./pages/UsaLlcCheckout"));
+const UsaServicePage = lazy(() => import("./pages/UsaServicePage"));
+const BankingProviderPage = lazy(() => import("./pages/BankingProviderPage"));
+const BankingCheckout = lazy(() => import("./pages/BankingCheckout"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Admin = lazy(() => import("./pages/Admin"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 
 const queryClient = new QueryClient();
 
@@ -52,7 +64,8 @@ const App = () => (
         <ScrollToTop />
         <RecoveryRedirect />
         <AttributionTracker />
-        <Routes>
+        <Suspense fallback={<div className="min-h-screen bg-background" />}>
+          <Routes>
           <Route path="/" element={<Index />} />
 
           {/* Section hubs */}
@@ -140,6 +153,7 @@ const App = () => (
           <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
         <WhatsAppFloat />
         <AIAssistant />
       </BrowserRouter>

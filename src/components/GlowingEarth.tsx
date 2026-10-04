@@ -1,8 +1,8 @@
-import earthMap from "@/assets/earth-map.jpg";
+import earthMap from "@/assets/earth-map.webp";
 
 /**
  * GlowingEarth — slowly rotating earth with a soft halo.
- * Lightweight: pure CSS, no JS.
+ * Hardware-accelerated GPU transform composited, lightweight.
  */
 const GlowingEarth = () => {
   return (
@@ -16,10 +16,26 @@ const GlowingEarth = () => {
 
         {/* The sphere (still) */}
         <div className="earth-sphere">
-          <div
-            className="earth-texture"
-            style={{ backgroundImage: `url(${earthMap})` }}
-          />
+          <div className="earth-strip" aria-hidden="true">
+            <img
+              src={earthMap}
+              alt=""
+              width="1200"
+              height="675"
+              className="earth-img"
+              decoding="async"
+              fetchPriority="high"
+            />
+            <img
+              src={earthMap}
+              alt=""
+              width="1200"
+              height="675"
+              className="earth-img"
+              decoding="async"
+              aria-hidden="true"
+            />
+          </div>
           <div className="earth-shade" />
           <div className="earth-rim" />
         </div>
@@ -64,23 +80,32 @@ const GlowingEarth = () => {
             0 0 80px hsl(210 70% 65% / 0.30),
             0 0 160px hsl(210 70% 60% / 0.15);
         }
-        .earth-texture {
+        .earth-strip {
           position: absolute;
-          inset: 0;
-          background-repeat: repeat-x;
-          background-size: 200% 100%;
-          background-position: 0% center;
+          top: 0;
+          left: 0;
+          height: 100%;
+          width: 200%;
+          display: flex;
           opacity: 0.92;
           mix-blend-mode: screen;
           filter: brightness(0.9) contrast(1.1) hue-rotate(-8deg);
+          will-change: transform;
           animation: earth-spin 60s linear infinite;
         }
+        .earth-img {
+          width: 50%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          pointer-events: none;
+        }
         @keyframes earth-spin {
-          from { background-position: 0% center; }
-          to   { background-position: -200% center; }
+          from { transform: translate3d(0, 0, 0); }
+          to   { transform: translate3d(-50%, 0, 0); }
         }
         @media (prefers-reduced-motion: reduce) {
-          .earth-texture { animation: none; }
+          .earth-strip { animation: none; }
         }
         .earth-shade {
           position: absolute;

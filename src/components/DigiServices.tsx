@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import heroUkLtd from "@/assets/card-hero-uk-ltd.jpg";
-import heroUsLlc from "@/assets/card-hero-us-llc.jpg";
-import heroBanking from "@/assets/card-hero-banking.jpg";
-import heroPayments from "@/assets/card-hero-payments.jpg";
-import heroWeb from "@/assets/card-hero-web.jpg";
-import heroTax from "@/assets/card-hero-tax.jpg";
+import heroUkLtd from "@/assets/card-hero-uk-ltd.webp";
+import heroUsLlc from "@/assets/card-hero-us-llc.webp";
+import heroBanking from "@/assets/card-hero-banking.webp";
+import heroPayments from "@/assets/card-hero-payments.webp";
+import heroWeb from "@/assets/card-hero-web.webp";
+import heroTax from "@/assets/card-hero-tax.webp";
 
 
 const items = [
@@ -90,8 +90,8 @@ const DigiServices = () => (
                 alt={it.title}
                 loading="lazy"
                 decoding="async"
-                width={1024}
-                height={768}
+                width={800}
+                height={600}
                 sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 360px"
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />

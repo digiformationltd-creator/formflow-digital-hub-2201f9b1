@@ -1,0 +1,37 @@
+{
+  "$schema": "https://agenticresourcediscovery.org/schema/v1/ai-catalog.json",
+  "name": "DigiFormation",
+  "description": "UK Limited Company & US LLC formation platform, international banking, payment gateways, custom CRM/ERP development, and AI agent engineering.",
+  "url": "https://www.digiformation.co.uk",
+  "version": "1.0.0",
+  "provider": {
+    "name": "Digiformation Ltd",
+    "url": "https://www.digiformation.co.uk"
+  },
+  "capabilities": [
+    {
+      "id": "company-formation-uk",
+      "name": "UK LTD Company Formation",
+      "description": "Full UK Limited Company incorporation with Companies House for international non-residents.",
+      "url": "https://www.digiformation.co.uk/uk-services/uk-ltd-formation"
+    },
+    {
+      "id": "company-formation-us",
+      "name": "US LLC Company Formation",
+      "description": "US LLC incorporation in Delaware, Wyoming and all 50 states with EIN registration.",
+      "url": "https://www.digiformation.co.uk/usa-services/us-llc-formation"
+    },
+    {
+      "id": "banking-payments",
+      "name": "International Banking & Payment Solutions",
+      "description": "Assistance with business accounts: Wise, Payoneer, Tide, Airwallex, Stripe and PayPal.",
+      "url": "https://www.digiformation.co.uk/banks-payment-solutions"
+    },
+    {
+      "id": "software-development",
+      "name": "Custom Software, CRM & AI Agents",
+      "description": "Bespoke software development, business automation, Digi Biz OS and autonomous AI agents.",
+      "url": "https://www.digiformation.co.uk/software-development"
+    }
+  ]
+}

@@ -20,7 +20,7 @@ import {
   Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import founderImg from "@/assets/founder-haroon.jpg";
+import founderImg from "@/assets/founder-haroon.webp";
 
 const COMPANIES_HOUSE_OFFICER_URL =
   "https://find-and-update.company-information.service.gov.uk/officers/iIzC9R8zKXH6lyWTWCDaT3_gK4E/appointments";

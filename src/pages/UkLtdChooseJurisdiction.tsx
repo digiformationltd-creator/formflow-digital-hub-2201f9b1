@@ -184,7 +184,7 @@ const UkLtdChooseJurisdiction = () => {
               Select your jurisdiction
             </label>
             <Select value={selectedCode ?? undefined} onValueChange={handleSelect}>
-              <SelectTrigger className="h-14 text-base rounded-xl bg-background/60 border-border/60">
+              <SelectTrigger aria-label="Choose a UK jurisdiction" className="h-14 text-base rounded-xl bg-background/60 border-border/60">
                 <SelectValue placeholder="— Choose a UK jurisdiction —" />
               </SelectTrigger>
               <SelectContent className="z-50">

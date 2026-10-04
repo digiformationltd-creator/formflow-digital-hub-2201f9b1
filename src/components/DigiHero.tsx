@@ -13,8 +13,9 @@ const headlines = [
 ];
 
 const DigiHero = () => {
+  const initialLength = `${headlines[0].pre} ${headlines[0].accent} ${headlines[0].post}`.length;
   const [headlineIndex, setHeadlineIndex] = useState(0);
-  const [charIndex, setCharIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(initialLength);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const currentHeadline = headlines[headlineIndex];
@@ -107,7 +108,7 @@ const DigiHero = () => {
 
           {/* Animated Typewriter Main Title */}
           <h1
-            className="relative text-4xl sm:text-6xl md:text-7xl lg:text-[5.2rem] font-bold leading-[1.08] mb-8 min-h-[3.6em] sm:min-h-[2.5em] lg:min-h-[2.2em] flex items-center justify-center animate-fade-up"
+            className="relative text-4xl sm:text-6xl md:text-7xl lg:text-[5.2rem] font-bold leading-[1.08] mb-8 min-h-[3.2em] sm:min-h-[2.4em] lg:min-h-[2.1em] text-center animate-fade-up"
             style={{ animationDelay: "0.1s" }}
             aria-label={fullText}
           >

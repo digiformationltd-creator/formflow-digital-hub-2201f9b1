@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Mail, Clock, MapPin, Facebook, Instagram, Youtube, Linkedin, Building2, Handshake, UserCircle2 } from "lucide-react";
-import logo from "@/assets/digiformation-logo-official.png";
+import logo from "@/assets/digiformation-logo-official.webp";
 
 
 // WhatsApp icon — neutral monochrome to match other social icons
@@ -105,7 +105,7 @@ const DigiFooter = () => {
       <div className="container mx-auto px-4 py-10 sm:py-14 grid gap-8 sm:gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 items-stretch">
         {/* Brand */}
         <div className="flex flex-col items-center text-center sm:items-start sm:text-left sm:col-span-2 lg:col-span-1 h-full">
-          <img src={logo} alt="Digiformation Ltd logo — trusted UK Limited Company & US LLC formation worldwide" className="h-24 w-auto object-contain mb-4" />
+          <img src={logo} alt="Digiformation Ltd logo — trusted UK Limited Company & US LLC formation worldwide" width="176" height="96" className="h-24 w-auto object-contain mb-4" />
           <div className="text-xs text-muted-foreground mb-4">
             <span className="font-semibold text-foreground">Digiformation Ltd</span><br />
             Company No. 16994903<br />
@@ -115,22 +115,22 @@ const DigiFooter = () => {
             <div className="text-xs uppercase tracking-[0.18em] font-semibold mb-3 opacity-90">Connect With Us</div>
             <div className="grid grid-cols-4 gap-2 w-full max-w-[200px] sm:max-w-none">
               {socials.map((s) => {
-                const IconComp = s.icon;
-                return (
-                  <a
-                    key={s.name}
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={s.name}
-                    title={s.name}
-                    className="w-9 h-9 rounded-lg glass grid place-items-center hover:bg-primary/20 hover:-translate-y-0.5 transition-all"
-                  >
-                    <IconComp className="w-4 h-4" />
-                  </a>
-                );
-              })}
-            </div>
+                 const IconComp = s.icon;
+                 return (
+                   <a
+                     key={s.name}
+                     href={s.href}
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     aria-label={s.name}
+                     title={s.name}
+                     className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg glass grid place-items-center hover:bg-primary/20 hover:-translate-y-0.5 transition-all"
+                   >
+                     <IconComp className="w-4 h-4" />
+                   </a>
+                 );
+               })}
+             </div>
           </div>
         </div>
 

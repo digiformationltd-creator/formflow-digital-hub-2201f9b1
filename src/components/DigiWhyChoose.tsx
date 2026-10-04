@@ -1,5 +1,5 @@
 import { Zap, Eye, ShieldCheck, Globe2, Headphones, Award } from "lucide-react";
-import whyBg from "@/assets/premium-why-choose-bg.jpg";
+import whyBg from "@/assets/premium-why-choose-bg.webp";
 
 const reasons = [
   { icon: Zap, title: "Speed & Efficiency", desc: "Quick UK & US company formation and compliance — most setups completed within days.", tint: "glass-tint-mustard" },

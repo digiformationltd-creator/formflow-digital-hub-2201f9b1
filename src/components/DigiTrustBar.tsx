@@ -60,6 +60,8 @@ const DigiTrustBar = () => {
                   src={l.src}
                   alt={l.alt}
                   loading="lazy"
+                  width="140"
+                  height="48"
                   className="transition-[filter] duration-300 group-hover:[filter:drop-shadow(0_6px_18px_var(--brand-glow,rgba(255,255,255,0.25)))]"
                 />
               </div>

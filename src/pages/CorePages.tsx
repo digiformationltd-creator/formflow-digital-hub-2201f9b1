@@ -51,7 +51,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { compliancePages } from "@/data/compliance";
 import { bankingProviders } from "@/data/banking";
-import heroWeb from "@/assets/card-hero-web.jpg";
+import heroWeb from "@/assets/card-hero-web.webp";
 import SourceHeardSelect from "@/components/attribution/SourceHeardSelect";
 import { recordLeadAttribution, type DeclaredSource } from "@/lib/attribution";
 

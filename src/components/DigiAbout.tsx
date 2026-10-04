@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Award, Building2, ShieldCheck, ArrowRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import founderImg from "@/assets/founder-haroon.jpg";
+import founderImg from "@/assets/founder-haroon.webp";
 
 const COMPANIES_HOUSE_URL =
   "https://find-and-update.company-information.service.gov.uk/officers/iIzC9R8zKXH6lyWTWCDaT3_gK4E/appointments";

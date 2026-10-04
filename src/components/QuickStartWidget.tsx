@@ -284,7 +284,7 @@ const QuickStartWidget = () => {
                   Select jurisdiction
                 </label>
                 <Select value={ukJur} onValueChange={pickJurisdiction}>
-                  <SelectTrigger className="h-12 text-base rounded-xl bg-background/60 border-border/60">
+                  <SelectTrigger aria-label="Choose a UK jurisdiction" className="h-12 text-base rounded-xl bg-background/60 border-border/60">
                     <SelectValue placeholder="— Choose a UK jurisdiction —" />
                   </SelectTrigger>
                   <SelectContent className="z-50">
