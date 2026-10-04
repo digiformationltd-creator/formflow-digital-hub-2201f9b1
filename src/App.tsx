@@ -10,6 +10,7 @@ import AIAssistant from "./components/AIAssistant";
 import ScrollToTop from "./components/ScrollToTop";
 import RecoveryRedirect from "./components/RecoveryRedirect";
 import AttributionTracker from "./components/AttributionTracker";
+import GoogleAnalyticsTracker from "./components/GoogleAnalyticsTracker";
 
 // Lazy-loaded routes for performance & minimal initial bundle
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
@@ -64,6 +65,7 @@ const App = () => (
         <ScrollToTop />
         <RecoveryRedirect />
         <AttributionTracker />
+        <GoogleAnalyticsTracker />
         <Suspense fallback={<div className="min-h-screen bg-background" />}>
           <Routes>
           <Route path="/" element={<Index />} />

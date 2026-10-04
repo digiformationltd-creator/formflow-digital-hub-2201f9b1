@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Award, Building2, ShieldCheck, ArrowRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import founderImg from "@/assets/founder-haroon.webp";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 const COMPANIES_HOUSE_URL =
   "https://find-and-update.company-information.service.gov.uk/officers/iIzC9R8zKXH6lyWTWCDaT3_gK4E/appointments";
@@ -118,6 +119,7 @@ const DigiAbout = () => (
                 href="https://wa.me/923164467464?text=Hi%20Digiformation%2C%20I%20want%20to%20get%20in%20touch%20about%20your%20services."
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick("about_get_in_touch")}
               >
                 Get in Touch
               </a>

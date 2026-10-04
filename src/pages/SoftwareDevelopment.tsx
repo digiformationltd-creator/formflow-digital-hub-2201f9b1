@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { trackWhatsAppClick } from "@/lib/analytics";
 import {
   ArrowRight,
   ExternalLink,
@@ -985,7 +986,12 @@ export default function SoftwareDevelopment() {
 
                 <div className="mt-7 space-y-2.5">
                   <Button asChild variant="hero" size="lg" className="rounded-full w-full">
-                    <a href={WHATSAPP_CONTACT_URL} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={WHATSAPP_CONTACT_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackWhatsAppClick("software_dev_ai_agent_10")}
+                    >
                       Get WhatsApp AI Agent (£10) <ArrowRight className="w-4 h-4 ml-1" />
                     </a>
                   </Button>

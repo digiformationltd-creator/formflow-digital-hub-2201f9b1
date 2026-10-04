@@ -27,6 +27,7 @@ import { notifyDigibizCrm } from "@/lib/crmBridge";
 import { COUNTRIES } from "@/lib/countries";
 import { normalizePhoneToE164 } from "@/lib/phone";
 import { recordLeadAttribution, type DeclaredSource } from "@/lib/attribution";
+import { trackBeginCheckout, trackPurchase } from "@/lib/analytics";
 import SourceHeardSelect from "@/components/attribution/SourceHeardSelect";
 import { isPlaceholderCompanyName, PLACEHOLDER_COMPANY_ERROR } from "@/lib/companyNameValidator";
 import { SearchableCountrySelect } from "./SearchableCountrySelect";
@@ -442,6 +443,16 @@ const CheckoutFlow = ({
   const vat = +(subtotal * vatRate).toFixed(2);
   const total = subtotal + vat;
 
+  // Track begin_checkout in Google Analytics 4
+  useEffect(() => {
+    trackBeginCheckout({
+      serviceTitle,
+      packageName: selectedItems[0]?.name,
+      price: total,
+      currency,
+    });
+  }, []);
+
   // Compute which extraSections are active (their item is selected)
   const activeExtraSections = useMemo(
     () => (extraSections || []).filter((s) => selected.has(s.itemId)),
@@ -742,6 +753,15 @@ const CheckoutFlow = ({
       email: form.email,
       whatsapp: form.whatsapp,
       notes: invoiceNumber ? `Invoice ${invoiceNumber}` : "",
+    });
+
+    // Google Analytics 4 purchase conversion event
+    trackPurchase({
+      orderRef: finalOrderRef,
+      serviceTitle,
+      packageName,
+      amount: total,
+      currency,
     });
 
     const priceStr = formatMoney(total, currency);

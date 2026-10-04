@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { buildOrderRef } from "@/lib/orderRef";
 import { notifyDigibizCrm } from "@/lib/crmBridge";
+import { trackLeadSubmission } from "@/lib/analytics";
 import {
   ArrowRight,
   CheckCircle2,
@@ -233,6 +234,14 @@ export const Contact = () => {
         declared: declaredSource,
       });
     }
+
+    // Google Analytics 4 lead generation event
+    trackLeadSubmission({
+      leadType: "contact_form",
+      service: form.service,
+      source: declaredSource?.label,
+      country: form.country,
+    });
 
     // Mirror the enquiry into the Digibizverse desktop CRM (lead + ticket).
     notifyDigibizCrm({ type: "ticket", subject: form.service || "Website enquiry", name: form.fullName, email: form.email, message: form.message });

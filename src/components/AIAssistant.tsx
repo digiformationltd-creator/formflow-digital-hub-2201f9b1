@@ -3,6 +3,7 @@ import { Bot, Send, X, Sparkles } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Link, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { trackEvent } from "@/lib/analytics";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -107,9 +108,10 @@ const AIAssistant = () => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, loading]);
 
-  // Close on ESC key
+  // Close on ESC key & track open in GA4
   useEffect(() => {
     if (!open) return;
+    trackEvent("ai_assistant_open");
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
@@ -159,6 +161,7 @@ const AIAssistant = () => {
     if (!hidden) {
       setMessages((p) => [...p, userMsg]);
       setInput("");
+      trackEvent("ai_assistant_message", { message_length: text.length });
     }
     setLoading(true);
 

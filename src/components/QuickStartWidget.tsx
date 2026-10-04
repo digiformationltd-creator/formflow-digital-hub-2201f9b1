@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Building2, Check, ChevronsUpDown, Flag, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackEvent } from "@/lib/analytics";
 import {
   Select,
   SelectContent,
@@ -110,8 +111,10 @@ const QuickStartWidget = () => {
 
   const handleStart = () => {
     if (tab === "usa" && usState) {
+      trackEvent("quickstart_select_jurisdiction", { country: "USA", state: usState });
       navigate(`/usa-services/us-llc-formation/choose-state?state=${usState}#packages`);
     } else if (tab === "uk" && ukJur) {
+      trackEvent("quickstart_select_jurisdiction", { country: "UK", jurisdiction: ukJur });
       navigate(`/uk-services/uk-ltd-formation/choose-jurisdiction?jurisdiction=${ukJur}`);
     }
   };

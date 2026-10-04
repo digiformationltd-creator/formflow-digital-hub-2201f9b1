@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Mail, Clock, MapPin, Facebook, Instagram, Youtube, Linkedin, Building2, Handshake, UserCircle2 } from "lucide-react";
 import logo from "@/assets/digiformation-logo-official.webp";
+import { trackWhatsAppClick } from "@/lib/analytics";
 
 
 // WhatsApp icon — neutral monochrome to match other social icons
@@ -91,6 +92,7 @@ const DigiFooter = () => {
               href="https://wa.me/923164467464"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick("footer_cta")}
               className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:opacity-90 transition"
             >
               <WhatsAppIcon className="w-4 h-4" /> WhatsApp Us
@@ -208,6 +210,7 @@ const DigiFooter = () => {
                 href="https://wa.me/923164467464"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick("footer_contact_list")}
                 className="hover:text-primary transition"
               >
                 +92 316 446 7464
