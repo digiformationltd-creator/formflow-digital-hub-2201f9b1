@@ -206,7 +206,7 @@ const DigiServicesSlider = () => {
                     marginTop: -cardH / 2,
                     transform: `rotateY(${idx * angleStep}deg) translateZ(${radius}px) scale(${scale})`,
                     opacity,
-                    transition: "opacity 0.6s ease, transform 0.6s cubic-bezier(0.23,1,0.32,1), border-color 0.4s ease, box-shadow 0.4s ease",
+                    transition: "opacity 0.6s ease, transform 0.6s cubic-bezier(0.23,1,0.32,1)",
                     backfaceVisibility: "hidden",
                   }}
                 >
@@ -258,7 +258,7 @@ const DigiServicesSlider = () => {
               className="p-3 -m-1.5 inline-flex items-center justify-center focus:outline-none"
             >
               <span
-                className={`h-1.5 rounded-full transition-all block ${
+                className={`h-1.5 rounded-full transition-colors duration-200 block ${
                   i === active ? "w-7 bg-primary" : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/60"
                 }`}
               />

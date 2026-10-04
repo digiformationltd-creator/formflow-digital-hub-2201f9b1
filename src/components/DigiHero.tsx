@@ -33,6 +33,8 @@ const DigiHero = () => {
     };
   }, [currentHeadline]);
 
+  const [isFirstRun, setIsFirstRun] = useState(true);
+
   // Typewriter effect state loop
   useEffect(() => {
     // Check if user prefers reduced motion
@@ -40,7 +42,7 @@ const DigiHero = () => {
       setCharIndex(fullText.length);
       const timer = setInterval(() => {
         setHeadlineIndex((prev) => (prev + 1) % headlines.length);
-      }, 4000);
+      }, 5000);
       return () => clearInterval(timer);
     }
 
@@ -53,10 +55,12 @@ const DigiHero = () => {
           setCharIndex((prev) => prev + 1);
         }, 42); // Typing speed
       } else {
-        // Finished typing full sentence — pause before deleting
+        // Finished typing full sentence — pause before deleting (longer pause on initial mount for zero-CLS stabilization)
+        const pauseMs = isFirstRun ? 6000 : 2500;
         timeout = setTimeout(() => {
           setIsDeleting(true);
-        }, 2400); // 2.4s pause on full text
+          setIsFirstRun(false);
+        }, pauseMs);
       }
     } else {
       // Deleting phase
@@ -74,7 +78,7 @@ const DigiHero = () => {
     }
 
     return () => clearTimeout(timeout);
-  }, [charIndex, isDeleting, fullText.length, headlines.length]);
+  }, [charIndex, isDeleting, fullText.length, headlines.length, isFirstRun]);
 
   // Slice segments based on current typed character count
   const displayedPre = fullText.slice(0, Math.min(charIndex, preEnd));

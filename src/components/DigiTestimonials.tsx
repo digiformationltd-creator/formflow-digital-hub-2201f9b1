@@ -124,7 +124,7 @@ const DigiTestimonials = () => {
                   className="p-3 -m-1.5 inline-flex items-center justify-center focus:outline-none"
                 >
                   <span
-                    className={`h-1.5 rounded-full transition-all block ${
+                    className={`h-1.5 rounded-full transition-colors duration-200 block ${
                       i === active ? "w-7 bg-primary" : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/60"
                     }`}
                   />
