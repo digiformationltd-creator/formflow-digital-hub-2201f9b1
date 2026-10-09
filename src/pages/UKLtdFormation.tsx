@@ -8,8 +8,6 @@ import ServiceFAQ from "@/components/seo/ServiceFAQ";
 import RelatedServices from "@/components/seo/RelatedServices";
 import RecommendedGuides from "@/components/seo/RecommendedGuides";
 import { useSeo } from "@/lib/seo";
-import companiesHouseLogo from "@/assets/partners/companies-house.svg";
-import govukLogo from "@/assets/partners/govuk.svg";
 
 const rotatingHeadlines = [
   { lead: "Register Your UK Limited Company in", accent: "Days" },
@@ -233,24 +231,8 @@ const UKLtdFormation = () => {
         <div className="container mx-auto px-4 py-12 md:py-16 relative">
           <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 lg:gap-14 items-center">
             <div className="max-w-3xl">
-              <div className="inline-flex flex-wrap items-center gap-3 mb-6">
-                <div className="h-11 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center">
-                  <img
-                    src={companiesHouseLogo}
-                    alt="Companies House official logo"
-                    className="h-6.5 w-auto object-contain"
-                  />
-                </div>
-                <div className="h-11 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center">
-                  <img
-                    src={govukLogo}
-                    alt="GOV.UK official logo"
-                    className="h-5.5 w-auto object-contain"
-                  />
-                </div>
-                <span className="text-xs uppercase tracking-[0.18em] font-semibold opacity-90">
-                  Official UK Company Formation
-                </span>
+              <div className="inline-flex items-center gap-3 mb-6">
+                <span className="text-xs uppercase tracking-[0.18em] font-semibold">UK Services</span>
               </div>
               <h1
                 key={headlineIdx}
@@ -283,13 +265,7 @@ const UKLtdFormation = () => {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {trustSignals.map(({ icon: Icon, label }) => (
               <div key={label} className="glass glass-tint-green rounded-xl p-5 flex flex-col items-center text-center gap-2">
-                {label.includes("Companies House") ? (
-                  <div className="h-9 px-2.5 py-1 rounded-lg bg-white/95 border border-white/20 shadow-sm flex items-center justify-center mb-0.5">
-                    <img src={companiesHouseLogo} alt="Companies House" className="h-5.5 w-auto object-contain" />
-                  </div>
-                ) : (
-                  <Icon className="w-6 h-6 text-primary" />
-                )}
+                <Icon className="w-6 h-6 text-primary" />
                 <p className="text-xs md:text-sm opacity-90 leading-tight">{label}</p>
               </div>
             ))}

@@ -11,8 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import companiesHouseLogo from "@/assets/partners/companies-house.svg";
-import govukLogo from "@/assets/partners/govuk.svg";
 
 const JURISDICTIONS = [
   {
@@ -165,14 +163,8 @@ const UkLtdChooseJurisdiction = () => {
         <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-primary/10 blur-3xl animate-pulse-glow" />
         <div className="container mx-auto px-4 py-12 md:py-16 relative">
           <div className="max-w-4xl">
-            <div className="inline-flex flex-wrap items-center gap-3 mb-6">
-              <div className="h-10 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center">
-                <img src={companiesHouseLogo} alt="Companies House" className="h-5.5 w-auto object-contain" />
-              </div>
-              <div className="h-10 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center">
-                <img src={govukLogo} alt="GOV.UK" className="h-4.5 w-auto object-contain" />
-              </div>
-              <span className="text-xs uppercase tracking-[0.18em] font-semibold opacity-90">Step 1 of 3 — Choose Jurisdiction</span>
+            <div className="inline-flex items-center gap-3 mb-6">
+              <span className="text-xs uppercase tracking-[0.18em] font-semibold">Step 1 of 3 — Choose Jurisdiction</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-bold leading-[1.02] tracking-tight">
               <em className="not-italic text-gradient">Choose your jurisdiction</em> to register your UK LTD

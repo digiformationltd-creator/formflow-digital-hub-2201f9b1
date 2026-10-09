@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import shopify from "@/assets/partners/shopify.png";
-import companiesHouse from "@/assets/partners/companies-house.svg";
-import govuk from "@/assets/partners/govuk.svg";
+import companiesHouse from "@/assets/partners/companies-house.png";
 import hmrc from "@/assets/partners/hmrc.png";
 import paypal from "@/assets/partners/paypal.png";
 import airwallex from "@/assets/partners/airwallex.png";
@@ -24,7 +23,6 @@ type Logo = {
 
 const logos: Logo[] = [
   { src: companiesHouse, alt: "Companies House", size: "xl", id: "companies-house" },
-  { src: govuk, alt: "GOV.UK", size: "lg", id: "govuk" },
   { src: hmrc, alt: "HM Revenue & Customs", size: "lg", id: "hmrc" },
   { src: irs, alt: "IRS", size: "md", id: "irs" },
   { src: paypal, alt: "PayPal", size: "xl", id: "paypal", href: "/banks-payment-solutions/paypal", glow: "210 100% 28%" },
