@@ -502,6 +502,7 @@ type DetailPkg = {
   ring: string;
   features: string[];
   link?: string;
+  logo?: string;
 };
 
 type PricingSection = {
@@ -792,6 +793,7 @@ const bankingPackages: DetailPkg[] = bankingProviders.map((b, i) => ({
   ring: toneCycle[i % toneCycle.length].ring,
   features: b.features,
   link: `/banks-payment-solutions/${b.slug}`,
+  logo: b.logo,
 }));
 
 // Web Development Packages
@@ -1063,6 +1065,11 @@ const PackageCard = ({ p }: { p: DetailPkg }) => (
     {p.badge && (
       <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-brand text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
         {p.badge}
+      </div>
+    )}
+    {p.logo && (
+      <div className="h-10 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center w-fit mb-3">
+        <img src={p.logo} alt={`${p.name} official logo`} className="h-6 max-w-[110px] w-auto object-contain" loading="lazy" />
       </div>
     )}
     <h3 className="text-xl font-bold mb-2 leading-snug">{p.name}</h3>

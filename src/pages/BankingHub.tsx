@@ -113,13 +113,28 @@ const BankingHub = () => {
                   </span>
                 )}
 
-                <div className="flex items-start justify-between gap-3">
-                  <h2 className="font-display text-2xl font-bold leading-tight">{p.name}</h2>
+                <div className="flex items-center justify-between gap-3 mb-4 mt-1">
+                  {p.logo ? (
+                    <div className="h-10 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                      <img
+                        src={p.logo}
+                        alt={`${p.name} official logo`}
+                        className="h-6 max-w-[110px] w-auto object-contain"
+                        loading="lazy"
+                      />
+                    </div>
+                  ) : (
+                    <div className="h-10" />
+                  )}
                   {p.category && (
                     <span className="text-[10px] uppercase tracking-wider opacity-60 text-right">
                       {p.category}
                     </span>
                   )}
+                </div>
+
+                <div className="flex items-start justify-between gap-3">
+                  <h2 className="font-display text-2xl font-bold leading-tight">{p.name}</h2>
                 </div>
 
                 <p className="text-sm opacity-80 mt-2 leading-relaxed line-clamp-2">{p.tagline}</p>

@@ -1,5 +1,21 @@
-export type BankingCategory = "Payment Gateways" | "Business Accounts" | "International Transfers";
+import paypalLogo from "@/assets/partners/paypal.png";
+import payoneerLogo from "@/assets/partners/payoneer.png";
+import worldfirstLogo from "@/assets/partners/worldfirst.png";
+import stripeLogo from "@/assets/partners/stripe.png";
+import sunrateLogo from "@/assets/partners/sunrate.png";
+import wiseLogo from "@/assets/partners/wise.png";
+import zionpeLogo from "@/assets/partners/zionpe.svg";
+import pingpongLogo from "@/assets/partners/pingpong.svg";
+import greyLogo from "@/assets/partners/grey.svg";
+import taptapLogo from "@/assets/partners/taptap.png";
+import nsaveLogo from "@/assets/partners/nsave.svg";
+import tideLogo from "@/assets/partners/tide.png";
+import zylaLogo from "@/assets/partners/zyla.svg";
+import airwallexLogo from "@/assets/partners/airwallex.png";
+import mollieLogo from "@/assets/partners/mollie.svg";
+import wallesterLogo from "@/assets/partners/wallester.svg";
 
+export type BankingCategory = "Payment Gateways" | "Business Accounts" | "International Transfers";
 
 export type BankingProvider = {
   slug: string;
@@ -11,6 +27,7 @@ export type BankingProvider = {
   setupPrice: string;
   category?: BankingCategory;
   tag?: "Recommended" | "Popular" | "Best for Business" | "New";
+  logo?: string;
   metaTitle: string;
   metaDescription: string;
   keywords: string;
@@ -257,12 +274,32 @@ const PROVIDER_META: Record<string, { category: BankingCategory; tag?: BankingPr
   taptap:           { category: "International Transfers" },
 };
 
+export const BANKING_LOGOS: Record<string, string> = {
+  paypal: paypalLogo,
+  payoneer: payoneerLogo,
+  worldfirst: worldfirstLogo,
+  stripe: stripeLogo,
+  sunrate: sunrateLogo,
+  wise: wiseLogo,
+  zionpe: zionpeLogo,
+  pingpong: pingpongLogo,
+  grey: greyLogo,
+  taptap: taptapLogo,
+  "nsave-business": nsaveLogo,
+  tide: tideLogo,
+  zyla: zylaLogo,
+  airwallex: airwallexLogo,
+  mollie: mollieLogo,
+  wallester: wallesterLogo,
+};
+
 for (const p of bankingProviders) {
   const meta = PROVIDER_META[p.slug];
   if (meta) {
     p.category = meta.category;
     p.tag = meta.tag;
   }
+  p.logo = BANKING_LOGOS[p.slug];
 }
 
 export const BANKING_CATEGORIES: BankingCategory[] = [

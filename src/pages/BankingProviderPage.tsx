@@ -68,7 +68,16 @@ const BankingProviderPage = () => {
           <div className="grid lg:grid-cols-[1.2fr_1fr] gap-10 lg:gap-14 items-center">
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-3 mb-6">
-                <span className="text-xs uppercase tracking-[0.18em] font-semibold">Banks & Payment Solutions</span>
+                {provider.logo && (
+                  <div className="h-11 px-4 py-2 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center">
+                    <img
+                      src={provider.logo}
+                      alt={`${provider.name} official logo`}
+                      className="h-7 max-w-[130px] w-auto object-contain"
+                    />
+                  </div>
+                )}
+                <span className="text-xs uppercase tracking-[0.18em] font-semibold opacity-80">Banks &amp; Payment Solutions</span>
               </div>
               <h1 className="text-5xl md:text-7xl font-bold leading-[1.02] tracking-tight">
                 {provider.name} <em className="not-italic text-gradient">Account Setup</em>
@@ -94,7 +103,23 @@ const BankingProviderPage = () => {
                   alt={`${provider.name} ${BANKING_SLUGS.has(provider.slug) ? "Business Banking" : "Payment Gateway"}`}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-tr from-background/40 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent" />
+                {provider.logo && (
+                  <div className="absolute bottom-6 left-6 right-6 p-4 rounded-xl bg-background/85 backdrop-blur-md border border-border/50 flex items-center justify-between shadow-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="h-11 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center">
+                        <img src={provider.logo} alt={`${provider.name} official logo`} className="h-7 max-w-[130px] w-auto object-contain" />
+                      </div>
+                      <div>
+                        <div className="text-[11px] uppercase tracking-wider font-semibold opacity-70">Verified Integration</div>
+                        <div className="text-sm font-bold">{provider.name} Official Setup</div>
+                      </div>
+                    </div>
+                    <div className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      Supported
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -133,10 +158,17 @@ const BankingProviderPage = () => {
           <h2 className="text-3xl font-bold mb-8">Other Payment Providers</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {bankingProviders.filter((p) => p.slug !== provider.slug).slice(0, 8).map((p) => (
-              <Link key={p.slug} to={`/banks-payment-solutions/${p.slug}`} className="glass glass-tint-purple rounded-2xl p-6 hover:-translate-y-1 hover:shadow-elegant transition-all group">
-                <h3 className="font-semibold text-lg group-hover:text-gradient">{p.name}</h3>
-                <div className="text-xs opacity-70 mt-1">{p.setupPrice} setup</div>
-                <div className="mt-3 text-[11px] uppercase tracking-[0.14em]">Explore →</div>
+              <Link key={p.slug} to={`/banks-payment-solutions/${p.slug}`} className="glass glass-tint-purple rounded-2xl p-6 hover:-translate-y-1 hover:shadow-elegant transition-all group flex flex-col justify-between">
+                <div>
+                  {p.logo && (
+                    <div className="h-10 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center w-fit mb-4 group-hover:scale-105 transition-transform">
+                      <img src={p.logo} alt={`${p.name} official logo`} className="h-6 max-w-[100px] w-auto object-contain" loading="lazy" />
+                    </div>
+                  )}
+                  <h3 className="font-semibold text-lg group-hover:text-gradient">{p.name}</h3>
+                  <div className="text-xs opacity-70 mt-1">{p.setupPrice} setup</div>
+                </div>
+                <div className="mt-4 text-[11px] uppercase tracking-[0.14em] text-primary flex items-center gap-1 font-semibold">Explore →</div>
               </Link>
             ))}
           </div>
