@@ -69,11 +69,11 @@ const BankingProviderPage = () => {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-3 mb-6">
                 {provider.logo && (
-                  <div className="h-11 px-4 py-2 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center">
+                  <div className="h-12 w-[140px] px-3.5 py-2 rounded-xl bg-white border border-border/20 shadow-sm flex items-center justify-center">
                     <img
                       src={provider.logo}
                       alt={`${provider.name} official logo`}
-                      className="h-7 max-w-[130px] w-auto object-contain"
+                      className={`${provider.heroLogoClassName || "h-5.5 max-w-[115px]"} w-auto object-contain`}
                     />
                   </div>
                 )}
@@ -107,8 +107,12 @@ const BankingProviderPage = () => {
                 {provider.logo && (
                   <div className="absolute bottom-6 left-6 right-6 p-4 rounded-xl bg-background/85 backdrop-blur-md border border-border/50 flex items-center justify-between shadow-xl">
                     <div className="flex items-center gap-3">
-                      <div className="h-11 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center">
-                        <img src={provider.logo} alt={`${provider.name} official logo`} className="h-7 max-w-[130px] w-auto object-contain" />
+                      <div className="h-12 w-[140px] px-3.5 py-2 rounded-xl bg-white border border-border/20 shadow-sm flex items-center justify-center">
+                        <img
+                          src={provider.logo}
+                          alt={`${provider.name} official logo`}
+                          className={`${provider.heroLogoClassName || "h-5.5 max-w-[115px]"} w-auto object-contain`}
+                        />
                       </div>
                       <div>
                         <div className="text-[11px] uppercase tracking-wider font-semibold opacity-70">Verified Integration</div>

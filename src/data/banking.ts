@@ -2,7 +2,7 @@ import paypalLogo from "@/assets/partners/paypal.png";
 import payoneerLogo from "@/assets/partners/payoneer.png";
 import worldfirstLogo from "@/assets/partners/worldfirst.png";
 import stripeLogo from "@/assets/partners/stripe.png";
-import sunrateLogo from "@/assets/partners/sunrate.png";
+import sunrateLogo from "@/assets/partners/sunrate.svg";
 import wiseLogo from "@/assets/partners/wise.png";
 import zionpeLogo from "@/assets/partners/zionpe.svg";
 import pingpongLogo from "@/assets/partners/pingpong.svg";
@@ -28,6 +28,8 @@ export type BankingProvider = {
   category?: BankingCategory;
   tag?: "Recommended" | "Popular" | "Best for Business" | "New";
   logo?: string;
+  logoClassName?: string;
+  heroLogoClassName?: string;
   metaTitle: string;
   metaDescription: string;
   keywords: string;
@@ -293,6 +295,31 @@ export const BANKING_LOGOS: Record<string, string> = {
   wallester: wallesterLogo,
 };
 
+// Optical sizing calibrations: Tide is the gold standard benchmark (~h-5 to h-5.5, ~90-100px width).
+// High aspect ratio logos get slightly more width, tall/blocky logos get tighter height.
+const PROVIDER_LOGO_STYLES: Record<string, { logoClass: string; heroClass: string }> = {
+  // Reference benchmark
+  tide:             { logoClass: "h-5 max-w-[95px]",   heroClass: "h-6 max-w-[115px]" },
+  // Scaled down from previously oversized:
+  stripe:           { logoClass: "h-4.5 max-w-[85px]", heroClass: "h-5.5 max-w-[105px]" },
+  grey:             { logoClass: "h-4 max-w-[95px]",   heroClass: "h-5 max-w-[115px]" },
+  "nsave-business": { logoClass: "h-4 max-w-[90px]",   heroClass: "h-5 max-w-[110px]" },
+  mollie:           { logoClass: "h-3.5 max-w-[85px]", heroClass: "h-4.5 max-w-[105px]" },
+  zyla:             { logoClass: "h-4.5 max-w-[95px]", heroClass: "h-5.5 max-w-[115px]" },
+  wallester:        { logoClass: "h-4 max-w-[100px]",  heroClass: "h-5 max-w-[125px]" },
+  // High aspect ratio (wide horizontal) logos:
+  sunrate:          { logoClass: "h-4 max-w-[105px]",  heroClass: "h-5 max-w-[130px]" },
+  worldfirst:       { logoClass: "h-4 max-w-[105px]",  heroClass: "h-5 max-w-[130px]" },
+  airwallex:        { logoClass: "h-4 max-w-[110px]",  heroClass: "h-5 max-w-[135px]" },
+  payoneer:         { logoClass: "h-4.5 max-w-[100px]", heroClass: "h-5.5 max-w-[120px]" },
+  // Standard aspect ratios:
+  paypal:           { logoClass: "h-4.5 max-w-[95px]",  heroClass: "h-5.5 max-w-[115px]" },
+  wise:             { logoClass: "h-4.5 max-w-[95px]",  heroClass: "h-5.5 max-w-[115px]" },
+  zionpe:           { logoClass: "h-4.5 max-w-[95px]",  heroClass: "h-5.5 max-w-[115px]" },
+  pingpong:         { logoClass: "h-4.5 max-w-[95px]",  heroClass: "h-5.5 max-w-[115px]" },
+  taptap:           { logoClass: "h-4.5 max-w-[90px]",  heroClass: "h-5.5 max-w-[110px]" },
+};
+
 for (const p of bankingProviders) {
   const meta = PROVIDER_META[p.slug];
   if (meta) {
@@ -300,6 +327,11 @@ for (const p of bankingProviders) {
     p.tag = meta.tag;
   }
   p.logo = BANKING_LOGOS[p.slug];
+  const style = PROVIDER_LOGO_STYLES[p.slug];
+  if (style) {
+    p.logoClassName = style.logoClass;
+    p.heroLogoClassName = style.heroClass;
+  }
 }
 
 export const BANKING_CATEGORIES: BankingCategory[] = [

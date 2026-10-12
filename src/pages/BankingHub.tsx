@@ -115,11 +115,11 @@ const BankingHub = () => {
 
                 <div className="flex items-center justify-between gap-3 mb-4 mt-1">
                   {p.logo ? (
-                    <div className="h-10 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+                    <div className="h-10 w-[124px] px-3 py-1.5 rounded-xl bg-white border border-border/20 shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
                       <img
                         src={p.logo}
                         alt={`${p.name} official logo`}
-                        className="h-6 max-w-[110px] w-auto object-contain"
+                        className={`${p.logoClassName || "h-4.5 max-w-[95px]"} w-auto object-contain`}
                         loading="lazy"
                       />
                     </div>
