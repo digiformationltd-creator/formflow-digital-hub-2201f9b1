@@ -4,6 +4,12 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { trackWhatsAppClick } from "@/lib/analytics";
 import {
+  DIGI_BIZ_OS_PACKAGES,
+  DIGI_BIZ_OS_PRICING,
+  DIGI_BIZ_OS_PRICING_URL,
+  DIGI_BIZ_OS_URL,
+} from "@/data/digiBizOs";
+import {
   ArrowRight,
   ExternalLink,
   Bot,
@@ -48,7 +54,6 @@ import osMarketing from "@/assets/digibizos/os-digi-marketing-XK_e_Bwl.png";
 import osChat from "@/assets/digibizos/os-digi-ai-chat-EU4baMLN.png";
 import osAiImage from "@/assets/digibizos/os-digi-ai-image-Blo_K5K8.png";
 
-const DIGI_BIZ_OS_URL = "https://www.digibizos.co.uk/";
 const WHATSAPP_CONTACT_URL = "https://wa.me/923164467464?text=Hi%20DigiFormation%2C%20I%20am%20interested%20in%20Software%20Development%20%2F%20Custom%20AI%20Agents.";
 
 const setMeta = (title: string, description: string, keywords?: string) => {
@@ -178,12 +183,36 @@ export default function SoftwareDevelopment() {
       name: "Digi Biz OS",
       operatingSystem: "Windows 10, Windows 11",
       applicationCategory: "BusinessApplication",
-      offers: {
-        "@type": "Offer",
-        price: "50",
-        priceCurrency: "GBP",
-        url: "https://www.digibizos.co.uk/",
-      },
+      offers: [
+        {
+          "@type": "Offer",
+          name: "3-Day Free Trial",
+          price: "0",
+          priceCurrency: "GBP",
+          url: DIGI_BIZ_OS_PRICING_URL,
+        },
+        {
+          "@type": "Offer",
+          name: "Lifetime Access",
+          price: DIGI_BIZ_OS_PRICING.lifetime.replace("£", ""),
+          priceCurrency: "GBP",
+          url: DIGI_BIZ_OS_PRICING_URL,
+        },
+        {
+          "@type": "Offer",
+          name: "Software Setup & Customization",
+          price: DIGI_BIZ_OS_PRICING.setup.replace("£", ""),
+          priceCurrency: "GBP",
+          url: DIGI_BIZ_OS_PRICING_URL,
+        },
+        {
+          "@type": "Offer",
+          name: "Source Code Licence",
+          price: DIGI_BIZ_OS_PRICING.sourceCode.replace("£", ""),
+          priceCurrency: "GBP",
+          url: DIGI_BIZ_OS_PRICING_URL,
+        },
+      ],
       creator: {
         "@type": "Organization",
         name: "Digiformation Ltd",
@@ -457,7 +486,7 @@ export default function SoftwareDevelopment() {
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Windows 10 & 11 Desktop Edition
                   </span>
-                  <span className="text-primary font-semibold">£50 Lifetime License</span>
+                  <span className="text-primary font-semibold">From {DIGI_BIZ_OS_PRICING.lifetime} • Free Trial Available</span>
                 </div>
               </div>
             </div>
@@ -580,8 +609,8 @@ export default function SoftwareDevelopment() {
 
                 <div className="pt-4 border-t border-border/40 flex flex-wrap items-center gap-4">
                   <Button asChild variant="hero" size="default" className="rounded-full">
-                    <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer">
-                      Get Digi Biz OS (£50 Lifetime) <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                    <a href={DIGI_BIZ_OS_PRICING_URL} target="_blank" rel="noopener noreferrer">
+                      Get Digi Biz OS (From {DIGI_BIZ_OS_PRICING.lifetime}) <ExternalLink className="w-3.5 h-3.5 ml-1" />
                     </a>
                   </Button>
                   <button
@@ -696,7 +725,7 @@ export default function SoftwareDevelopment() {
                 <ShieldCheck className="w-8 h-8 text-primary mb-4" />
                 <h3 className="font-display text-lg font-bold mb-2">Zero Monthly SaaS Fees</h3>
                 <p className="text-xs sm:text-sm opacity-85 leading-relaxed">
-                  One-time purchase model (£50). Own your business operating system without perpetual monthly subscription lock-ins.
+                  One-time purchase model (from {DIGI_BIZ_OS_PRICING.lifetime}). Own your business operating system without perpetual monthly subscription lock-ins.
                 </p>
               </div>
             </div>
@@ -1117,9 +1146,9 @@ export default function SoftwareDevelopment() {
                 </p>
               </div>
               <div className="pt-4 border-t border-border/40 flex items-center justify-between">
-                <span className="text-xs font-semibold opacity-70">Ready-Made: £50</span>
-                <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
-                  Get OS <ExternalLink className="w-3.5 h-3.5" />
+                <span className="text-xs font-semibold opacity-70">Ready-Made: From {DIGI_BIZ_OS_PRICING.lifetime}</span>
+                <a href={DIGI_BIZ_OS_PRICING_URL} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                  Pricing & Plans <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </div>
             </div>
@@ -1147,25 +1176,71 @@ export default function SoftwareDevelopment() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Path A: Ready-Made */}
-            <div className="relative glass rounded-3xl p-8 ring-1 ring-cyan-400/60 bg-gradient-to-b from-cyan-500/25 to-indigo-500/5 flex flex-col justify-between hover:-translate-y-1 transition-all">
+            <div className="relative glass rounded-3xl p-6 sm:p-8 ring-1 ring-cyan-400/60 bg-gradient-to-b from-cyan-500/20 to-indigo-500/5 flex flex-col justify-between hover:-translate-y-1 transition-all">
               <div>
-                <div className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gradient-brand text-white mb-4">
-                  Path A — Ready-Made Software
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                  <div className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest bg-gradient-brand text-white">
+                    Path A — Ready-Made Software
+                  </div>
+                  <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full">
+                    3-Day Free Trial Available
+                  </span>
                 </div>
                 <h3 className="text-2xl font-bold mb-2">Get Digi Biz OS</h3>
-                <p className="text-sm opacity-85 leading-relaxed mb-6">
-                  Deploy our autonomous AI desktop operating system on your Windows machine today. Universal voice control, built-in CRM, multi-agent workflows, and zero monthly fees.
+                <p className="text-sm opacity-85 leading-relaxed mb-5">
+                  Deploy our autonomous AI desktop operating system on your Windows machine today. Universal voice control, built-in CRM, multi-agent workflows, and zero monthly SaaS fees.
                 </p>
-                <div className="text-3xl font-bold text-gradient mb-6">
-                  £50 <span className="text-xs font-normal opacity-70">/ Lifetime License</span>
+
+                {/* 4 Packages breakdown synced with digibizos.co.uk */}
+                <div className="space-y-2.5 mb-6">
+                  {DIGI_BIZ_OS_PACKAGES.map((pkg) => (
+                    <a
+                      key={pkg.name}
+                      href={pkg.ctaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/item block p-3 rounded-2xl bg-card/60 hover:bg-card/90 border border-border/40 hover:border-primary/50 transition-all text-left"
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm text-foreground group-hover/item:text-primary transition-colors">
+                            {pkg.name}
+                          </span>
+                          {pkg.badge && (
+                            <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-bold border border-primary/30">
+                              {pkg.badge}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="font-bold text-sm text-gradient">{pkg.price}</span>
+                          {pkg.originalPrice && (
+                            <s className="text-[11px] opacity-50 ml-1.5">{pkg.originalPrice}</s>
+                          )}
+                          <span className="text-[10px] opacity-60 ml-1">
+                            {pkg.period === "one-time" ? "lifetime" : pkg.period}
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-[11px] opacity-75 line-clamp-1 leading-snug">
+                        {pkg.description}
+                      </p>
+                    </a>
+                  ))}
                 </div>
               </div>
 
-              <Button asChild variant="hero" size="lg" className="rounded-full w-full">
-                <a href={DIGI_BIZ_OS_URL} target="_blank" rel="noopener noreferrer">
-                  Explore Digi Biz OS <ExternalLink className="w-4 h-4 ml-1" />
-                </a>
-              </Button>
+              <div className="space-y-2 pt-2 border-t border-border/30">
+                <Button asChild variant="hero" size="lg" className="rounded-full w-full">
+                  <a href={DIGI_BIZ_OS_PRICING_URL} target="_blank" rel="noopener noreferrer">
+                    Explore Digi Biz OS Official Pricing <ExternalLink className="w-4 h-4 ml-1" />
+                  </a>
+                </Button>
+                <div className="flex items-center justify-between text-[11px] opacity-65 px-1">
+                  <span>One-time payment • No SaaS fees</span>
+                  <span className="text-emerald-400 font-medium">Verified from digibizos.co.uk</span>
+                </div>
+              </div>
             </div>
 
             {/* Path B: Custom Development */}
@@ -1254,7 +1329,7 @@ const faqs = [
   },
   {
     q: "What is the difference between Digi Biz OS and Custom CRM / Software Development?",
-    a: "Digi Biz OS is a ready-made, desktop AI business operating system for Windows that you can purchase (£50 lifetime license) and run immediately. Custom Software Development is our bespoke engineering service where DigiFormation builds tailored web applications, CRMs, ERPs, or custom AI agents specifically designed around your company's proprietary workflow.",
+    a: `Digi Biz OS is a ready-made, desktop AI business operating system for Windows available on digibizos.co.uk in four transparent tiers: a 3-Day Free Trial, a ${DIGI_BIZ_OS_PRICING.lifetime} Lifetime Single-PC Licence (was ${DIGI_BIZ_OS_PRICING.lifetimeOriginal}), Done-For-You Setup & Custom Workflows for ${DIGI_BIZ_OS_PRICING.setup} (was ${DIGI_BIZ_OS_PRICING.setupOriginal}), and a full Source Code Licence for ${DIGI_BIZ_OS_PRICING.sourceCode} (was ${DIGI_BIZ_OS_PRICING.sourceCodeOriginal}). Custom Software Development is our bespoke engineering service where DigiFormation builds tailored web applications, CRMs, ERPs, or custom AI agents specifically designed around your company's proprietary workflow.`,
   },
   {
     q: "How does a WhatsApp AI Agent work and what can it automate for my business?",
