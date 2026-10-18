@@ -29,7 +29,7 @@ const whatYouGet = [
   "U.S. Registered Agent Service (1 Year Included)",
   "U.S. Business Address for corporate mail handling",
   "Custom Operating Agreement & Banking Resolution",
-  "BOI (Beneficial Ownership Information) filing guidance",
+  "BOI applicability review and, where required, foreign-reporting-company filing support",
   "Assistance with U.S. Business Banking (Mercury, Relay, Wise)",
 ];
 
@@ -370,7 +370,7 @@ const UsaLlcFormation = () => {
               <div className="p-4 rounded-xl glass border-primary/20 flex items-start gap-3 text-xs opacity-90">
                 <ShieldCheck className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <span>
-                  All formations include complete corporate documentation and FinCEN BOI compliance reporting support.
+                  All formations include complete corporate documentation and a FinCEN BOI applicability review; filing support is provided only where current FinCEN rules require it.
                 </span>
               </div>
             </div>
@@ -446,7 +446,7 @@ const UsaLlcFormation = () => {
         items={[
           { name: "EIN Tax ID Number", path: "/usa-services/ein-number", description: "Official IRS Employer Identification Number for non-residents without SSN.", icon: "utr" },
           { name: "ITIN Number Service", path: "/usa-services/itin-number", description: "Individual Taxpayer Identification Number application via IRS acceptance routes.", icon: "id-verify" },
-          { name: "BOI Report Filing", path: "/usa-services/bio-report", description: "Mandatory FinCEN Beneficial Ownership Information compliance filing.", icon: "change-service" },
+          { name: "BOI Applicability Review", path: "/usa-services/bio-report", description: "FinCEN BOI applicability review and conditional filing support.", icon: "change-service" },
           { name: "Annual Tax Filing", path: "/usa-services/annual-tax-filing", description: "U.S. federal and state annual returns (Form 5472 + 1120 support).", icon: "change-service" },
           { name: "U.S. Business Banking", path: "/banks-payment-solutions", description: "Open Mercury, Relay or Wise accounts paired with your new U.S. LLC.", icon: "banking" },
           { name: "Stripe & PayPal Gateways", path: "/banks-payment-solutions", description: "Connect global USD payment processing to your U.S. company.", icon: "payments" },
@@ -463,7 +463,7 @@ const UsaLlcFormation = () => {
           { q: "Which U.S. state is best for non-residents?", a: "Wyoming and Delaware are the most popular choices. Wyoming offers lower annual reporting fees ($62) and strong privacy. Delaware is preferred by tech startups seeking venture funding. Florida is popular for physical e-commerce and Latin American trade." },
           { q: "Do I need a Social Security Number (SSN) to get an EIN?", a: "No. Non-residents can obtain an official IRS Employer Identification Number (EIN) using Form SS-4 with their foreign passport as responsible party documentation." },
           { q: "Can I open a U.S. business bank account remotely?", a: "Yes. After receiving your LLC formation documents and EIN, we guide you through applying with U.S. business fintechs like Mercury, Relay, and Wise Business remotely." },
-          { q: "What is a BOI Report and do I have to file it?", a: "Under the Corporate Transparency Act, most U.S. LLCs must file a Beneficial Ownership Information (BOI) report with FinCEN. We provide fully managed BOI filing assistance." },
+          { q: "What is a BOI Report and do I have to file it?", a: "U.S.-created companies are currently exempt under FinCEN's 11 August 2026 rule. Certain foreign entities registered to do business in the U.S. may still report; we review the entity facts and current FinCEN guidance." },
           { q: "How long does U.S. LLC formation take?", a: "State formation typically takes 3–7 business days depending on the state. IRS EIN issuance for non-residents without SSN takes an additional 3–10 business days." },
         ]}
       />

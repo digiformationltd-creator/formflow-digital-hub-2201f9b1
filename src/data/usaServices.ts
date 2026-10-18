@@ -180,7 +180,7 @@ export const usaServicePages: UsaService[] = [
     turnaround: "2–5 business days",
     metaTitle: "BOI Report Service for U.S. LLCs | Digiformation Ltd",
     metaDescription:
-      "File your U.S. LLC BOI report accurately with Digiformation Ltd. Digital confirmation and full compliance guaranteed.",
+      "Review BOI applicability and, where required, file your U.S. or foreign-entity report accurately with Digiformation Ltd. Digital confirmation and compliance-focused support.",
     keywords: "BOI report service, Beneficial ownership report USA, LLC compliance filing, BOI report submission",
     formFields: [
       { key: "llc_name", label: "LLC Name", required: true },

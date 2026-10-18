@@ -1,0 +1,23 @@
+{
+  "/pricing": "/packages",
+  "/uk-company-services/registered-office-address": "/uk-services/registered-office-address",
+  "/uk-company-services/director-service-address": "/uk-services/registered-office-address",
+  "/usa-services/boi-report": "/usa-services/bio-report",
+  "/uk-services/utr-number": "/uk-services/utr-codes",
+  "/ltd-formation-services": "/uk-services/uk-ltd-formation",
+  "/ltd-formation-services/uk-ltd-formation": "/uk-services/uk-ltd-formation",
+  "/ltd-formation-services/ltd-id-verification": "/uk-services/ltd-id-verification",
+  "/ltd-formation/ltd-id-verification": "/uk-services/ltd-id-verification",
+  "/ltd-formation-services/registered-office-address": "/uk-services/registered-office-address",
+  "/ltd-formation-services/utr-codes": "/uk-services/utr-codes",
+  "/usa-services/usa-llc-formation": "/usa-services/us-llc-formation",
+  "/llc-formation-services": "/usa-services/us-llc-formation",
+  "/llc-formation-services/usa-llc-formation": "/usa-services/us-llc-formation",
+  "/llc-formation-services/ein-number": "/usa-services/ein-number",
+  "/llc-formation-services/itin-number": "/usa-services/itin-number",
+  "/llc-formation-services/annual-tax-filing": "/usa-services/annual-tax-filing",
+  "/llc-formation-services/bio-report": "/usa-services/bio-report",
+  "/software-and-ai": "/software-development",
+  "/ai-agents": "/software-development",
+  "/3d-interactive-animated-web": "/web-development"
+}

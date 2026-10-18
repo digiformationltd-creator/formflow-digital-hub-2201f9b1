@@ -83,14 +83,14 @@ export function buildAddressDraft(input: {
 }
 
 export function saveAddressDraft(d: AddressDraft) {
-  try { sessionStorage.setItem(KEY(d.id), JSON.stringify(d)); } catch {}
+  try { sessionStorage.setItem(KEY(d.id), JSON.stringify(d)); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
 }
 export function getAddressDraft(id: string): AddressDraft | null {
   try { const s = sessionStorage.getItem(KEY(id)); return s ? JSON.parse(s) as AddressDraft : null; }
   catch { return null; }
 }
 export function clearAddressDraft(id: string) {
-  try { sessionStorage.removeItem(KEY(id)); } catch {}
+  try { sessionStorage.removeItem(KEY(id)); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
 }
 
 /** UK postcode regex — used only for an advisory warning, never to invent values. */

@@ -2,8 +2,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 declare global {
   interface Window {
-    dataLayer?: any[];
-    gtag?: (...args: any[]) => void;
+    dataLayer?: unknown[][];
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
@@ -13,13 +13,13 @@ export const GA_MEASUREMENT_ID = "G-E063R532V0";
  * Universal safe call for gtag that queues into dataLayer even if
  * Google Analytics script is still loading asynchronously.
  */
-export const gtag = (...args: any[]) => {
+export const gtag = (...args: unknown[]) => {
   if (typeof window === "undefined") return;
   if (typeof window.gtag === "function") {
     window.gtag(...args);
   } else {
     window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push(arguments);
+    window.dataLayer.push(args);
   }
 };
 
@@ -39,7 +39,7 @@ export const trackPageView = (url: string, title?: string) => {
 /**
  * Generic custom event tracker for Google Analytics 4.
  */
-export const trackEvent = (eventName: string, params: Record<string, any> = {}) => {
+export const trackEvent = (eventName: string, params: Record<string, unknown> = {}) => {
   if (typeof window === "undefined") return;
   gtag("event", eventName, {
     ...params,
@@ -110,6 +110,17 @@ export const trackPurchase = (params: {
   amount: number;
   currency: string;
 }) => {
+  // A successful invoice/order may be returned again after a refresh or retry.
+  // Keep GA4 transaction IDs idempotent per browser session.
+  if (typeof window !== "undefined") {
+    const key = `df_purchase_tracked:${params.orderRef}`;
+    try {
+      if (window.sessionStorage.getItem(key)) return false;
+      window.sessionStorage.setItem(key, "1");
+    } catch {
+      // Storage restrictions must never block the conversion event.
+    }
+  }
   trackEvent("purchase", {
     transaction_id: params.orderRef,
     value: params.amount,
@@ -124,6 +135,7 @@ export const trackPurchase = (params: {
       },
     ],
   });
+  return true;
 };
 
 /**

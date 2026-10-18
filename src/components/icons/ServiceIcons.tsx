@@ -9,7 +9,7 @@
  *   - currentColor + linearGradient(id=brand-grad) as the accent
  *   - round caps and joins
  */
-import { memo } from "react";
+import { memo, useId } from "react";
 
 export type ServiceIconName =
   | "uk-ltd"
@@ -48,7 +48,8 @@ const Defs = ({ id }: { id: string }) => (
 );
 
 const ServiceIcon = memo(({ name, size = 56, className, strokeWidth = 2, gradientId }: Props) => {
-  const gid = gradientId ?? `svc-grad-${name}`;
+  const instanceId = useId().replaceAll(':', '');
+  const gid = `${gradientId ?? `svc-grad-${name}`}-${instanceId}`;
   const stroke = `url(#${gid})`;
   const fill = `url(#${gid}-soft)`;
   const common = {

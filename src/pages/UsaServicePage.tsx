@@ -26,15 +26,15 @@ const FAQS_BY_SLUG: Record<string, FAQ[]> = {
     { q: "Will my ITIN expire?", a: "ITINs expire if not used on a federal tax return for three consecutive years. We can help you renew it before expiry." },
   ],
   "bio-report": [
-    { q: "What is a BOI report?", a: "Under the US Corporate Transparency Act, most US LLCs and corporations must file a Beneficial Ownership Information (BOI) report with FinCEN disclosing each owner with 25%+ stake or substantial control." },
-    { q: "When is the BOI report due?", a: "New entities formed in 2024+ must file within 90 days of formation. Existing entities had until 1 January 2025. Updates must be filed within 30 days of any ownership change." },
-    { q: "What are the penalties for not filing?", a: "Civil penalties of up to $591/day and criminal penalties of up to $10,000 and 2 years imprisonment for willful failure to file." },
+    { q: "What is a BOI report?", a: "Under FinCEN's current 11 August 2026 rule, U.S.-created companies are exempt from BOI reporting. Only certain foreign entities registered to do business in the U.S. may need to report, subject to exemptions. Check current FinCEN guidance for the specific entity and owner facts." },
+    { q: "When is the BOI report due?", a: "Deadlines depend on when a qualifying foreign entity became a reporting company; use the current FinCEN rule and FAQ rather than the old 90-day or 1 January 2025 guidance." },
+    { q: "What are the penalties for not filing?", a: "If BOI applies, penalties can be significant; confirm the current statutory amount and deadline on FinCEN before filing or skipping a report." },
     { q: "Is the BOI report public?", a: "No. BOI data is held in a secure FinCEN database accessible only to authorized federal, state and law enforcement agencies." },
   ],
   "boi-report": [
-    { q: "What is a BOI report?", a: "Under the US Corporate Transparency Act, most US LLCs and corporations must file a Beneficial Ownership Information (BOI) report with FinCEN disclosing each owner with 25%+ stake or substantial control." },
-    { q: "When is the BOI report due?", a: "New entities formed in 2024+ must file within 90 days of formation. Existing entities had until 1 January 2025. Updates must be filed within 30 days of any ownership change." },
-    { q: "What are the penalties for not filing?", a: "Civil penalties of up to $591/day and criminal penalties of up to $10,000 and 2 years imprisonment for willful failure to file." },
+    { q: "What is a BOI report?", a: "Under FinCEN's current 11 August 2026 rule, U.S.-created companies are exempt from BOI reporting. Only certain foreign entities registered to do business in the U.S. may need to report, subject to exemptions. Check current FinCEN guidance for the specific entity and owner facts." },
+    { q: "When is the BOI report due?", a: "Deadlines depend on when a qualifying foreign entity became a reporting company; use the current FinCEN rule and FAQ rather than the old 90-day or 1 January 2025 guidance." },
+    { q: "What are the penalties for not filing?", a: "If BOI applies, penalties can be significant; confirm the current statutory amount and deadline on FinCEN before filing or skipping a report." },
     { q: "Is the BOI report public?", a: "No. BOI data is held in a secure FinCEN database accessible only to authorized federal, state and law enforcement agencies." },
   ],
   "annual-tax-filing": [

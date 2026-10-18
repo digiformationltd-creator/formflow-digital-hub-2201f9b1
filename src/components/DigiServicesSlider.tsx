@@ -34,7 +34,7 @@ const services: Service[] = [
   { num: "06", icon: FileText, category: "UK Compliance", title: "Company Annual Filing", desc: "Confirmation statements, annual accounts filing and all statutory returns submitted to Companies House on time.", href: "/uk-services/company-annual-filing" },
   { num: "07", icon: Hash, category: "USA Services", title: "EIN Number Registration", desc: "Get your US Employer Identification Number (EIN) from the IRS. Required for US business banking and tax compliance.", href: "/usa-services/ein-number" },
   { num: "08", icon: Code2, category: "Software & AI", title: "Software & AI Agents", desc: "Custom CRM/ERP platforms, business automation workflows, WhatsApp AI agents, and Digi Biz OS integration engineered for scale.", href: "/software-development" },
-  { num: "09", icon: Layers, category: "3D & WebGL", title: "3D & Interactive Websites", desc: "Hardware-accelerated Three.js 3D web experiences, smooth scroll-driven interactive animation, and immersive product showcases.", href: "/3d-interactive-animated-web" },
+  { num: "09", icon: Layers, category: "3D & WebGL", title: "3D & Interactive Websites", desc: "Hardware-accelerated Three.js 3D web experiences, smooth scroll-driven interactive animation, and immersive product showcases.", href: "/web-development" },
 ];
 
 const total = services.length;
@@ -104,7 +104,7 @@ const DigiServicesSlider = () => {
   };
 
   return (
-    <section id="services" className="relative py-12 md:py-16 overflow-hidden">
+    <section id="service-highlights" className="relative py-12 md:py-16 overflow-hidden">
       <div className="absolute inset-0 grid-pattern opacity-30 pointer-events-none" />
       <div className="absolute -right-32 top-1/4 w-[500px] h-[500px] rounded-full bg-primary/10 blur-3xl" />
 

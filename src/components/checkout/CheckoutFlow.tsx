@@ -376,7 +376,7 @@ const CheckoutFlow = ({
 
   const hasDraftData = !!draft;
   const clearDraft = () => {
-    try { window.localStorage.removeItem(draftKey); } catch {}
+    try { window.localStorage.removeItem(draftKey); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
     setForm(emptyForm);
     setExtra({});
     setSelected(initialSelected);
@@ -399,7 +399,7 @@ const CheckoutFlow = ({
           serviceMode,
           declaredSource,
         }));
-      } catch {}
+      } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
     }, 300);
     return () => clearTimeout(t);
   }, [form, extra, selected, stepIdx, serviceMode, declaredSource, successInfo, draftKey]);
@@ -407,7 +407,7 @@ const CheckoutFlow = ({
   // Clear draft after successful submit
   useEffect(() => {
     if (successInfo) {
-      try { window.localStorage.removeItem(draftKey); } catch {}
+      try { window.localStorage.removeItem(draftKey); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
     }
   }, [successInfo, draftKey]);
 
@@ -735,6 +735,8 @@ const CheckoutFlow = ({
       console.error("invoice generation failed", err);
     }
 
+    const orderSucceeded = Boolean(invoiceNumber);
+
     // Record lead attribution onto this order (best-effort, never blocks UX).
     void recordLeadAttribution({
       entityType: "order",
@@ -755,14 +757,20 @@ const CheckoutFlow = ({
       notes: invoiceNumber ? `Invoice ${invoiceNumber}` : "",
     });
 
-    // Google Analytics 4 purchase conversion event
-    trackPurchase({
-      orderRef: finalOrderRef,
-      serviceTitle,
-      packageName,
-      amount: total,
-      currency,
-    });
+    // A purchase means the business-defined success condition was met: the
+    // invoice/order endpoint returned an invoice number. Failed invoice
+    // generation must never be reported as a completed purchase.
+    if (orderSucceeded) {
+      trackPurchase({
+        orderRef: finalOrderRef,
+        serviceTitle,
+        packageName,
+        amount: total,
+        currency,
+      });
+    } else {
+      console.warn("[analytics] purchase skipped because invoice generation did not succeed", { orderRef: finalOrderRef });
+    }
 
     const priceStr = formatMoney(total, currency);
     const pagePath = window.location.pathname + window.location.search;
@@ -1177,7 +1185,8 @@ const CheckoutFlow = ({
                   const selectedRoles = form.role ? form.role.split(", ").filter(Boolean) : [];
                   const toggleRole = (r: string) => {
                     const set = new Set(selectedRoles);
-                    set.has(r) ? set.delete(r) : set.add(r);
+                    if (set.has(r)) set.delete(r);
+                    else set.add(r);
                     setForm({ ...form, role: Array.from(set).join(", ") });
                   };
                   return (

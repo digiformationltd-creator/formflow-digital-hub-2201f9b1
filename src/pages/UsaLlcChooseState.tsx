@@ -268,7 +268,7 @@ const UsaLlcChooseState = () => {
         items={[
           { name: "EIN Number", path: "/usa-services/ein-number", description: "Federal Employer Identification Number — required for US banking, Stripe and tax filings.", icon: "ein" },
           { name: "ITIN Application", path: "/usa-services/itin-number", description: "Individual Taxpayer Identification Number for non-resident owners and shareholders.", icon: "itin" },
-          { name: "BOI Report Filing", path: "/usa-services/boi-report", description: "Mandatory Beneficial Ownership Information report under the Corporate Transparency Act.", icon: "boi" },
+          { name: "BOI Applicability Review", path: "/usa-services/bio-report", description: "Check whether current FinCEN rules require a report for the entity.", icon: "boi" },
           { name: "US Business Banking", path: "/banks-payment-solutions", description: "Open Mercury, Wise or Payoneer accounts for your new LLC.", icon: "banking" },
           { name: "Stripe & PayPal Setup", path: "/banks-payment-solutions", description: "Activate global payment gateways on your LLC in days.", icon: "payments" },
           { name: "Annual Tax Filings", path: "/usa-services", description: "Form 5472, 1120, and state reports prepared and filed for you.", icon: "compliance" },

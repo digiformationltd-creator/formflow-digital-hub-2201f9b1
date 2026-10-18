@@ -65,7 +65,7 @@ Deno.serve(async (req) => {
   try {
     const cutoff = Date.now() - RETENTION_DAYS * 86_400_000
     const orphans: string[] = []
-    let offset = 0
+    const offset = 0
     const PAGE = 1000
 
     // Build set of referenced storage paths (anything that lives in the invoices bucket).
@@ -122,7 +122,6 @@ Deno.serve(async (req) => {
       removed_count: removed,
       details: { scanned: orphans.length, retention_days: RETENTION_DAYS },
     })
-    offset // silence linter
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
     summary.invoice_storage_error = msg

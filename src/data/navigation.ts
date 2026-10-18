@@ -6,7 +6,7 @@ export const ukServices: NavItem[] = [
   { name: "Companies House ID Verification", path: "/uk-services/ltd-id-verification" },
   { name: "Registered Office Address", path: "/uk-services/registered-office-address" },
   { name: "Confirmation Statement Filing", path: "/uk-services/company-annual-filing" },
-  { name: "Get UTR Number (HMRC)", path: "/uk-services/utr-number" },
+  { name: "Get UTR Number (HMRC)", path: "/uk-services/utr-codes" },
   { name: "Companies House Authentication Code", path: "/uk-services/auth-code" },
   { name: "Activation Code Service", path: "/uk-services/activation-code" },
   { name: "UK VAT Registration & Submission", path: "/uk-services/uk-vat-registration" },

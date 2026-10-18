@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useSeo } from '@/lib/seo';
 import { supabase } from "@/integrations/supabase/client";
 import { buildOrderRef } from "@/lib/orderRef";
 import { notifyDigibizCrm } from "@/lib/crmBridge";
@@ -52,6 +53,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { compliancePages } from "@/data/compliance";
 import { bankingProviders } from "@/data/banking";
+import { DIGI_BIZ_OS_PRICING, DIGI_BIZ_OS_URL } from "@/data/digiBizOs";
 import heroWeb from "@/assets/card-hero-web.webp";
 import SourceHeardSelect from "@/components/attribution/SourceHeardSelect";
 import { recordLeadAttribution, type DeclaredSource } from "@/lib/attribution";
@@ -945,19 +947,56 @@ const softwareDevPackages: DetailPkg[] = [
   },
   {
     name: "Digi Biz OS (Desktop AI OS)",
-    price: "£50",
-    badge: "Lifetime License",
-    note: "Autonomous AI Desktop Operating System",
+    price: DIGI_BIZ_OS_PRICING.lifetime,
+    badge: "Lifetime Licence",
+    note: "One-time payment · Single-PC licence",
     tone: "from-indigo-500/25 to-indigo-500/5",
     ring: "ring-indigo-400/60",
-    link: "https://www.digibizos.co.uk/",
+    link: DIGI_BIZ_OS_URL,
     features: [
       "Universal Voice AI Assistant (JARVIS-style)",
       "Multi-agent autonomous concurrent execution",
       "DIGI CRM & automated WhatsApp threads",
       "Digi Studio video & avatar content creator",
       "Universal MCP toolchain & local SQLite storage",
+      "90%+ modules with integrated AI brain",
       "Zero monthly SaaS subscription fees",
+    ],
+  },
+  {
+    name: "Digi Biz OS Setup & Custom Workflows",
+    price: DIGI_BIZ_OS_PRICING.setup,
+    badge: "Done-for-You Setup",
+    note: "One-time setup with 5 custom workflows",
+    tone: "from-blue-500/25 to-blue-500/5",
+    ring: "ring-blue-400/60",
+    link: DIGI_BIZ_OS_URL,
+    features: [
+      "Everything in Lifetime Licence",
+      "Full PC software installation & setup",
+      "5 custom business workflows",
+      "AI provider API keys configured",
+      "WhatsApp AI Sales Agent connection",
+      "Business Knowledge Base ingestion",
+      "1-on-1 onboarding walkthrough",
+    ],
+  },
+  {
+    name: "Digi Biz OS Source Code Licence",
+    price: DIGI_BIZ_OS_PRICING.sourceCode,
+    badge: "Full Ownership",
+    note: "One-time source code licence",
+    tone: "from-violet-500/25 to-violet-500/5",
+    ring: "ring-violet-400/60",
+    link: DIGI_BIZ_OS_URL,
+    features: [
+      "Everything in Lifetime Licence",
+      "Complete source code repository",
+      "Customise every feature for your business",
+      "Private developer access & documentation",
+      "Build and sign your own installers",
+      "Commercial & resale rights included",
+      "12 months of update pulls",
     ],
   },
   {
@@ -1045,9 +1084,9 @@ const pricingSections: PricingSection[] = [
   {
     title: "Software & AI Agents",
     tag: "Software & AI",
-    intro: "Autonomous AI agents, desktop operating systems, bespoke CRMs and automation platforms.",
+    intro: "Official Digi Biz OS licences plus autonomous AI agents, bespoke CRMs and automation platforms.",
     packages: softwareDevPackages,
-    cols: 4,
+    cols: 3,
   },
 ];
 
@@ -1508,13 +1547,16 @@ export const Blog = () => {
 };
 
 /* ---------- ClientArea ---------- */
-export const ClientArea = () => (
+export const ClientArea = () => {
+  useSeo({ title: 'Client Area — DigiFormation', description: 'Access your private DigiFormation client portal.', path: '/client-area', noindex: true });
+  return (
   <SimplePage
     eyebrow="Client Area"
     title="Your dedicated client portal"
     description="Sign in to track applications, upload documents, and access all your services in one secure place."
   />
-);
+  );
+};
 
 /* ---------- Web Development ---------- */
 const webServices = [
@@ -1776,13 +1818,14 @@ const LegalSection = ({
 );
 
 export const Privacy = () => {
+  const isTerms = useLocation().pathname === '/terms';
   useEffect(() => {
     setMeta(
-      "Privacy Policy & Terms of Service — Digiformation Ltd (GDPR & UK DPA Compliant)",
-      "Read Digiformation Ltd's GDPR & UK Data Protection Act compliant Privacy Policy and Terms of Service. How we protect client data during UK LTD, US LLC and banking services worldwide.",
+      isTerms ? 'Terms of Service — Digiformation Ltd' : 'Privacy Policy — Digiformation Ltd',
+      isTerms ? 'Read the terms governing DigiFormation company formation, compliance and digital services, including service obligations and payment terms.' : 'Read how DigiFormation collects, uses and protects personal information when providing company formation, compliance and digital services.',
       "Digiformation privacy policy, GDPR privacy, UK DPA compliance, terms of service company formation, data protection worldwide"
     );
-  }, []);
+  }, [isTerms]);
 
   return (
     <Layout>

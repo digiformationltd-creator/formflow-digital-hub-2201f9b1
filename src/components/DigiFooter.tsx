@@ -157,14 +157,14 @@ const DigiFooter = () => {
           </div>
           <ul className="space-y-2 text-sm">
             <li><Link to="/software-development" className="hover:text-primary transition">Software Development</Link></li>
-            <li><Link to="/ai-agents" className="hover:text-primary transition">AI Agents &amp; Automation</Link></li>
+            <li><Link to="/software-development" className="hover:text-primary transition">AI Agents &amp; Automation</Link></li>
             <li>
               <a href="https://digibizos.co.uk/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition inline-flex items-center gap-1">
                 Digi Biz OS <span className="text-[10px] px-1.5 py-0.2 rounded bg-primary/20 text-primary">SaaS</span>
               </a>
             </li>
             <li><Link to="/web-development" className="hover:text-primary transition">Web Development</Link></li>
-            <li><Link to="/3d-interactive-animated-web" className="hover:text-primary transition">3D Interactive Web</Link></li>
+            <li><Link to="/web-development" className="hover:text-primary transition">3D Interactive Web</Link></li>
           </ul>
         </div>
 

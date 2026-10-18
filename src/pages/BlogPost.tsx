@@ -1,103 +1,46 @@
-import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowRight, Clock, Tag, Calendar } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { blogPosts, findBlogPost } from "@/data/blog";
-
-const setMeta = (name: string, content: string) => {
-  let el = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
-  if (!el) {
-    el = document.createElement("meta");
-    el.setAttribute("name", name);
-    document.head.appendChild(el);
-  }
-  el.setAttribute("content", content);
-};
-const setProp = (p: string, c: string) => {
-  let el = document.querySelector(`meta[property="${p}"]`) as HTMLMetaElement | null;
-  if (!el) { el = document.createElement("meta"); el.setAttribute("property", p); document.head.appendChild(el); }
-  el.setAttribute("content", c);
-};
+import { useSeo } from "@/lib/seo";
 
 const BlogPost = () => {
   const { slug } = useParams();
   const post = findBlogPost(slug);
 
-  useEffect(() => {
-    if (!post) return;
-    document.title = post.metaTitle;
-    setMeta("description", post.metaDescription);
-    setMeta("keywords", post.keywords);
-    setMeta("robots", "index, follow, max-snippet:-1, max-image-preview:large");
-    setMeta("author", "Digiformation Ltd");
-    setProp("og:title", post.metaTitle);
-    setProp("og:description", post.metaDescription);
-    setProp("og:type", "article");
-    setProp("og:url", `https://www.digiformation.co.uk/blog/${post.slug}`);
-    setProp("article:published_time", post.date);
-    setProp("article:section", post.category);
-    setMeta("twitter:card", "summary_large_image");
-    setMeta("twitter:title", post.metaTitle);
-    setMeta("twitter:description", post.metaDescription);
-
-    let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (!canonical) {
-      canonical = document.createElement("link");
-      canonical.rel = "canonical";
-      document.head.appendChild(canonical);
-    }
-    canonical.href = `https://www.digiformation.co.uk/blog/${post.slug}`;
-
-    const id = "blogpost-jsonld";
-    document.getElementById(id)?.remove();
-    const s = document.createElement("script");
-    s.type = "application/ld+json";
-    s.id = id;
-    s.text = JSON.stringify({
+  useSeo(post ? {
+    title: post.metaTitle,
+    description: post.metaDescription,
+    keywords: post.keywords,
+    path: `/blog/${post.slug}`,
+    type: "article",
+    breadcrumbs: [
+      { name: "Home", path: "/" },
+      { name: "Blog", path: "/blog" },
+      { name: post.title, path: `/blog/${post.slug}` },
+    ],
+    jsonLd: {
       "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "BlogPosting",
-          "@id": `https://www.digiformation.co.uk/blog/${post.slug}#article`,
-          headline: post.title,
-          description: post.metaDescription,
-          datePublished: post.date,
-          dateModified: post.date,
-          author: {
-            "@type": "Organization",
-            "@id": "https://www.digiformation.co.uk/#organization",
-            name: "Digiformation Ltd",
-            url: "https://www.digiformation.co.uk/"
-          },
-          publisher: {
-            "@type": "Organization",
-            "@id": "https://www.digiformation.co.uk/#organization",
-            name: "Digiformation Ltd",
-            url: "https://www.digiformation.co.uk/",
-            logo: {
-              "@type": "ImageObject",
-              url: "https://www.digiformation.co.uk/favicon-512.png"
-            }
-          },
-          image: "https://www.digiformation.co.uk/favicon-512.png",
-          mainEntityOfPage: `https://www.digiformation.co.uk/blog/${post.slug}`,
-          keywords: post.keywords,
-          articleSection: post.category,
-        },
-        {
-          "@type": "BreadcrumbList",
-          "@id": `https://www.digiformation.co.uk/blog/${post.slug}#breadcrumbs`,
-          itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: "https://www.digiformation.co.uk/" },
-            { "@type": "ListItem", position: 2, name: "Blog", item: "https://www.digiformation.co.uk/blog" },
-            { "@type": "ListItem", position: 3, name: post.title, item: `https://www.digiformation.co.uk/blog/${post.slug}` }
-          ]
-        }
-      ]
-    });
-    document.head.appendChild(s);
-  }, [post]);
+      "@type": "BlogPosting",
+      "@id": `https://www.digiformation.co.uk/blog/${post.slug}#article`,
+      headline: post.title,
+      description: post.metaDescription,
+      datePublished: post.date,
+      dateModified: post.date,
+      author: { "@id": "https://www.digiformation.co.uk/#organization" },
+      publisher: { "@id": "https://www.digiformation.co.uk/#organization" },
+      image: "https://www.digiformation.co.uk/favicon-512.png",
+      mainEntityOfPage: `https://www.digiformation.co.uk/blog/${post.slug}`,
+      keywords: post.keywords,
+      articleSection: post.category,
+    },
+  } : {
+    title: "Article not found — Digiformation Ltd",
+    description: "The requested article could not be found. Browse the DigiFormation blog for current guides.",
+    path: `/blog/${slug ?? ""}`,
+    noindex: true,
+  }, [post?.slug, slug]);
 
   if (!post) {
     return (
@@ -166,7 +109,7 @@ const BlogPost = () => {
               <li><Link to="/usa-services/us-llc-formation" className="text-primary hover:underline">→ US LLC Formation</Link></li>
               <li><Link to="/software-development" className="text-primary hover:underline">→ Software Development &amp; AI Agents (from £10)</Link></li>
               <li><Link to="/web-development" className="text-primary hover:underline">→ Web Development &amp; E-Commerce (from £30)</Link></li>
-              <li><Link to="/3d-interactive-animated-web" className="text-primary hover:underline">→ 3D &amp; Interactive Web Development (£180)</Link></li>
+              <li><Link to="/web-development" className="text-primary hover:underline">→ 3D &amp; Interactive Web Development (£180)</Link></li>
               <li><Link to="/banks-payment-solutions" className="text-primary hover:underline">→ Banks &amp; Payment Solutions</Link></li>
               <li><Link to="/contact" className="text-primary hover:underline">→ Free WhatsApp Consultation</Link></li>
             </ul>

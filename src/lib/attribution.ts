@@ -62,7 +62,6 @@ const AI_HOSTS: Record<string, string> = {
   "deepseek.com": "deepseek",
   "chat.deepseek.com": "deepseek",
   "copilot.microsoft.com": "copilot",
-  "www.bing.com": "bing", // careful — overridden below for /chat
 };
 const SEARCH_HOSTS: Record<string, string> = {
   "www.google.com": "google",
@@ -92,15 +91,18 @@ const SOCIAL_HOSTS: Record<string, string> = {
   "t.co": "twitter",
 };
 
-const detectFromReferrer = (referrer: string): { source: string; category: SourceCategory } | null => {
+export const detectFromReferrer = (referrer: string): { source: string; category: SourceCategory } | null => {
   if (!referrer) return null;
   let host = "";
   try { host = new URL(referrer).hostname.toLowerCase(); } catch { return null; }
-  if (host.endsWith(window.location.hostname)) return null; // internal
+  const ownHost = window.location.hostname.toLowerCase();
+  if (host === ownHost || host.endsWith(`.${ownHost}`)) return null; // internal
   // bing /chat path → copilot
-  if (host.includes("bing.com") && referrer.includes("/chat")) return { source: "copilot", category: "ai" };
+  if ((host === 'bing.com' || host.endsWith('.bing.com')) && new URL(referrer).pathname.startsWith('/chat')) return { source: "copilot", category: "ai" };
   if (AI_HOSTS[host]) return { source: AI_HOSTS[host], category: "ai" };
-  if (SEARCH_HOSTS[host]) return { source: SEARCH_HOSTS[host], category: "search" };
+  if (SEARCH_HOSTS[host] || /^(?:www\.)?google\.[a-z.]+$/.test(host)) {
+    return { source: SEARCH_HOSTS[host] ?? "google", category: "search" };
+  }
   if (SOCIAL_HOSTS[host]) return { source: SOCIAL_HOSTS[host], category: "social" };
   return { source: host.replace(/^www\./, ""), category: "referral" };
 };
@@ -128,7 +130,7 @@ export const getVisitorId = (): string => {
   if (!id) {
     id = uuid();
     setCookie(COOKIE_NAME, id, COOKIE_DAYS);
-    try { localStorage.setItem(COOKIE_NAME, id); } catch {}
+    try { localStorage.setItem(COOKIE_NAME, id); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
   }
   return id;
 };
@@ -163,7 +165,8 @@ export const trackPageView = async () => {
         : cat.includes("cpc") || cat.includes("ppc") || cat.includes("paid") ? "search"
         : cat.includes("ai") ? "ai"
         : cat.includes("referral") ? "referral"
-        : "direct";
+        : /^(?:www\.)?google\.[a-z.]+$/.test(source) || source === "google" || source === "bing" ? "search"
+        : "referral";
     } else if (detected) {
       source = detected.source;
       category = detected.category;
@@ -183,16 +186,17 @@ export const trackPageView = async () => {
 
     // First touch → store permanently if absent
     let first: any = null;
-    try { first = JSON.parse(localStorage.getItem(LS_FIRST) || "null"); } catch {}
+    try { first = JSON.parse(localStorage.getItem(LS_FIRST) || "null"); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
     if (!first) {
       first = { ...visit, at: new Date().toISOString() };
-      try { localStorage.setItem(LS_FIRST, JSON.stringify(first)); } catch {}
+      try { localStorage.setItem(LS_FIRST, JSON.stringify(first)); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
     }
     // Last touch
-    try { localStorage.setItem(LS_LAST, JSON.stringify({ ...visit, at: new Date().toISOString() })); } catch {}
+    try { localStorage.setItem(LS_LAST, JSON.stringify({ ...visit, at: new Date().toISOString() })); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
 
-    // Fire-and-forget DB writes — never block UI
-    void supabase.from("visitor_sessions").insert({
+    // Dispatch DB writes without blocking UI, while assimilating Supabase's
+    // thenable so the request actually starts and failures remain observable.
+    void Promise.resolve(supabase.from("visitor_sessions").insert({
       visitor_id,
       landing_page: landing,
       referrer: referrer || null,
@@ -205,9 +209,11 @@ export const trackPageView = async () => {
       detected_category: category,
       device_type: device,
       browser,
-    });
+    })).then(({ error }) => {
+      if (error) console.warn("[attribution] visitor session write failed", error);
+    }).catch((error) => console.warn("[attribution] visitor session dispatch failed", error));
 
-    void supabase.rpc("upsert_visitor_attribution", {
+    void Promise.resolve(supabase.rpc("upsert_visitor_attribution", {
       payload: {
         visitor_id,
         first_source: first.source,
@@ -224,7 +230,9 @@ export const trackPageView = async () => {
         last_visit_at: new Date().toISOString(),
         device_type: device,
       },
-    } as any);
+    } as any)).then(({ error }) => {
+      if (error) console.warn("[attribution] attribution upsert failed", error);
+    }).catch((error) => console.warn("[attribution] attribution dispatch failed", error));
   } catch (err) {
     // Silent fail — attribution must never break the app
     console.warn("[attribution] tracker failed", err);
@@ -235,8 +243,8 @@ export const trackPageView = async () => {
 export const getAttributionSnapshot = (): AttributionSnapshot => {
   const visitor_id = getVisitorId();
   let first: any = {}; let last: any = {};
-  try { first = JSON.parse(localStorage.getItem(LS_FIRST) || "{}"); } catch {}
-  try { last = JSON.parse(localStorage.getItem(LS_LAST) || "{}"); } catch {}
+  try { first = JSON.parse(localStorage.getItem(LS_FIRST) || "{}"); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
+  try { last = JSON.parse(localStorage.getItem(LS_LAST) || "{}"); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
   const url = typeof window !== "undefined" ? new URL(window.location.href) : null;
   return {
     visitor_id,

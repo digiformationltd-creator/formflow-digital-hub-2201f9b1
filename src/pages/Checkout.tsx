@@ -131,7 +131,7 @@ const Checkout = () => {
   }
 
   // 2) Fallback: multi-select category groups (Address bundle, Compliance picker, IDV).
-  const activeGroup = useMemo(() => {
+  const activeGroup = (() => {
     const svc = serviceParam.toLowerCase();
     if (svc) {
       const byService = CATALOG_GROUPS.find((g) =>
@@ -146,9 +146,9 @@ const Checkout = () => {
       if (byItem) return byItem;
     }
     return CATALOG_GROUPS[1]; // default to UK Compliance picker
-  }, [serviceParam, preselected]);
+  })();
 
-  const extraSections = useMemo(() => {
+  const extraSections = (() => {
     if (activeGroup.key !== "uk-compliance") return undefined;
     return activeGroup.items
       .filter((it) => complianceItemFormFields[it.id])
@@ -157,7 +157,7 @@ const Checkout = () => {
         title: complianceItemFormFields[it.id].title,
         fields: complianceItemFormFields[it.id].fields,
       }));
-  }, [activeGroup]);
+  })();
 
   const isAddressGroup = activeGroup.key === "uk-address";
 

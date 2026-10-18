@@ -4,9 +4,125 @@
       "source": "/pricing",
       "destination": "/packages",
       "permanent": true
+    },
+    {
+      "source": "/uk-company-services/registered-office-address",
+      "destination": "/uk-services/registered-office-address",
+      "permanent": true
+    },
+    {
+      "source": "/uk-company-services/director-service-address",
+      "destination": "/uk-services/registered-office-address",
+      "permanent": true
+    },
+    {
+      "source": "/usa-services/boi-report",
+      "destination": "/usa-services/bio-report",
+      "permanent": true
+    },
+    {
+      "source": "/uk-services/utr-number",
+      "destination": "/uk-services/utr-codes",
+      "permanent": true
+    },
+    {
+      "source": "/ltd-formation-services",
+      "destination": "/uk-services/uk-ltd-formation",
+      "permanent": true
+    },
+    {
+      "source": "/ltd-formation-services/uk-ltd-formation",
+      "destination": "/uk-services/uk-ltd-formation",
+      "permanent": true
+    },
+    {
+      "source": "/ltd-formation-services/ltd-id-verification",
+      "destination": "/uk-services/ltd-id-verification",
+      "permanent": true
+    },
+    {
+      "source": "/ltd-formation/ltd-id-verification",
+      "destination": "/uk-services/ltd-id-verification",
+      "permanent": true
+    },
+    {
+      "source": "/ltd-formation-services/registered-office-address",
+      "destination": "/uk-services/registered-office-address",
+      "permanent": true
+    },
+    {
+      "source": "/ltd-formation-services/utr-codes",
+      "destination": "/uk-services/utr-codes",
+      "permanent": true
+    },
+    {
+      "source": "/usa-services/usa-llc-formation",
+      "destination": "/usa-services/us-llc-formation",
+      "permanent": true
+    },
+    {
+      "source": "/llc-formation-services",
+      "destination": "/usa-services/us-llc-formation",
+      "permanent": true
+    },
+    {
+      "source": "/llc-formation-services/usa-llc-formation",
+      "destination": "/usa-services/us-llc-formation",
+      "permanent": true
+    },
+    {
+      "source": "/llc-formation-services/ein-number",
+      "destination": "/usa-services/ein-number",
+      "permanent": true
+    },
+    {
+      "source": "/llc-formation-services/itin-number",
+      "destination": "/usa-services/itin-number",
+      "permanent": true
+    },
+    {
+      "source": "/llc-formation-services/annual-tax-filing",
+      "destination": "/usa-services/annual-tax-filing",
+      "permanent": true
+    },
+    {
+      "source": "/llc-formation-services/bio-report",
+      "destination": "/usa-services/bio-report",
+      "permanent": true
+    },
+    {
+      "source": "/software-and-ai",
+      "destination": "/software-development",
+      "permanent": true
+    },
+    {
+      "source": "/ai-agents",
+      "destination": "/software-development",
+      "permanent": true
+    },
+    {
+      "source": "/3d-interactive-animated-web",
+      "destination": "/web-development",
+      "permanent": true
     }
   ],
   "rewrites": [
+    {
+      "source": "/admin/:path*",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/banks-payment-solutions/:slug/checkout",
+      "destination": "/checkout/index.html"
+    },
+    {
+      "source": "/uk-services/:path*/checkout",
+      "destination": "/checkout/index.html"
+    },
+    {
+      "source": "/usa-services/:path*/checkout",
+      "destination": "/checkout/index.html"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

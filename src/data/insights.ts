@@ -71,7 +71,7 @@ export const insights: Insight[] = [
     heroIntro:
       "A transparent, source-cited benchmark of every cost a founder pays in year one to incorporate and run a private limited company in the United Kingdom — built from Companies House, HMRC and 24 formation-agent pricing pages.",
     keyFindings: [
-      "Companies House raised the standard digital incorporation fee to £50 in May 2024, the first increase in over a decade.",
+      "Companies House raised the standard digital incorporation fee to £100 from 1 February 2026; confirmation statements are £50 online.",
       "Median agent-bundled formation cost for non-residents in 2026 is £149 including registered office, director service address and a business bank introduction.",
       "Year-one true cost of running a UK Ltd (formation + address + confirmation statement + basic accounting) sits between £420 and £980 for a single-director micro-entity.",
       "ECCTA identity verification (mandatory from late 2025) adds a one-off £30–£60 cost per officer through an Authorised Corporate Service Provider.",
@@ -87,15 +87,15 @@ export const insights: Insight[] = [
         table: {
           headers: ["Filing", "Method", "Fee (GBP)"],
           rows: [
-            ["Incorporation of a private company", "Software / WebFiling", "£50"],
-            ["Incorporation (same-day)", "Software", "£78"],
-            ["Incorporation by paper (IN01)", "Postal", "£71"],
-            ["Confirmation statement (annual)", "Digital", "£34"],
-            ["Confirmation statement (paper)", "Postal", "£62"],
+            ["Incorporation of a private company", "Software / WebFiling", "£100"],
+            ["Incorporation (same-day)", "Software", "£156"],
+            ["Incorporation by paper (IN01)", "Postal", "£124"],
+            ["Confirmation statement (annual)", "Digital", "£50"],
+            ["Confirmation statement (paper)", "Postal", "£110"],
             ["Change of company name", "Digital", "£20"],
-            ["Voluntary strike-off (DS01)", "Digital", "£33"],
+            ["Voluntary strike-off (DS01)", "Digital", "£13"],
           ],
-          caption: "Source: Companies House fee schedule, effective May 2024 and unchanged through Q1 2026.",
+          caption: "Source: Companies House fee schedule, updated 25 September 2026; fee changes effective 1 February 2026.",
         },
       },
       {
@@ -107,7 +107,7 @@ export const insights: Insight[] = [
         table: {
           headers: ["Tier", "Typical inclusions", "Price range (ex VAT)"],
           rows: [
-            ["Self-serve / DIY", "Direct Companies House filing only", "£50"],
+            ["Self-serve / DIY", "Direct Companies House filing only", "£100"],
             ["Basic agent", "Filing + digital certificate + share certificate", "£12.99 – £29.99"],
             ["Standard non-resident", "Filing + registered office + director service address (12 months)", "£99 – £179"],
             ["Premium non-resident", "Above + business bank introduction + VAT registration + 1 year mail forwarding", "£199 – £349"],
@@ -143,14 +143,14 @@ export const insights: Insight[] = [
         table: {
           headers: ["Region", "Year 1 median true cost (GBP)", "vs UK resident"],
           rows: [
-            ["United Kingdom (resident)", "£420", "baseline"],
-            ["Pakistan", "£612", "+45.7%"],
-            ["India", "£589", "+40.2%"],
-            ["Bangladesh", "£604", "+43.8%"],
-            ["Nigeria", "£648", "+54.3%"],
-            ["UAE / GCC", "£565", "+34.5%"],
+            ["United Kingdom (resident)", "£486", "baseline"],
+            ["Pakistan", "£678", "+39.5%"],
+            ["India", "£655", "+34.8%"],
+            ["Bangladesh", "£670", "+37.9%"],
+            ["Nigeria", "£714", "+46.9%"],
+            ["UAE / GCC", "£631", "+29.8%"],
           ],
-          caption: "Year-one cost includes formation, registered office, service address, ECCTA verification and confirmation statement.",
+          caption: "Modelled year-one estimates. Statutory components use the current £100 incorporation and £50 digital confirmation-statement fees; verify agent and address inputs before publication.",
         },
       },
       {
@@ -162,15 +162,15 @@ export const insights: Insight[] = [
         table: {
           headers: ["Line item", "Low (GBP)", "Median (GBP)", "High (GBP)"],
           rows: [
-            ["Companies House incorporation", "50", "50", "50"],
+            ["Companies House incorporation", "100", "100", "100"],
             ["Formation agent fee", "0", "99", "199"],
             ["Registered office (12 mo)", "39", "79", "120"],
             ["Director service address (12 mo)", "19", "39", "60"],
             ["ECCTA verification (1 officer)", "30", "45", "60"],
-            ["Confirmation statement", "34", "34", "34"],
+            ["Confirmation statement", "50", "50", "50"],
             ["Bookkeeping (micro)", "0", "180", "360"],
             ["Annual accounts", "0", "100", "300"],
-            ["Total", "£172", "£646", "£1,183"],
+            ["Total", "£238", "£692", "£1,249"],
           ],
         },
       },
@@ -180,7 +180,7 @@ export const insights: Insight[] = [
     sources: [
       { label: "Companies House — Our fees", url: "https://www.gov.uk/government/publications/companies-house-fees" },
       { label: "HMRC — Register for VAT", url: "https://www.gov.uk/register-for-vat" },
-      { label: "ECCTA 2023 — identity verification", url: "https://www.gov.uk/government/collections/economic-crime-and-corporate-transparency-act-2023" },
+      { label: "ECCTA 2023 — identity verification", url: "https://www.gov.uk/government/collections/identity-verification-for-companies-house" },
       { label: "Companies House — Confirmation statement guidance", url: "https://www.gov.uk/guidance/confirmation-statement-guidance" },
     ],
     internalLinks: SHARED_INTERNAL_LINKS,
@@ -194,7 +194,7 @@ export const insights: Insight[] = [
     faq: [
       {
         q: "What is the cheapest legal way to form a UK Ltd in 2026?",
-        a: "Filing directly with Companies House via WebFiling for the £50 statutory fee. You still need a valid registered office address in the UK and ECCTA identity verification.",
+          a: "Filing directly with Companies House via WebFiling for the £100 statutory incorporation fee. You still need a valid registered office address in the UK and Companies House identity verification where applicable.",
       },
       {
         q: "Do non-residents pay more to form a UK company?",
@@ -220,7 +220,7 @@ export const insights: Insight[] = [
     heroIntro:
       "A data-driven side-by-side comparison of the four jurisdictions non-resident founders most commonly choose in 2026: the United Kingdom, the United States (Wyoming and Delaware LLCs), the United Arab Emirates and the European Union (Estonia and Ireland).",
     keyFindings: [
-      "The UK remains the fastest jurisdiction for non-residents — median incorporation time of 24 hours and the lowest statutory cost at £50.",
+      "The UK remains the fastest jurisdiction for non-residents — median incorporation time of 24 hours and a £100 standard digital statutory incorporation fee.",
       "Wyoming LLC is the cheapest US option with state filing at $100 and no state income tax, but requires an EIN before Stripe activation.",
       "UAE freezone costs start at AED 12,500 ($3,400) but offer 0% corporate tax under the small-business relief threshold of AED 375,000.",
       "Estonia e-Residency LLC remains the only fully online EU option for non-residents at €265, but corporate tax (20%) is deferred only on undistributed profits.",
@@ -233,7 +233,7 @@ export const insights: Insight[] = [
         table: {
           headers: ["Metric", "UK Ltd", "US LLC (WY)", "UAE Freezone", "Estonia OÜ", "Ireland Ltd"],
           rows: [
-            ["Statutory formation cost", "£50", "$100", "AED 12,500", "€265", "€50"],
+            ["Statutory formation cost", "£100", "$100", "AED 12,500", "€265", "€50"],
             ["Median agent cost (non-resident)", "£149", "$299", "AED 18,000", "€350", "€650"],
             ["Time to incorporate", "24 hours", "1–5 business days", "5–10 days", "1 business day", "3–5 days"],
             ["Corporate tax rate", "19–25%", "Pass-through / 21% if C-Corp", "0–9%", "0% retained / 20% distributed", "12.5%"],
@@ -241,7 +241,7 @@ export const insights: Insight[] = [
             ["Stripe support (non-resident)", "Yes", "Yes", "No", "Limited", "Yes"],
             ["PayPal Business support", "Yes", "Yes", "Yes", "Yes", "Yes"],
             ["Wise Business support", "Yes", "Yes", "No", "Yes", "Yes"],
-            ["Annual filing cost", "£34 + accounts", "$60 (WY)", "AED 5k–15k", "€0 (digital)", "€0–€350"],
+            ["Annual filing cost", "£50 + accounts", "$60 (WY)", "AED 5k–15k", "€0 (digital)", "€0–€350"],
             ["Recommended for", "EU/UK e-commerce", "US SaaS & FBA", "Local UAE trade", "Digital nomads", "EU SaaS"],
           ],
         },
@@ -577,7 +577,7 @@ export const insights: Insight[] = [
         id: "how-to-stay-compliant",
         h2: "The 6-point UK compliance routine",
         bullets: [
-          "Confirmation statement — file every 12 months (£34 digital).",
+          "Confirmation statement — file every 12 months (£50 digital).",
           "Annual accounts — file within 9 months of accounting reference date (dormant companies still must file AA02).",
           "Corporation tax return (CT600) — file with HMRC within 12 months of accounting period end.",
           "PAYE / VAT — register and file where thresholds are met.",
@@ -589,7 +589,7 @@ export const insights: Insight[] = [
     methodology:
       "Aggregate register and dissolution figures sourced from the Companies House quarterly statistical release (December 2025). Strike-off reason breakdown derived from a stratified sample of 12,000 gazetted strike-off notices published in The Gazette during 2025. Non-resident failure-mode analysis based on Digiformation's internal compliance dataset of 4,200 managed companies.",
     sources: [
-      { label: "Companies House — Statistical releases", url: "https://www.gov.uk/government/collections/companies-house-data-and-statistics" },
+      { label: "Companies House — Statistical releases", url: "https://www.gov.uk/government/organisations/companies-house/about/statistics" },
       { label: "Companies House — Late filing penalties", url: "https://www.gov.uk/government/publications/late-filing-penalties" },
       { label: "ECCTA 2023 — full text", url: "https://www.legislation.gov.uk/ukpga/2023/56/contents" },
       { label: "The Gazette — Companies House notices", url: "https://www.thegazette.co.uk/" },
@@ -620,7 +620,7 @@ export const insights: Insight[] = [
       "We scored 14 jurisdictions across five dimensions that actually matter to a remote founder in 2026: time to incorporate, total year-one cost, effective tax burden, banking and EMI access, and payment processor approval rate.",
     keyFindings: [
       "The United States (Wyoming LLC) ranks #1 overall — best score on banking access (Mercury, Relay, Wise) and Stripe approval.",
-      "The United Kingdom ranks #2 — fastest incorporation (24 hours), lowest statutory cost (£50), strongest global trust signal.",
+      "The United Kingdom ranks #2 — fastest incorporation (24 hours), £100 standard digital statutory fee, strongest global trust signal.",
       "Estonia ranks #3 — only fully online EU formation route, deferred 20% tax on retained profits.",
       "UAE freezones rank #4 for residents but drop to #11 for non-residents due to in-person visa-stamp requirements.",
       "Singapore ranks #5 for fundable startups but requires a nominee director (~SGD 2,000/year), pushing it out of the top 3 for solo founders.",
@@ -673,7 +673,7 @@ export const insights: Insight[] = [
           },
           {
             h3: "2. United Kingdom — Private Limited Company",
-            body: "£50 incorporation, 24-hour turnaround, fully digital, no residency requirement. Pairs with Wise GBP, Revolut Business, Tide and Airwallex. Strong Stripe approval when address + director data match.",
+            body: "£100 standard digital incorporation, 24-hour turnaround, fully digital, no residency requirement. Pairs with Wise GBP, Revolut Business, Tide and Airwallex. Provider approval remains subject to the provider's own checks.",
           },
           {
             h3: "3. Estonia — OÜ via e-Residency",

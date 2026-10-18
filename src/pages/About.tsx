@@ -55,7 +55,7 @@ const pillars = [
   {
     icon: Cpu,
     title: "Autonomous AI Agents & WhatsApp Automation",
-    href: "/ai-agents",
+    href: "/software-development",
     desc: "Enterprise multi-agent architectures and £10 starter WhatsApp AI business agents integrated with official Meta Cloud APIs.",
   },
   {
@@ -74,7 +74,7 @@ const pillars = [
   {
     icon: Layers,
     title: "3D, WebGL & Interactive Web",
-    href: "/3d-interactive-animated-web",
+    href: "/web-development",
     desc: "Hardware-accelerated Three.js 3D product configurators, scroll-driven interactive experiences, and accessible canvas rendering.",
   },
 ];

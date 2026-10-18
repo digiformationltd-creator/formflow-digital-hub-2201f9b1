@@ -33,7 +33,10 @@ const setName = (n: string, c: string) => upsertMeta(`meta[name="${n}"]`, "name"
 const setProp = (p: string, c: string) => upsertMeta(`meta[property="${p}"]`, "property", p, c);
 
 const setCanonical = (href: string) => {
-  let el = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+  const links = Array.from(document.querySelectorAll('link[rel="canonical"]')) as HTMLLinkElement[];
+  const [first, ...duplicates] = links;
+  duplicates.forEach((link) => link.remove());
+  let el = first ?? null;
   if (!el) {
     el = document.createElement("link");
     el.rel = "canonical";
@@ -53,11 +56,18 @@ const setJsonLd = (id: string, data: unknown) => {
   el.text = JSON.stringify(data);
 };
 
+const removeJsonLd = (id: string) => document.getElementById(id)?.remove();
+
+const normalizePath = (path: string) => {
+  const withLeadingSlash = path.startsWith("/") ? path : `/${path}`;
+  if (withLeadingSlash === "/") return "/";
+  return withLeadingSlash.replace(/\/+$/, "");
+};
+
 export const applySeo = (opts: SeoOptions) => {
   const relPath = opts.path ?? (typeof window !== "undefined" ? window.location.pathname : "/");
-  const cleanPath = relPath.startsWith("/") ? relPath : `/${relPath}`;
-  const canonicalUrl = `${CANONICAL_DOMAIN}${cleanPath === "/" ? "" : cleanPath}/`.replace(/\/\/$/, "/");
-  const fullCanonical = cleanPath === "/" ? `${CANONICAL_DOMAIN}/` : `${CANONICAL_DOMAIN}${cleanPath}`;
+  const cleanPath = normalizePath(relPath);
+  const fullCanonical = `${CANONICAL_DOMAIN}${cleanPath}`;
   
   const image = opts.image
     ? (opts.image.startsWith("http") ? opts.image : `${CANONICAL_DOMAIN}${opts.image.startsWith("/") ? "" : "/"}${opts.image}`)
@@ -78,6 +88,7 @@ export const applySeo = (opts: SeoOptions) => {
   setProp("og:type", opts.type || "website");
   setProp("og:url", fullCanonical);
   setProp("og:image", image);
+  setProp("og:image:alt", `${opts.title} — ${ORG_NAME}`);
   setProp("og:site_name", ORG_NAME);
   setProp("og:locale", "en_GB");
 
@@ -90,8 +101,19 @@ export const applySeo = (opts: SeoOptions) => {
   setName("twitter:creator", "@Digiformation00");
 
   setCanonical(fullCanonical);
+  for (const language of ['en', 'x-default']) {
+    let alternate = document.querySelector<HTMLLinkElement>(`link[rel="alternate"][hreflang="${language}"]`);
+    if (!alternate) {
+      alternate = document.createElement('link');
+      alternate.rel = 'alternate';
+      alternate.hreflang = language;
+      document.head.appendChild(alternate);
+    }
+    alternate.href = fullCanonical;
+  }
 
-  // Breadcrumbs JSON-LD
+  // Remove route-owned JSON-LD before applying the next route's values. This
+  // prevents stale breadcrumb/article schema after client-side navigation.
   if (opts.breadcrumbs && opts.breadcrumbs.length) {
     setJsonLd("ldjson-breadcrumbs", {
       "@context": "https://schema.org",
@@ -103,11 +125,15 @@ export const applySeo = (opts: SeoOptions) => {
         item: b.path.startsWith("http") ? b.path : `${CANONICAL_DOMAIN}${b.path.startsWith("/") ? "" : "/"}${b.path}`,
       })),
     });
+  } else {
+    removeJsonLd("ldjson-breadcrumbs");
   }
 
   // Page-specific JSON-LD
   if (opts.jsonLd) {
     setJsonLd("ldjson-page", opts.jsonLd);
+  } else {
+    removeJsonLd("ldjson-page");
   }
 };
 

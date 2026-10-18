@@ -199,7 +199,7 @@ export default function OsOrders() {
     setPendingId(o.id);
     try {
       // Idempotency: re-use existing invoice if one is already linked
-      let { data: existing } = await supabase
+      const { data: existing } = await supabase
         .from("invoices")
         .select("id, invoice_number, bill_to_email, bill_to_name, total_gbp, service_description, status, currency")
         .eq("order_id", o.id)
@@ -260,7 +260,7 @@ export default function OsOrders() {
       return;
     }
     const ids = (ordersData || []).map((o: any) => o.id);
-    let invMap = new Map<string, { invoice_number: string; status: string }>();
+    const invMap = new Map<string, { invoice_number: string; status: string }>();
     if (ids.length) {
       const { data: invs } = await supabase
         .from("invoices")
