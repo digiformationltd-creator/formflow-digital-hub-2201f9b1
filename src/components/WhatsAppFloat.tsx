@@ -27,20 +27,55 @@ const WhatsAppFloat = () => {
       rel="noopener noreferrer"
       onClick={() => trackWhatsAppClick("floating_button")}
       aria-label="Chat with us on WhatsApp"
-      className="hide-on-nav-open fixed bottom-5 right-5 z-50 group flex items-center justify-center bg-[#25D366] text-white rounded-full shadow-2xl hover:scale-110 transition-transform w-14 h-14 sm:w-16 sm:h-16"
+      className="hide-on-nav-open fixed bottom-5 right-5 z-50 group flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.45)] hover:drop-shadow-[0_14px_30px_rgba(37,211,102,0.55)] hover:scale-110 active:scale-95 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#25D366]/40"
     >
-      {/* Official WhatsApp glyph */}
+      {/* 100% Authentic Official WhatsApp Brand Emblem */}
       <svg
-        viewBox="0 0 32 32"
-        className="w-7 h-7 sm:w-8 sm:h-8"
-        fill="currentColor"
+        viewBox="0 0 175.216 175.552"
+        className="w-full h-full"
         aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M19.11 17.205c-.372 0-1.088 1.39-1.518 1.39a.63.63 0 0 1-.315-.1c-.802-.402-1.504-.817-2.163-1.447-.545-.516-1.146-1.29-1.46-1.963a.426.426 0 0 1-.073-.215c0-.33.99-.945.99-1.49 0-.143-.73-2.09-.832-2.335-.143-.372-.214-.487-.6-.487-.187 0-.36-.043-.53-.043-.302 0-.53.115-.746.315-.688.645-1.032 1.318-1.045 2.247v.114c-.015.99.472 1.977 1.017 2.78 1.23 1.82 2.83 3.41 4.823 4.31.616.287 2.108.888 2.788.888.817 0 2.535-.515 2.535-1.79 0-.13 0-.244-.03-.372-.058-.144-2.23-1.202-2.83-1.202zm-2.95 7.376a8.696 8.696 0 0 1-4.42-1.205l-3.155.81.84-3.069c-.802-1.341-1.225-2.876-1.225-4.45 0-4.806 3.965-8.7 8.834-8.7 2.366 0 4.6.926 6.275 2.566a8.553 8.553 0 0 1 2.6 6.135c-.001 4.8-3.967 8.913-8.749 8.913zM22.45 9.39a10.434 10.434 0 0 0-7.435-3.061c-5.79 0-10.515 4.681-10.515 10.43 0 1.834.487 3.634 1.412 5.214L4 27.317l5.46-1.425a10.585 10.585 0 0 0 5.05 1.282h.005c5.79 0 10.485-4.682 10.485-10.43 0-2.792-1.105-5.41-3.084-7.385h.534z" />
+        <defs>
+          <linearGradient
+            id="wa-float-gradient"
+            x1="85.915"
+            x2="86.535"
+            y1="32.567"
+            y2="137.092"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor="#25D366" />
+            <stop offset="100%" stopColor="#20BA59" />
+          </linearGradient>
+        </defs>
+        {/* Crisp white outer speech bubble border with tail */}
+        <path
+          fill="#ffffff"
+          d="m12.966 161.238 10.439-38.114a73.42 73.42 0 0 1-9.821-36.772c.017-40.556 33.021-73.55 73.578-73.55 19.681.01 38.154 7.669 52.047 21.572s21.537 32.383 21.53 52.037c-.018 40.553-33.027 73.553-73.578 73.553h-.032c-12.313-.005-24.412-3.094-35.159-8.954z"
+        />
+        {/* Vibrant official WhatsApp green bubble */}
+        <path
+          fill="url(#wa-float-gradient)"
+          d="M87.184 25.227c-33.733 0-61.166 27.423-61.178 61.13a60.98 60.98 0 0 0 9.349 32.535l1.455 2.313-6.179 22.558 23.146-6.069 2.235 1.324c9.387 5.571 20.15 8.517 31.126 8.523h.023c33.707 0 61.14-27.426 61.153-61.135a60.75 60.75 0 0 0-17.895-43.251 60.75 60.75 0 0 0-43.235-17.928z"
+        />
+        {/* Iconic solid white phone handset receiver */}
+        <path
+          fill="#ffffff"
+          fillRule="evenodd"
+          d="M68.772 55.603c-1.378-3.061-2.828-3.123-4.137-3.176l-3.524-.043c-1.226 0-3.218.46-4.902 2.3s-6.435 6.287-6.435 15.332 6.588 17.785 7.506 19.013 12.718 20.381 31.405 27.75c15.529 6.124 18.689 4.906 22.061 4.6s10.877-4.447 12.408-8.74 1.532-7.971 1.073-8.74-1.685-1.226-3.525-2.146-10.877-5.367-12.562-5.981-2.91-.919-4.137.921-4.746 5.979-5.819 7.206-2.144 1.381-3.984.462-7.76-2.861-14.784-9.124c-5.465-4.873-9.154-10.891-10.228-12.73s-.114-2.835.808-3.751c.825-.824 1.838-2.147 2.759-3.22s1.224-1.84 1.836-3.065.307-2.301-.153-3.22-4.032-10.011-5.666-13.647"
+        />
       </svg>
-      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+
+      {/* Online activity ping dot */}
+      <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 pointer-events-none">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#25D366] opacity-75"></span>
-        <span className="relative inline-flex rounded-full h-3 w-3 bg-[#25D366]"></span>
+        <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-[#25D366] border-2 border-white shadow-sm"></span>
+      </span>
+
+      {/* Desktop hover tooltip */}
+      <span className="hidden sm:block absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-foreground text-background text-xs font-semibold px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+        Chat on WhatsApp
       </span>
     </a>
   );

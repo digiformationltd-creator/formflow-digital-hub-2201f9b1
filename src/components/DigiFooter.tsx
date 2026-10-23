@@ -93,7 +93,7 @@ const DigiFooter = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackWhatsAppClick("footer_cta")}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:opacity-90 transition"
+              className="inline-flex items-center gap-2.5 px-5 py-3 rounded-full bg-[#25D366] hover:bg-[#20ba59] text-white font-semibold shadow-md hover:shadow-lg transition-all"
             >
               <WhatsAppIcon className="w-4 h-4" /> WhatsApp Us
             </a>
