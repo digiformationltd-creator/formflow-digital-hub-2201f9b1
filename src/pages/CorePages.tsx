@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useSeo } from '@/lib/seo';
+import { applySeo, useSeo } from '@/lib/seo';
 import { supabase } from "@/integrations/supabase/client";
 import { buildOrderRef } from "@/lib/orderRef";
 import { notifyDigibizCrm } from "@/lib/crmBridge";
@@ -60,43 +60,7 @@ import { recordLeadAttribution, type DeclaredSource } from "@/lib/attribution";
 
 /* ---------- helpers ---------- */
 const setMeta = (title: string, description: string, keywords?: string) => {
-  document.title = title;
-  const setName = (n: string, c: string) => {
-    let el = document.querySelector(`meta[name="${n}"]`) as HTMLMetaElement | null;
-    if (!el) {
-      el = document.createElement("meta");
-      el.setAttribute("name", n);
-      document.head.appendChild(el);
-    }
-    el.setAttribute("content", c);
-  };
-  const setProp = (p: string, c: string) => {
-    let el = document.querySelector(`meta[property="${p}"]`) as HTMLMetaElement | null;
-    if (!el) {
-      el = document.createElement("meta");
-      el.setAttribute("property", p);
-      document.head.appendChild(el);
-    }
-    el.setAttribute("content", c);
-  };
-  setName("description", description);
-  if (keywords) setName("keywords", keywords);
-  setName("robots", "index, follow, max-snippet:-1, max-image-preview:large");
-  setProp("og:title", title);
-  setProp("og:description", description);
-  setProp("og:type", "website");
-  setProp("og:url", window.location.href);
-  setName("twitter:card", "summary_large_image");
-  setName("twitter:title", title);
-  setName("twitter:description", description);
-  // canonical
-  let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-  if (!canonical) {
-    canonical = document.createElement("link");
-    canonical.rel = "canonical";
-    document.head.appendChild(canonical);
-  }
-  canonical.href = `https://www.digiformation.co.uk${window.location.pathname}`;
+  applySeo({ title, description, keywords, path: window.location.pathname });
 };
 
 const injectJsonLd = (id: string, data: object) => {
@@ -1258,24 +1222,24 @@ const faqList: FaqItem[] = [
   {
     category: "ID Verification",
     q: "Can ID verification be completed using a Pakistani ID card, or is a passport required?",
-    a: "Yes, ID verification for UK company formation can be completed using any of the following government-issued documents:\n\n1. Pakistani National ID Card (CNIC)\n2. Passport\n3. Driving License\n\nPlease note: For UK business bank account opening, a Passport or Driving License is mandatory — a CNIC alone is not accepted by most banks.",
+    a: "Accepted identity documents depend on the Companies House verification route and your circumstances. Check the current GOV.UK One Login document and country rules, or verify the chosen Authorised Corporate Service Provider’s requirements. A CNIC, passport or driving licence is not universally accepted by every route or bank. Use your own accurate details and confirm the accepted evidence before submitting.",
   },
 
   // 📍 Banking & Accounts
   {
     category: "Banking & Accounts",
     q: "What are the requirements for UK business bank accounts?",
-    a: "General requirements for most UK business bank accounts: UK Company Number, UK Phone Number, Company Website, Passport or Driving License, Live Selfie Verification, and a Gmail ID & Password (you can provide one or we can arrange it). Important: most banks require a passport and live selfie verification. Wise does NOT require live selfie verification, and Payoneer can be created without a passport.",
+    a: "Requirements depend on the provider, where the real directors and beneficial owners live, and the business activity. Expect company records, identification, proof of address and, where requested, evidence of trading activity or source of funds. Check the provider’s current supported-country and verification rules before applying. Do not send DigiFormation your email-account password, banking password, recovery codes or one-time sign-in codes. We can explain the application process; the provider decides eligibility and approval. Company formation does not guarantee an account.",
   },
   {
     category: "Banking & Accounts",
     q: "I want to open a UK bank account — what do I need?",
-    a: "To open a UK business bank account, you must first have a UK registered company. Then you'll need a Passport or Driving License, your company details, and verification documents. We provide complete guidance and support throughout the process.",
+    a: "The legal structure and documents accepted depend on the provider and account product. For a UK limited-company application, prepare company records and the real directors’ and beneficial owners’ identification and address evidence. Providers may impose residency, country and business-activity restrictions. Confirm their current rules first; our application support cannot guarantee approval.",
   },
   {
     category: "Banking & Accounts",
     q: "Can I open a bank account using a UK resident's identity?",
-    a: "We do not deal with physical banks. However, for virtual banks that do not support Pakistani identity, we can assist if a UK resident completes ID verification and the account is created under their name.",
+    a: "No. Do not use another person’s identity or misleading ownership, residency or control information to bypass a provider’s rules. Applications must identify the real business, beneficial owners and any genuinely authorized representatives. A representative’s role must be real, documented and accepted by the provider. A UK resident’s involvement does not automatically make an otherwise ineligible application acceptable. Confirm eligibility directly with the provider before paying or applying.",
   },
 
   // 📍 Access & Support
@@ -1550,11 +1514,104 @@ export const Blog = () => {
 export const ClientArea = () => {
   useSeo({ title: 'Client Area — DigiFormation', description: 'Access your private DigiFormation client portal.', path: '/client-area', noindex: true });
   return (
-  <SimplePage
-    eyebrow="Client Area"
-    title="Your dedicated client portal"
-    description="Sign in to track applications, upload documents, and access all your services in one secure place."
-  />
+    <SimplePage
+      eyebrow="Client Area"
+      title="Your dedicated client portal"
+      description="Sign in to track applications, download official incorporation documents, view invoices, and manage all your services in one secure place."
+    >
+      <div className="max-w-4xl mx-auto space-y-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="glass rounded-2xl p-8 border border-primary/30 flex flex-col justify-between">
+            <div>
+              <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mb-5 text-primary">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="font-display text-2xl font-bold mb-3">Existing Client?</h3>
+              <p className="text-sm opacity-80 leading-relaxed mb-6">
+                Sign in with your email to access your company dashboard, download incorporation documents, check filing dates, and track orders.
+              </p>
+            </div>
+            <Button asChild variant="hero" size="lg" className="rounded-full w-full">
+              <Link to="/auth">Sign In to Dashboard <ArrowRight className="w-4 h-4 ml-2" /></Link>
+            </Button>
+          </div>
+
+          <div className="glass rounded-2xl p-8 border border-white/10 flex flex-col justify-between">
+            <div>
+              <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center mb-5 text-foreground">
+                <Building2 className="w-6 h-6" />
+              </div>
+              <h3 className="font-display text-2xl font-bold mb-3">New Client?</h3>
+              <p className="text-sm opacity-80 leading-relaxed mb-6">
+                Create a free client account in seconds or choose a UK LTD or USA LLC formation package to automatically launch your portal.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Button asChild variant="outline" size="lg" className="rounded-full w-full">
+                <Link to="/auth">Create Client Account</Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="rounded-full w-full opacity-70 hover:opacity-100">
+                <Link to="/packages">Explore Formation Packages →</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="glass rounded-2xl p-8 border border-white/10">
+          <h3 className="font-display text-xl font-bold mb-6 text-center">What You Can Do Inside Your Client Portal</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-sm">
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2">
+              <div className="font-semibold text-primary flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" /> Company &amp; Filing Tracker
+              </div>
+              <p className="text-xs opacity-75">
+                Instant access to your official Company Number, Authentication Code, UTR number, and confirmation statement deadlines.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2">
+              <div className="font-semibold text-primary flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" /> Secure Document Vault
+              </div>
+              <p className="text-xs opacity-75">
+                Download your official Certificate of Incorporation, Memorandum, Articles of Association, and HMRC letters anytime.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2">
+              <div className="font-semibold text-primary flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" /> Invoices &amp; Receipts
+              </div>
+              <p className="text-xs opacity-75">
+                View itemized invoices for all purchases and download official PDF receipts for your business bookkeeping.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2">
+              <div className="font-semibold text-primary flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" /> Address Subscriptions
+              </div>
+              <p className="text-xs opacity-75">
+                Monitor your London registered office address, director service address, and mail forwarding contract renewals.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2">
+              <div className="font-semibold text-primary flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" /> 1-Click Order New Services
+              </div>
+              <p className="text-xs opacity-75">
+                Add compliance filings, VAT registration, banking introductions, or US EIN numbers directly from your dashboard.
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 space-y-2">
+              <div className="font-semibold text-primary flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" /> Dedicated Support Tickets
+              </div>
+              <p className="text-xs opacity-75">
+                Open direct priority support tickets tracked by the DigiFormation compliance and formations team.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </SimplePage>
   );
 };
 
