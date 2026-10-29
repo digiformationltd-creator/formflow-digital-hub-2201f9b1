@@ -23,7 +23,7 @@ const moreLinks = [
 const DigiNav = () => {
   const [open, setOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<import("@supabase/supabase-js").User | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -122,6 +122,7 @@ const DigiNav = () => {
           {/* Desktop links */}
           <div className="hidden xl:flex items-center gap-6">
             <NavLink to="/" className="text-sm hover:opacity-80 transition">Home</NavLink>
+            <NavLink to="/id-verification" className="text-sm hover:opacity-80 transition font-semibold text-primary">ID Verification</NavLink>
             
             {navGroups.map((g) => (
               <div key={g.label} className="relative group">
@@ -222,6 +223,9 @@ const DigiNav = () => {
           <div className="glass rounded-2xl p-3 sm:p-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
             <Link to="/" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10">
               Home
+            </Link>
+            <Link to="/id-verification" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10 font-semibold text-primary">
+              ID Verification
             </Link>
             <Link to="/packages" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10 font-semibold text-primary">
               Packages & Pricing →

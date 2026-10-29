@@ -13,6 +13,7 @@ export const ukServices: NavItem[] = [
 ];
 
 export const ukCompliance: NavItem[] = [
+  { name: "Company Change Services", path: "/uk-company-services/change-services" },
   { name: "Change UK Company Name (NM01)", path: "/uk-compliance/company-name-change" },
   { name: "Change Registered Office Address (AD01)", path: "/uk-compliance/company-address-change" },
   { name: "File Annual Accounts (UK LTD)", path: "/uk-compliance/annual-accounts-filing" },
@@ -60,6 +61,7 @@ export const navGroups: NavGroup[] = [
 
 export const simpleLinks: NavItem[] = [
   { name: "Home", path: "/" },
+  { name: "ID Verification", path: "/id-verification" },
   { name: "Packages & Pricing", path: "/packages" },
   { name: "Software & AI Agents", path: "/software-development" },
   { name: "Business Website Development", path: "/web-development" },

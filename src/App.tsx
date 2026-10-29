@@ -4,15 +4,16 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 import AIAssistant from "./components/AIAssistant";
 import ScrollToTop from "./components/ScrollToTop";
 import RecoveryRedirect from "./components/RecoveryRedirect";
 import AttributionTracker from "./components/AttributionTracker";
 import GoogleAnalyticsTracker from "./components/GoogleAnalyticsTracker";
+import RouteSeoBoundary from './components/RouteSeoBoundary';
 
 // Lazy-loaded routes for performance & minimal initial bundle
+const Index = lazy(() => import('./pages/Index.tsx'));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const DynamicServicePage = lazy(() => import("./pages/DynamicServicePage").then((m) => ({ default: m.DynamicServicePage })));
 const UKServicesHub = lazy(() => import("./pages/SectionHubs").then((m) => ({ default: m.UKServicesHub })));
@@ -37,6 +38,7 @@ const UkLtdChooseJurisdiction = lazy(() => import("./pages/UkLtdChooseJurisdicti
 const UkLtdCheckout = lazy(() => import("./pages/UkLtdCheckout"));
 const LtdIdVerification = lazy(() => import("./pages/LtdIdVerification"));
 const LtdIdVerificationCheckout = lazy(() => import("./pages/LtdIdVerificationCheckout"));
+const IdVerificationPage = lazy(() => import("./pages/IdVerificationPage"));
 const RegisteredOfficeAddress = lazy(() => import("./pages/RegisteredOfficeAddress"));
 const UtrCodes = lazy(() => import("./pages/UtrCodes"));
 const CompliancePage = lazy(() => import("./pages/CompliancePage"));
@@ -69,6 +71,8 @@ const App = () => (
         <Suspense fallback={<div className="min-h-screen bg-background" />}>
           <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/id-verification" element={<IdVerificationPage />} />
+          <Route path="/id-verification/checkout" element={<LtdIdVerificationCheckout />} />
 
           {/* Section hubs */}
           <Route path="/uk-services" element={<UKServicesHub />} />
@@ -155,6 +159,7 @@ const App = () => (
           <Route path="/unsubscribe" element={<Unsubscribe />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <RouteSeoBoundary />
         </Suspense>
         <WhatsAppFloat />
         <AIAssistant />
