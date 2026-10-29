@@ -120,9 +120,9 @@ const DigiNav = () => {
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden xl:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-3 xl:gap-6">
             <NavLink to="/" className="text-sm hover:opacity-80 transition">Home</NavLink>
-            <NavLink to="/id-verification" className="text-sm hover:opacity-80 transition font-semibold text-primary">ID Verification</NavLink>
+            <NavLink to="/id-verification" className="text-sm hover:opacity-80 transition font-semibold text-primary whitespace-nowrap">ID Verification</NavLink>
             
             {navGroups.map((g) => (
               <div key={g.label} className="relative group">
@@ -209,7 +209,7 @@ const DigiNav = () => {
             <button
               aria-label="Toggle menu"
               onClick={() => setOpen(!open)}
-              className="xl:hidden h-11 w-11 sm:h-12 sm:w-12 xl:h-14 xl:w-14 rounded-lg grid place-items-center hover:bg-primary/10 transition shrink-0"
+              className="lg:hidden h-11 w-11 sm:h-12 sm:w-12 rounded-lg grid place-items-center hover:bg-primary/10 transition shrink-0"
             >
               {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -219,7 +219,7 @@ const DigiNav = () => {
 
       {/* Mobile drawer */}
       {open && (
-        <div className="xl:hidden container mx-auto mt-2 px-3 sm:px-4">
+        <div className="lg:hidden container mx-auto mt-2 px-3 sm:px-4">
           <div className="glass rounded-2xl p-3 sm:p-4 max-h-[calc(100vh-6rem)] overflow-y-auto">
             <Link to="/" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10">
               Home
@@ -227,14 +227,11 @@ const DigiNav = () => {
             <Link to="/id-verification" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10 font-semibold text-primary">
               ID Verification
             </Link>
-            <Link to="/packages" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10 font-semibold text-primary">
-              Packages & Pricing →
-            </Link>
             {navGroups.map((g) => (
               <div key={g.label} className="border-t border-border/40 mt-1 pt-1">
                 <button
                   onClick={() => setOpenGroup(openGroup === g.label ? null : g.label)}
-                  className="flex items-center justify-between w-full px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10"
+                  className="flex items-center justify-between w-full px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10 font-medium"
                 >
                   {g.label}
                   <ChevronDown className={`w-4 h-4 transition-transform ${openGroup === g.label ? "rotate-180" : ""}`} />
@@ -257,6 +254,9 @@ const DigiNav = () => {
               </div>
             ))}
             <div className="border-t border-border/40 mt-1 pt-1">
+              <Link to="/packages" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10 font-semibold text-primary">
+                Packages & Pricing →
+              </Link>
               <Link to="/software-development" onClick={() => setOpen(false)} className="block px-4 py-2.5 text-sm rounded-lg hover:bg-primary/10">
                 Software & AI Agents
               </Link>

@@ -108,24 +108,112 @@
   ],
   "rewrites": [
     {
+      "source": "/auth",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/admin",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/unsubscribe",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/client-area",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/uk-services/uk-ltd-formation/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/uk-services/ltd-id-verification/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/usa-services/us-llc-formation/checkout",
+      "destination": "/app-shell"
+    },
+    {
       "source": "/admin/:path*",
-      "destination": "/admin/index.html"
+      "destination": "/app-shell"
     },
     {
-      "source": "/banks-payment-solutions/:slug/checkout",
-      "destination": "/checkout/index.html"
+      "source": "/banks-payment-solutions/paypal/checkout",
+      "destination": "/app-shell"
     },
     {
-      "source": "/uk-services/:path*/checkout",
-      "destination": "/checkout/index.html"
+      "source": "/banks-payment-solutions/payoneer/checkout",
+      "destination": "/app-shell"
     },
     {
-      "source": "/usa-services/:path*/checkout",
-      "destination": "/checkout/index.html"
+      "source": "/banks-payment-solutions/stripe/checkout",
+      "destination": "/app-shell"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/banks-payment-solutions/wise/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/worldfirst/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/tide/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/airwallex/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/pingpong/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/mollie/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/wallester/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/sunrate/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/zionpe/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/zyla/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/grey/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/taptap/checkout",
+      "destination": "/app-shell"
+    },
+    {
+      "source": "/banks-payment-solutions/nsave-business/checkout",
+      "destination": "/app-shell"
     }
   ],
   "headers": [
@@ -149,6 +237,370 @@
           "value": "strict-origin-when-cross-origin"
         }
       ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/auth",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/reset-password",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/dashboard",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/admin",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/unsubscribe",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/client-area",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/uk-services/uk-ltd-formation/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/uk-services/ltd-id-verification/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/usa-services/us-llc-formation/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/admin/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/paypal/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/payoneer/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/stripe/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/wise/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/worldfirst/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/tide/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/airwallex/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/pingpong/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/mollie/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/wallester/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/sunrate/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/zionpe/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/zyla/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/grey/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/taptap/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/banks-payment-solutions/nsave-business/checkout",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
     }
-  ]
+  ],
+  "buildCommand": "node scripts/sync-sitemap.mjs && vite build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false
 }
