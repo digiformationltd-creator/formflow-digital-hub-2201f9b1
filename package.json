@@ -6,8 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:verified": "npm run build && node scripts/seo-stage-04-audit.mjs",
-    "postbuild": "node scripts/prerender-seo.mjs || exit 0",
+    "postbuild": "node scripts/prerender-seo.mjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",

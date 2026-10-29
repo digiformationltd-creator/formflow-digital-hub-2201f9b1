@@ -599,8 +599,6 @@
       ]
     }
   ],
-  "buildCommand": "node scripts/sync-sitemap.mjs && vite build",
-  "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false
 }

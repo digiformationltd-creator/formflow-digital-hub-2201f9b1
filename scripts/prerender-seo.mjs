@@ -1,94 +1,205 @@
 #!/usr/bin/env node
-// Export the same production React routes a user receives. No UA branching,
-// hosted reads/writes, fabricated fallback copy, or optional snapshot command.
-import fs from 'node:fs';
-import path from 'node:path';
-import { createHash } from 'node:crypto';
-import { JSDOM } from 'jsdom';
-import { DIST, REPORTS, SITE, publicPaths, privatePaths, startStaticServer, launchChromium, blockExternalTraffic, readSeo, seoFailures } from './seo-runtime.mjs';
+// Generates crawlable route shells after the Vite build. The React app still
+// hydrates/replaces #root at runtime, but bots and link unfurlers receive a
+// route-specific title, description, canonical, hreflang, JSON-LD and H1 in
+// the initial HTML response.
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-if (process.env.VERCEL || process.env.CI || process.env.SKIP_PRERENDER || process.env.NODE_ENV === 'production' && !process.env.AUDIT_CHROMIUM_PATH && !process.env.LOCALAPPDATA) {
-  console.log('Skipping prerender in CI/cloud environment');
-  process.exit(0);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, "..");
+const DIST = path.join(ROOT, "dist");
+const SITE = "https://www.digiformation.co.uk";
+const SITEMAP = path.join(ROOT, "public", "sitemap.xml");
+
+const PRIVATE_PREFIXES = [
+  "/auth",
+  "/reset-password",
+  "/dashboard",
+  "/admin",
+  "/checkout",
+  "/unsubscribe",
+  "/client-area",
+];
+
+const CORE = {
+  "/": ["DigiFormation — Worldwide Company Formation & Business Setup", "Form a UK Ltd or US LLC remotely with company formation, compliance, banking guidance and websites for international founders."],
+  "/id-verification": ["UK Companies House ID Verification 2026 | Director & PSC Check — £20", "Official UK Companies House Identity Verification service under ECCTA 2023. Fast digital verification for UK & non-resident directors, PSCs, and officers for £20."],
+  "/about": ["About DigiFormation — Worldwide Business Setup Specialists", "Meet DigiFormation: practical company formation, compliance and digital business support for founders worldwide."],
+  "/contact": ["Contact DigiFormation — Talk to a Business Setup Specialist", "Contact DigiFormation for UK company formation, U.S. setup, compliance, banking guidance and website support."],
+  "/packages": ["Company Formation Packages — DigiFormation", "Compare DigiFormation packages for UK LTD formation, U.S. LLC setup, compliance, banking guidance and digital services."],
+  "/faq": ["Frequently Asked Questions — DigiFormation", "Answers about UK and U.S. company formation, identity verification, compliance, banking and digital services."],
+  "/blog": ["DigiFormation Blog — Company Formation & Compliance Guides", "Practical, source-led guides covering company formation, compliance, banking, tax IDs and digital growth for global founders."],
+  "/insights": ["DigiFormation Insights — Data-Led Formation & Compliance Research", "Research reports on company formation costs, compliance, payment providers and worldwide business setup."],
+  "/software-development": ["Custom Software Development — DigiFormation", "Build secure, scalable business software, automations and dashboards with DigiFormation's product engineering team."],
+  "/web-development": ["Web Development & 3D Experiences — DigiFormation", "Fast, accessible websites and interactive 3D experiences designed for trust, conversion and measurable growth."],
+  "/uk-services": ["UK Company Formation & Compliance Services", "Form and maintain a UK company remotely with registered office, identity verification, UTR and annual compliance support."],
+  "/uk-compliance": ["UK Company Compliance Services — DigiFormation", "Stay on top of Companies House and HMRC obligations with practical UK company compliance support."],
+  "/usa-services": ["U.S. Company Formation & Compliance Services", "Launch and maintain a U.S. company remotely with LLC formation, EIN, ITIN, banking guidance and conditional BOI review."],
+  "/banks-payment-solutions": ["Business Banking & Payment Solutions — DigiFormation", "Compare legitimate banking and payment-provider routes for international companies; approvals remain subject to each provider's checks."],
+};
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
-const template = fs.readFileSync(path.join(DIST, 'index.html'), 'utf8');
-let server;
-let browser;
-try {
-  server = await startStaticServer({ renderTemplate: template });
-  browser = await launchChromium();
-} catch (e) {
-  console.warn('Prerender environment not ready, skipping:', e.message);
-  process.exit(0);
+function json(value) {
+  return JSON.stringify(value).replaceAll("<", "\\u003c");
 }
-const snapshots = new Map();
-const rows = [];
-const errors = [];
-const paths = [...new Set(publicPaths())];
-if (paths.length !== publicPaths().length) throw new Error('Duplicate sitemap routes');
-try {
-  for (let index = 0; index < paths.length; index += 3) {
-    await Promise.all(paths.slice(index, index + 3).map(async (pathname) => {
-      const page = await browser.newPage({ viewport: { width: 1365, height: 900 }, reducedMotion: 'reduce' });
-      await blockExternalTraffic(page, server.base);
-      page.on('pageerror', (error) => errors.push({ path: pathname, message: error.message }));
-      try {
-        const response = await page.goto(server.base + pathname, { waitUntil: 'domcontentloaded', timeout: 30000 });
-        await page.waitForFunction((route) => document.documentElement.dataset.routeReady === route && document.querySelector('h1'), pathname, { timeout: 15000 });
-        await page.waitForTimeout(150);
-        const data = await readSeo(page);
-        const failures = seoFailures(data, pathname);
-        if (response.status() !== 200) failures.push(`HTTP ${response.status()}`);
-        if (errors.some((error) => error.path === pathname)) failures.push('Runtime page error');
-        rows.push({ path: pathname, ...data, failures });
-        if (failures.length) { console.error(`${pathname}: ${failures.join('; ')}`); return; }
-        // Make entrance-animation end states visible to no-JS users. React
-        // restores its own controlled styles when the interactive app mounts.
-        await page.evaluate(() => {
-          document.querySelectorAll('#root [style]').forEach((element) => {
-            if (element instanceof HTMLElement && element.style.opacity === '0' && element.style.transform) {
-              element.style.opacity = '1'; element.style.transform = 'none';
-            }
-          });
-          document.documentElement.removeAttribute('data-route-ready');
-          document.documentElement.dataset.prerendered = 'true';
-        });
-        snapshots.set(pathname, await page.content());
-        console.log(`SSG ${snapshots.size}/${paths.length} ${pathname}: ${data.primaryWords} primary words`);
-      } finally { await page.close(); }
-    }));
-  }
-  if (rows.some(row => row.failures.length) || errors.length || snapshots.size !== paths.length) {
-    fs.mkdirSync(REPORTS, { recursive: true });
-    fs.writeFileSync(path.join(REPORTS, 'prerender-failures.json'), JSON.stringify({ at: new Date().toISOString(), errors, rows }, null, 2));
-    console.warn('SSG verification completed with caveats; build will continue with standard React SPA fallback.');
-  }
-  const missing = await browser.newPage({ reducedMotion: 'reduce' });
-  await blockExternalTraffic(missing, server.base);
-  await missing.goto(server.base + '/404', { waitUntil: 'domcontentloaded' });
-  await missing.waitForFunction(() => document.documentElement.dataset.routeReady === '/404' && document.querySelector('meta[name="robots"]')?.content.includes('noindex'));
-  snapshots.set('/404', await missing.content());
-  await missing.close();
 
-  // Only persist once every marketing route passed; a broken render fails build.
-  for (const [pathname, html] of snapshots) {
-    const output = path.join(DIST, pathname === '/' ? 'index.html' : pathname.slice(1) + '.html');
-    fs.mkdirSync(path.dirname(output), { recursive: true }); fs.writeFileSync(output, html);
+function humanize(pathname) {
+  const last = pathname.split("/").filter(Boolean).pop() || "DigiFormation";
+  return last
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function parseBlogMetadata() {
+  const source = fs.readFileSync(path.join(ROOT, "src", "data", "blog.ts"), "utf8");
+  const result = new Map();
+  const regex = /slug:\s*["']([^"']+)["'][\s\S]*?title:\s*["']([^"']+)["'][\s\S]*?excerpt:\s*["']([^"']*)["'][\s\S]*?metaTitle:\s*["']([^"']+)["'][\s\S]*?metaDescription:\s*["']([^"']*)["']/g;
+  for (const match of source.matchAll(regex)) {
+    result.set(`/blog/${match[1]}`, {
+      title: match[4] || match[2],
+      description: match[5] || match[3],
+      h1: match[2],
+      type: "BlogPosting",
+    });
   }
-  const document = new JSDOM(template).window.document;
-  document.title = 'DigiFormation — Private Application';
-  for (const name of ['robots', 'googlebot']) {
-    let meta = document.querySelector(`meta[name="${name}"]`);
-    if (!meta) { meta = document.createElement('meta'); meta.setAttribute('name', name); document.head.appendChild(meta); }
-    meta.setAttribute('content', 'noindex, nofollow');
+  return result;
+}
+
+function parseInsightMetadata() {
+  const source = fs.readFileSync(path.join(ROOT, "src", "data", "insights.ts"), "utf8");
+  const result = new Map();
+  const regex = /slug:\s*["']([^"']+)["'][\s\S]*?title:\s*["']([^"']+)["'][\s\S]*?metaTitle:\s*["']([^"']+)["'][\s\S]*?metaDescription:\s*["']([^"']*)["']/g;
+  for (const match of source.matchAll(regex)) {
+    result.set(`/insights/${match[1]}`, {
+      title: match[3] || match[2],
+      description: match[4],
+      h1: match[2],
+      type: "Article",
+    });
   }
-  document.querySelectorAll('link[rel="canonical"], link[hreflang], script[type="application/ld+json"], meta[property^="og:"], meta[name^="twitter:"]').forEach((element) => element.remove());
-  document.getElementById('root').innerHTML = '<main><h1>DigiFormation private application</h1><noscript>JavaScript is required for secure sign-in and checkout. <a href="/contact">Contact support</a> if you need assistance.</noscript></main>';
-  fs.writeFileSync(path.join(DIST, 'app-shell.html'), '<!DOCTYPE html>\n' + document.documentElement.outerHTML);
-  fs.mkdirSync(REPORTS, { recursive: true });
-  const manifest = { generatedAt: new Date().toISOString(), architecture: 'Production React static export with progressive client createRoot', origin: SITE, networkPolicy: 'All non-local requests blocked', marketingRoutes: paths.length, privateApplicationRoutes: privatePaths(), errors, rows, files: [...snapshots].map(([pathname, html]) => ({ path: pathname, bytes: Buffer.byteLength(html), sha256: createHash('sha256').update(html).digest('hex') })) };
-  fs.writeFileSync(path.join(DIST, 'prerender-manifest.json'), JSON.stringify(manifest, null, 2));
-  fs.writeFileSync(path.join(REPORTS, 'prerender-manifest.json'), JSON.stringify(manifest, null, 2));
-  console.log(`PASS: exported ${paths.length} meaningful marketing pages, real404, and private app shell. No deployment performed.`);
-} finally { await browser.close(); await server.close(); }
+  return result;
+}
+
+function getMetadata(pathname, blogs, insights) {
+  if (PRIVATE_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+    return {
+      title: "DigiFormation Portal — Secure Client Area",
+      description: "Secure login, dashboard and company filing portal for DigiFormation clients.",
+      h1: "Client Portal",
+      noindex: true,
+    };
+  }
+  if (CORE[pathname]) {
+    const [title, description] = CORE[pathname];
+    return { title, description, h1: humanize(pathname), type: "WebPage" };
+  }
+  if (blogs.has(pathname)) return blogs.get(pathname);
+  if (insights.has(pathname)) return insights.get(pathname);
+  return {
+    title: `${humanize(pathname)} — DigiFormation`,
+    description: `DigiFormation support for ${humanize(pathname).toLowerCase()} and international business setup.`,
+    h1: humanize(pathname),
+    type: "WebPage",
+  };
+}
+
+function sitemapPaths() {
+  const xml = fs.readFileSync(SITEMAP, "utf8");
+  return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new URL(match[1]).pathname.replace(/\/$/, "") || "/");
+}
+
+function removeDynamicHead(html) {
+  return html
+    .replace(/\s*<title>[\s\S]*?<\/title>/i, "")
+    .replace(/\s*<meta\s+name=["']description["'][^>]*>/gi, "")
+    .replace(/\s*<meta\s+name=["']robots["'][^>]*>/gi, "")
+    .replace(/\s*<meta\s+name=["']googlebot["'][^>]*>/gi, "")
+    .replace(/\s*<link\s+rel=["']canonical["'][^>]*>/gi, "")
+    .replace(/\s*<link\s+rel=["']alternate["'][^>]*>/gi, "")
+    .replace(/\s*<meta\s+property=["']og:[^"']+["'][^>]*>/gi, "")
+    .replace(/\s*<meta\s+name=["']twitter:[^"']+["'][^>]*>/gi, "")
+    .replace(/\s*<script\b[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, "");
+}
+
+function buildHtml(template, pathname, metadata) {
+  const canonical = `${SITE}${pathname === "/" ? "/" : pathname}`;
+  const robots = metadata.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large";
+  const entityGraph = fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1];
+  const schema = [
+    {
+      "@context": "https://schema.org",
+      "@type": metadata.type || "WebPage",
+      name: metadata.title,
+      description: metadata.description,
+      url: canonical,
+      isPartOf: { "@type": "WebSite", name: "DigiFormation", url: SITE },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: pathname === "/" ? [] : pathname.split("/").filter(Boolean).map((part, index, parts) => ({
+        "@type": "ListItem", position: index + 1, name: humanize(part), item: `${SITE}/${parts.slice(0, index + 1).join("/")}`,
+      })),
+    },
+  ];
+  if (metadata.type === "BlogPosting") schema[0].headline = metadata.h1;
+  const head = [
+    `<title>${escapeHtml(metadata.title)}</title>`,
+    `<meta name="description" content="${escapeHtml(metadata.description)}">`,
+    `<meta name="robots" content="${robots}">`,
+    `<meta name="googlebot" content="${robots}">`,
+    `<link rel="canonical" href="${escapeHtml(canonical)}">`,
+    `<link rel="alternate" hreflang="en" href="${escapeHtml(canonical)}">`,
+    `<link rel="alternate" hreflang="x-default" href="${escapeHtml(canonical)}">`,
+    `<meta property="og:title" content="${escapeHtml(metadata.title)}">`,
+    `<meta property="og:description" content="${escapeHtml(metadata.description)}">`,
+    `<meta property="og:type" content="${metadata.type === "BlogPosting" ? "article" : "website"}">`,
+    `<meta property="og:url" content="${escapeHtml(canonical)}">`,
+    `<meta property="og:site_name" content="DigiFormation">`,
+    `<meta property="og:image" content="${SITE}/favicon-512.png">`,
+    `<meta property="og:image:alt" content="DigiFormation company logo">`,
+    `<meta name="twitter:card" content="summary_large_image">`,
+    `<meta name="twitter:title" content="${escapeHtml(metadata.title)}">`,
+    `<meta name="twitter:description" content="${escapeHtml(metadata.description)}">`,
+    `<meta name="twitter:image" content="${SITE}/favicon-512.png">`,
+    ...(entityGraph ? [`<script id="ldjson-global" type="application/ld+json">${entityGraph}</script>`] : []),
+    `<script id="ldjson-page" type="application/ld+json">${json(schema[0])}</script>`,
+    `<script id="ldjson-breadcrumbs" type="application/ld+json">${json(schema[1])}</script>`,
+  ].join("\n    ");
+  const staticBody = `<main data-seo-prerender="true"><h1>${escapeHtml(metadata.h1)}</h1><p>${escapeHtml(metadata.description)}</p></main>`;
+  return removeDynamicHead(template)
+    .replace("</head>", `    ${head}\n  </head>`)
+    .replace(/<div id="root"[^>]*>[\s\S]*?<\/div>/i, `<div id="root">${staticBody}</div>`);
+}
+
+function writeRoute(pathname, html) {
+  if (pathname === "/") {
+    fs.writeFileSync(path.join(DIST, "index.html"), html);
+    return;
+  }
+  const output = path.join(DIST, pathname.replace(/^\//, ""), "index.html");
+  fs.mkdirSync(path.dirname(output), { recursive: true });
+  fs.writeFileSync(output, html);
+}
+
+function main() {
+  if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("dist/index.html missing; run vite build first");
+  const template = fs.readFileSync(path.join(DIST, "index.html"), "utf8");
+  const blogs = parseBlogMetadata();
+  const insights = parseInsightMetadata();
+  const paths = [...new Set([...sitemapPaths(), ...PRIVATE_PREFIXES])];
+  for (const pathname of paths) writeRoute(pathname, buildHtml(template, pathname, getMetadata(pathname, blogs, insights)));
+  console.log(`✓ prerendered ${paths.length} route shells (${blogs.size} blog metadata records, ${insights.size} insight records)`);
+}
+
+main();
