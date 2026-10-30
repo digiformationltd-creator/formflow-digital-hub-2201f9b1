@@ -120,9 +120,9 @@ const DigiNav = () => {
           </Link>
 
           {/* Desktop links */}
-          <div className="hidden lg:flex items-center gap-3 xl:gap-6">
-            <NavLink to="/" className="text-sm hover:opacity-80 transition">Home</NavLink>
-            <NavLink to="/id-verification" className="text-sm hover:opacity-80 transition font-semibold text-primary whitespace-nowrap">ID Verification</NavLink>
+          <div className="hidden lg:flex items-center gap-2 xl:gap-5 text-xs xl:text-sm">
+            <NavLink to="/" className={({ isActive }) => `transition ${isActive ? "text-primary font-bold" : "hover:opacity-80"}`}>Home</NavLink>
+            <NavLink to="/id-verification" className={({ isActive }) => `transition font-semibold whitespace-nowrap ${isActive ? "text-primary underline underline-offset-4" : "text-primary hover:text-primary/80"}`}>ID Verification</NavLink>
             
             {navGroups.map((g) => (
               <div key={g.label} className="relative group">

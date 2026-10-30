@@ -61,16 +61,23 @@ function humanize(pathname) {
 }
 
 function parseBlogMetadata() {
-  const source = fs.readFileSync(path.join(ROOT, "src", "data", "blog.ts"), "utf8");
+  const blogFiles = [
+    path.join(ROOT, "src", "data", "blog.ts"),
+    path.join(ROOT, "src", "data", "cornerstoneArticles.ts"),
+  ];
   const result = new Map();
-  const regex = /slug:\s*["']([^"']+)["'][\s\S]*?title:\s*["']([^"']+)["'][\s\S]*?excerpt:\s*["']([^"']*)["'][\s\S]*?metaTitle:\s*["']([^"']+)["'][\s\S]*?metaDescription:\s*["']([^"']*)["']/g;
-  for (const match of source.matchAll(regex)) {
-    result.set(`/blog/${match[1]}`, {
-      title: match[4] || match[2],
-      description: match[5] || match[3],
-      h1: match[2],
-      type: "BlogPosting",
-    });
+  for (const f of blogFiles) {
+    if (!fs.existsSync(f)) continue;
+    const source = fs.readFileSync(f, "utf8");
+    const regex = /slug:\s*["']([^"']+)["'][\s\S]*?title:\s*["']([^"']+)["'][\s\S]*?excerpt:\s*["']([^"']*)["'][\s\S]*?metaTitle:\s*["']([^"']+)["'][\s\S]*?metaDescription:\s*["']([^"']*)["']/g;
+    for (const match of source.matchAll(regex)) {
+      result.set(`/blog/${match[1]}`, {
+        title: match[4] || match[2],
+        description: match[5] || match[3],
+        h1: match[2],
+        type: "BlogPosting",
+      });
+    }
   }
   return result;
 }

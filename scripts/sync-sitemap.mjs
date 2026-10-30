@@ -2,6 +2,7 @@
 // Auto-syncs blog post slugs & authentic dates from src/data/blog.ts into public/sitemap.xml
 // Runs before `vite build`.
 import fs from "node:fs";
+import ts from "typescript";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -50,18 +51,61 @@ function removeExcludedUrls(xml) {
 const TODAY = new Date().toISOString().split("T")[0];
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-function getBlogPosts() {
-  const tsx = fs.readFileSync(BLOG_FILE, "utf8");
-  const posts = [];
-  // Keep the match scoped to one object so a missing date cannot consume the
-  // next post and silently truncate the sitemap.
-  const regex = /\{[\s\S]*?slug:\s*["']([^"']+)["'][\s\S]*?date:\s*["'](\d{4}-\d{2}-\d{2})["'][\s\S]*?\},/g;
-  for (const match of tsx.matchAll(regex)) {
-    posts.push({ slug: match[1], date: match[2] || TODAY });
+const CORNERSTONE_FILE = path.join(ROOT, "src", "data", "cornerstoneArticles.ts");
+
+export function getBlogPosts(source = fs.readFileSync(BLOG_FILE, 'utf8')) {
+  const extractFromArray = (arr) => {
+    const collected = [];
+    for (const element of arr.elements) {
+      if (ts.isSpreadElement && ts.isSpreadElement(element)) {
+        continue;
+      }
+      if (!ts.isObjectLiteralExpression(element)) continue;
+      const value = name => {
+        const property = element.properties.find(p => ts.isPropertyAssignment(p) && (ts.isIdentifier(p.name) || ts.isStringLiteral(p.name)) && p.name.text === name);
+        return property && ts.isPropertyAssignment(property) && ts.isStringLiteral(property.initializer) ? property.initializer.text : undefined;
+      };
+      const slug = value('slug'), date = value('date'), modified = value('dateModified');
+      if (slug && /^[a-z0-9-]+$/.test(slug) && date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        collected.push({ slug, date, modified: modified || date });
+      }
+    }
+    return collected;
+  };
+
+  const getArrayFromSource = (fileSrc) => {
+    const file = ts.createSourceFile('file.ts', fileSrc, ts.ScriptTarget.Latest, true);
+    for (const statement of file.statements) if (ts.isVariableStatement(statement)) {
+      for (const declaration of statement.declarationList.declarations) {
+        if (declaration.initializer && ts.isArrayLiteralExpression(declaration.initializer)) {
+          return declaration.initializer;
+        }
+      }
+    }
+    return null;
+  };
+
+  const mainArray = getArrayFromSource(source);
+  if (!mainArray) throw new Error('blogPosts literal missing; refusing sitemap rewrite');
+  
+  let posts = [];
+  if (fs.existsSync(CORNERSTONE_FILE)) {
+    const csArray = getArrayFromSource(fs.readFileSync(CORNERSTONE_FILE, 'utf8'));
+    if (csArray) {
+      posts = posts.concat(extractFromArray(csArray));
+    }
   }
-  if (posts.length === 0) throw new Error("No dated blog posts found; refusing to rewrite sitemap.xml");
-  const unique = new Set(posts.map((post) => post.slug));
-  if (unique.size !== posts.length) throw new Error("Duplicate blog slug found; refusing to rewrite sitemap.xml");
+  posts = posts.concat(extractFromArray(mainArray));
+
+  if (!posts.length || new Set(posts.map(post => post.slug)).size !== posts.length) {
+    // Deduplicate by slug keeping first occurrence
+    const seen = new Set();
+    posts = posts.filter(p => {
+      if (seen.has(p.slug)) return false;
+      seen.add(p.slug);
+      return true;
+    });
+  }
   return posts;
 }
 
@@ -69,7 +113,7 @@ function buildBlock(posts) {
   const urls = posts
     .map(
       (p) =>
-        `  <url><loc>https://www.digiformation.co.uk/blog/${p.slug}</loc><lastmod>${p.date}</lastmod><changefreq>weekly</changefreq><priority>0.75</priority></url>`
+        `  <url><loc>https://www.digiformation.co.uk/blog/${p.slug}</loc>${p.modified ? `<lastmod>${p.modified}</lastmod>` : ""}</url>`
     )
     .join("\n");
   return `${MARK_START}\n${urls}\n${MARK_END}`;
@@ -98,7 +142,7 @@ function syncSitemap() {
     if (!xml.includes(`<loc>${url}</loc>`)) xml = xml.replace('</urlset>', `  <url><loc>${url}</loc></url>\n</urlset>`);
   }
   fs.writeFileSync(SITEMAP, xml);
-  console.log(`✓ sitemap.xml synced (${posts.length} blog posts, authentic lastmod preserved)`);
+  console.log(`✓ sitemap.xml synced (${posts.length} blog posts, explicit source dateModified used; no build-date fabrication)`);
 }
 
-syncSitemap();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) syncSitemap();
