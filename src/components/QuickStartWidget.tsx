@@ -21,6 +21,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { US_LLC_STATE_PRICING } from "@/data/usLlcPricing";
 
 type StateRow = {
   state_code: string;
@@ -48,18 +49,34 @@ const formatUSD = (n: number) =>
 const QuickStartWidget = () => {
   const navigate = useNavigate();
   const [tab, setTab] = useState<"usa" | "uk">("uk");
-  const [states, setStates] = useState<StateRow[]>([]);
+  const [states, setStates] = useState<StateRow[]>(
+    US_LLC_STATE_PRICING.map((s) => ({
+      state_code: s.state_code,
+      state_name: s.state_name,
+      starter_price_usd: s.starter_price_usd,
+      is_popular: s.is_popular,
+    }))
+  );
   const [usState, setUsState] = useState<string | undefined>(undefined);
   const [ukJur, setUkJur] = useState<string | undefined>(undefined);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
-        .from("us_llc_state_pricing")
-        .select("state_code, state_name, starter_price_usd, is_popular")
-        .order("state_name", { ascending: true });
-      if (data) setStates(data as StateRow[]);
+      try {
+        const { data } = await supabase
+          .from("us_llc_state_pricing")
+          .select("state_code, state_name, starter_price_usd, is_popular")
+          .order("state_name", { ascending: true });
+        if (data && data.length > 0) {
+          const isFlatLegacy = data.every((r: any) => r.starter_price_usd === 175);
+          if (!isFlatLegacy) {
+            setStates(data as StateRow[]);
+          }
+        }
+      } catch {
+        // Fallback active
+      }
     })();
 
     // Auto-preselect last choices from localStorage

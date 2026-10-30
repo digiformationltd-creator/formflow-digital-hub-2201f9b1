@@ -1,14 +1,28 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Bot, Send, X, Sparkles } from "lucide-react";
-import ReactMarkdown from "react-markdown";
+// The markdown engine is needed only after the chat is opened. Keep the
+// launcher available without loading the parser on every marketing page.
+const ReactMarkdown = lazy(() => import('react-markdown'));
 import { Link, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { trackEvent } from "@/lib/analytics";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-// Pool of 50+ quick questions — rotates every hour (6 shown at a time)
+// Pool of 60+ quick questions — rotates every hour (6 shown at a time)
 const QUICK_QUESTIONS_POOL = [
+  // Top Strategic Business & Advisory Intent
+  "Tell Me Your Business (Advisor Quiz)",
+  "Best LLC State for My Business",
+  "UK LTD vs US LLC for Non-Residents",
+  "Montana LLC vs Wyoming vs New Mexico",
+  "US LLC Packages & Pricing (Starter, Silver, Gold)",
+  "Best Bank & Payment Gateway for Amazon / eBay",
+  "How can Pakistani / non-US founders get ITIN & EIN?",
+  "Can I open Mercury Bank remotely without US visit?",
+  "Zero-Tax rules for non-resident US LLCs",
+  "How to save $5,000/yr with DigiBizOS Open-Source?",
+
   // Banking & Payments
   "Best bank for eCommerce?",
   "Best account for eBay sellers?",
@@ -311,6 +325,7 @@ const AIAssistant = () => {
                     }`}
                   >
                     <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-a:text-primary prose-a:underline">
+                      <Suspense fallback={<span className="whitespace-pre-wrap">{chunk}</span>}>
                       <ReactMarkdown
                         components={{
                           a: ({ href, children }) => {
@@ -331,6 +346,7 @@ const AIAssistant = () => {
                       >
                         {chunk}
                       </ReactMarkdown>
+                      </Suspense>
                     </div>
                   </div>
                 </div>

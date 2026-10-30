@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSeo } from "@/lib/seo";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowRight, MapPin, CheckCircle2, Loader2 } from "lucide-react";
+import { ArrowRight, MapPin, CheckCircle2, Loader2, ShieldCheck, Clock, FileText } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,68 +13,34 @@ import {
 } from "@/components/ui/select";
 import heroImg from "@/assets/card-hero-us-llc.webp";
 import { supabase } from "@/integrations/supabase/client";
+import { US_LLC_STATE_PRICING, LLC_PACKAGE_DETAILS, UsLlcStatePricing } from "@/data/usLlcPricing";
 import ServiceFAQ from "@/components/seo/ServiceFAQ";
 import RelatedServices from "@/components/seo/RelatedServices";
 import RecommendedGuides from "@/components/seo/RecommendedGuides";
 
-type StatePricing = {
-  id: string;
-  state_code: string;
-  state_name: string;
-  starter_price_usd: number;
-  silver_price_usd: number;
-  gold_price_usd: number;
-  display_order: number;
-  is_popular: boolean;
+type StatePricing = UsLlcStatePricing & {
+  id?: string;
 };
 
 const PACKAGE_FEATURES = {
-  Starter: [
-    "U.S. LLC Registration",
-    "Shared Business Address",
-    "Articles of Organization",
-    "Employer Identification Number (EIN)",
-    "Digital Company Documents (PDF)",
-    "Certificate of Formation (Digital)",
-    "Client Portal Access (document uploads & status updates)",
-    "24/7 Support",
-  ],
-  Silver: [
-    "U.S. LLC Registration",
-    "Unique Business Address (with portal & mail support)",
-    "Articles of Organization",
-    "Employer Identification Number (EIN)",
-    "Digital Company Documents (PDF)",
-    "Certificate of Formation (Digital)",
-    "Client Portal Access (document uploads & status updates)",
-    "24/7 Support",
-  ],
-  Gold: [
-    "U.S. LLC Registration",
-    "Unique Business Address (with portal & mail support)",
-    "Articles of Organization",
-    "Employer Identification Number (EIN)",
-    "Individual Taxpayer Identification Number (ITIN) included",
-    "Digital Company Documents (PDF)",
-    "Certificate of Formation (Digital)",
-    "Client Portal Access (document uploads & status updates)",
-    "Priority 24/7 Support",
-  ],
+  Starter: LLC_PACKAGE_DETAILS.Starter.features,
+  Silver: LLC_PACKAGE_DETAILS.Silver.features,
+  Gold: LLC_PACKAGE_DETAILS.Gold.features,
 };
 
 const formatUSD = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
 
 const UsaLlcChooseState = () => {
-  const [states, setStates] = useState<StatePricing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [states, setStates] = useState<StatePricing[]>(US_LLC_STATE_PRICING as StatePricing[]);
+  const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
 
   useSeo({
     title: "Choose Your State — U.S. LLC Formation | Digiformation",
-    description: "Select the U.S. state for your LLC. Compare Wyoming, Delaware, Florida and Texas pricing for Starter, Silver, and Gold packages — non-resident friendly.",
-    keywords: "US LLC state, LLC formation pricing, Wyoming LLC, Delaware LLC, Florida LLC, Texas LLC, non resident LLC formation",
+    description: "Select the U.S. state for your LLC. Compare Wyoming, Delaware, Florida, New Mexico and Montana pricing for Starter, Silver, and Gold packages — non-resident friendly.",
+    keywords: "US LLC state, LLC formation pricing, Wyoming LLC, Delaware LLC, Florida LLC, Texas LLC, Montana LLC, non resident LLC formation",
     type: "website",
     breadcrumbs: [
       { name: "Home", path: "/" },
@@ -86,12 +52,29 @@ const UsaLlcChooseState = () => {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase
-        .from("us_llc_state_pricing")
-        .select("*")
-        .order("display_order", { ascending: true });
-      if (!error && data) setStates(data as StatePricing[]);
-      setLoading(false);
+      try {
+        const { data, error } = await supabase
+          .from("us_llc_state_pricing")
+          .select("*")
+          .order("display_order", { ascending: true });
+        if (!error && data && data.length > 0) {
+          // Verify that it is not the legacy flat 175 table before overwriting verified benchmark
+          const isFlatLegacy = data.every((r: any) => r.starter_price_usd === 175);
+          if (!isFlatLegacy) {
+            setStates((prev) =>
+              data.map((row: any) => {
+                const localMatch = prev.find((p) => p.state_code === row.state_code);
+                return {
+                  ...localMatch,
+                  ...row,
+                };
+              })
+            );
+          }
+        }
+      } catch {
+        // Fallback to local verified US_LLC_STATE_PRICING
+      }
     })();
   }, []);
 
@@ -228,7 +211,34 @@ const UsaLlcChooseState = () => {
               <h2 className="text-4xl md:text-5xl font-bold">
                 Choose your <em className="not-italic text-gradient">package</em>
               </h2>
-              <p className="opacity-80 mt-3">Pricing tailored for {selected.state_name}. All amounts in USD.</p>
+              <p className="opacity-80 mt-3 max-w-2xl mx-auto">
+                Pricing tailored for {selected.state_name}. All state filing fees included. No surprise hidden charges.
+              </p>
+
+              {/* State Transparency Intelligence Bar */}
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs">
+                {selected.privacy_level && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/80 border border-border/60">
+                    <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                    <strong>Privacy:</strong> {selected.privacy_level}
+                  </span>
+                )}
+                {selected.turnaround_days && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/80 border border-border/60">
+                    <Clock className="w-3.5 h-3.5 text-primary" />
+                    <strong>Turnaround:</strong> {selected.turnaround_days}
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/80 border border-border/60">
+                  <FileText className="w-3.5 h-3.5 text-primary" />
+                  <strong>Annual State Report:</strong> {selected.annual_fee_usd !== undefined ? formatUSD(selected.annual_fee_usd) + "/yr" : "State standard"}
+                </span>
+                {selected.best_for && (
+                  <div className="w-full text-center mt-2 opacity-80 text-xs italic">
+                    Recommended for: {selected.best_for}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">

@@ -6,6 +6,7 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import CheckoutFlow, { CheckoutItem } from "@/components/checkout/CheckoutFlow";
+import { getUsLlcPricingByCode, UsLlcStatePricing } from "@/data/usLlcPricing";
 
 type StatePricing = {
   state_code: string;
@@ -30,8 +31,9 @@ const UsaLlcCheckout = () => {
   const pkgParam = params.get("package") as PackageName | null;
   const packageName: PackageName = PACKAGES.includes(pkgParam as PackageName) ? (pkgParam as PackageName) : "Silver";
 
-  const [pricing, setPricing] = useState<StatePricing | null>(null);
-  const [loading, setLoading] = useState(true);
+  const localDefault = stateCode ? getUsLlcPricingByCode(stateCode) : null;
+  const [pricing, setPricing] = useState<StatePricing | null>(localDefault ?? null);
+  const [loading, setLoading] = useState(!localDefault);
 
   useSeo({
     title: "Checkout — U.S. LLC Formation | Digiformation Ltd",
@@ -45,13 +47,20 @@ const UsaLlcCheckout = () => {
       return;
     }
     (async () => {
-      const { data } = await supabase
-        .from("us_llc_state_pricing")
-        .select("state_code,state_name,starter_price_usd,silver_price_usd,gold_price_usd")
-        .eq("state_code", stateCode)
-        .maybeSingle();
-      if (data) setPricing(data as StatePricing);
-      setLoading(false);
+      try {
+        const { data } = await supabase
+          .from("us_llc_state_pricing")
+          .select("state_code,state_name,starter_price_usd,silver_price_usd,gold_price_usd")
+          .eq("state_code", stateCode)
+          .maybeSingle();
+        if (data && data.starter_price_usd !== 175) {
+          setPricing(data as StatePricing);
+        }
+      } catch {
+        // Fallback already active
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [stateCode]);
 
