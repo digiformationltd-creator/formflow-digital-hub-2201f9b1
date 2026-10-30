@@ -1,13 +1,23 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
-import { Bot, Send, X, Sparkles } from "lucide-react";
+import { Bot, Send, X, Sparkles, ArrowRight } from "lucide-react";
 // The markdown engine is needed only after the chat is opened. Keep the
 // launcher available without loading the parser on every marketing page.
 const ReactMarkdown = lazy(() => import('react-markdown'));
 import { Link, useLocation } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { trackEvent } from "@/lib/analytics";
+import {
+  extractBusinessProfile,
+  generateBusinessFollowUps,
+  type BusinessProfile,
+  type BusinessFollowUpSuggestion,
+} from "@/lib/ai/recommendationEngine";
 
-type Msg = { role: "user" | "assistant"; content: string };
+export type Msg = {
+  role: "user" | "assistant";
+  content: string;
+  suggestions?: BusinessFollowUpSuggestion[];
+};
 
 // Pool of 60+ quick questions — rotates every hour (6 shown at a time)
 const QUICK_QUESTIONS_POOL = [
@@ -104,7 +114,24 @@ function getHourlyQuickQuestions(count = 6): string[] {
 
 const WELCOME: Msg = {
   role: "assistant",
-  content: "Hi! 👋 What would you like to start today?",
+  content: "Hi! 👋 Welcome to DigiFormation. I am your International Business Consultant.\n\nWhether you need to register a **UK LTD**, form a **US LLC**, open a **business bank account**, or set up **Stripe & PayPal**, I am here to guide your global business setup step-by-step.\n\nWhat type of business are you planning to start or expand?",
+  suggestions: [
+    {
+      label: "Compare UK LTD vs US LLC for my business",
+      prompt: "I am deciding between a UK LTD and a US LLC. Which is better for my business model and country of residence?",
+      category: "company_formation",
+    },
+    {
+      label: "Best US LLC states & formation costs",
+      prompt: "Which US LLC states (Wyoming, Delaware, New Mexico, or Montana) offer the best tax advantages and lowest fees?",
+      category: "company_formation",
+    },
+    {
+      label: "Non-resident business bank accounts",
+      prompt: "What virtual business bank accounts (like Mercury, Relay, Wise, or Payoneer) can non-residents open remotely?",
+      category: "banking",
+    },
+  ],
 };
 
 const AIAssistant = () => {
@@ -112,6 +139,8 @@ const AIAssistant = () => {
   const [messages, setMessages] = useState<Msg[]>([WELCOME]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [businessProfile, setBusinessProfile] = useState<BusinessProfile>({});
+  const previousSuggestionsRef = useRef<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const nudgedCountRef = useRef<number>(0);
   const nudgeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -172,10 +201,13 @@ const AIAssistant = () => {
   const send = async (text: string, opts: { hidden?: boolean } = {}) => {
     const { hidden = false } = opts;
     const userMsg: Msg = { role: "user", content: text };
+    let updatedProfile = businessProfile;
     if (!hidden) {
       setMessages((p) => [...p, userMsg]);
       setInput("");
       trackEvent("ai_assistant_message", { message_length: text.length });
+      updatedProfile = extractBusinessProfile([...messages, userMsg], businessProfile);
+      setBusinessProfile(updatedProfile);
     }
     setLoading(true);
 
@@ -241,11 +273,43 @@ const AIAssistant = () => {
           }
         }
       }
+
+      // Proactive recommendation engine: generate contextual follow-ups once assistant finishes replying
+      if (acc.trim() && !hidden) {
+        const followUps = generateBusinessFollowUps({
+          currentMessage: text,
+          aiResponse: acc,
+          history: [...history, { role: "assistant", content: acc }],
+          profile: updatedProfile,
+          previousSuggestions: previousSuggestionsRef.current,
+        });
+        previousSuggestionsRef.current = [
+          ...previousSuggestionsRef.current,
+          ...followUps.map((f) => f.label),
+        ];
+        setMessages((prev) =>
+          prev.map((m, i) =>
+            i === prev.length - 1 ? { ...m, content: acc, suggestions: followUps } : m
+          )
+        );
+      }
     } catch (e) {
       setMessages((p) => [...p, { role: "assistant", content: "⚠️ Network error. Please try again." }]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSuggestionClick = (suggestion: BusinessFollowUpSuggestion) => {
+    if (loading) return;
+    trackEvent("ai_suggestion_clicked", {
+      label: suggestion.label,
+      category: suggestion.category,
+      prompt: suggestion.prompt,
+      business_type: businessProfile.business_type || "unknown",
+      residence_country: businessProfile.residence_country || "unknown",
+    });
+    send(suggestion.prompt);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -348,6 +412,32 @@ const AIAssistant = () => {
                       </ReactMarkdown>
                       </Suspense>
                     </div>
+
+                    {/* Recommended Next Steps Suggestions */}
+                    {m.role === "assistant" && m.suggestions && m.suggestions.length > 0 && !(i === messages.length - 1 && loading) && (
+                      <div className="mt-3 pt-2.5 border-t border-border/60">
+                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-primary uppercase tracking-wider mb-2">
+                          <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <span>Recommended Next Steps</span>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          {m.suggestions.map((s) => (
+                            <button
+                              key={s.label}
+                              type="button"
+                              onClick={() => handleSuggestionClick(s)}
+                              disabled={loading}
+                              className="w-full text-left text-xs bg-muted/60 hover:bg-primary/10 hover:border-primary/50 hover:text-primary transition-all border border-border/80 rounded-xl px-3 py-2 flex items-center justify-between group cursor-pointer disabled:opacity-50 active:scale-[0.99]"
+                            >
+                              <span className="font-medium text-foreground group-hover:text-primary transition-colors pr-2 leading-relaxed">
+                                {s.label}
+                              </span>
+                              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ));
