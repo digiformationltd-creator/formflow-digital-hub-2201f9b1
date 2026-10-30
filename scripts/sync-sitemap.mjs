@@ -2,7 +2,6 @@
 // Auto-syncs blog post slugs & authentic dates from src/data/blog.ts into public/sitemap.xml
 // Runs before `vite build`.
 import fs from "node:fs";
-import ts from "typescript";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -10,6 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const BLOG_FILE = path.join(ROOT, "src", "data", "blog.ts");
 const SITEMAP = path.join(ROOT, "public", "sitemap.xml");
+const CORNERSTONE_FILE = path.join(ROOT, "src", "data", "cornerstoneArticles.ts");
 const MARK_START = "  <!-- Blog Posts (auto-generated) -->";
 const MARK_END = "  <!-- /Blog Posts (auto-generated) -->";
 
@@ -51,62 +51,31 @@ function removeExcludedUrls(xml) {
 const TODAY = new Date().toISOString().split("T")[0];
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-const CORNERSTONE_FILE = path.join(ROOT, "src", "data", "cornerstoneArticles.ts");
-
-export function getBlogPosts(source = fs.readFileSync(BLOG_FILE, 'utf8')) {
-  const extractFromArray = (arr) => {
-    const collected = [];
-    for (const element of arr.elements) {
-      if (ts.isSpreadElement && ts.isSpreadElement(element)) {
-        continue;
-      }
-      if (!ts.isObjectLiteralExpression(element)) continue;
-      const value = name => {
-        const property = element.properties.find(p => ts.isPropertyAssignment(p) && (ts.isIdentifier(p.name) || ts.isStringLiteral(p.name)) && p.name.text === name);
-        return property && ts.isPropertyAssignment(property) && ts.isStringLiteral(property.initializer) ? property.initializer.text : undefined;
-      };
-      const slug = value('slug'), date = value('date'), modified = value('dateModified');
-      if (slug && /^[a-z0-9-]+$/.test(slug) && date && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        collected.push({ slug, date, modified: modified || date });
-      }
-    }
-    return collected;
-  };
-
-  const getArrayFromSource = (fileSrc) => {
-    const file = ts.createSourceFile('file.ts', fileSrc, ts.ScriptTarget.Latest, true);
-    for (const statement of file.statements) if (ts.isVariableStatement(statement)) {
-      for (const declaration of statement.declarationList.declarations) {
-        if (declaration.initializer && ts.isArrayLiteralExpression(declaration.initializer)) {
-          return declaration.initializer;
-        }
-      }
-    }
-    return null;
-  };
-
-  const mainArray = getArrayFromSource(source);
-  if (!mainArray) throw new Error('blogPosts literal missing; refusing sitemap rewrite');
-  
-  let posts = [];
-  if (fs.existsSync(CORNERSTONE_FILE)) {
-    const csArray = getArrayFromSource(fs.readFileSync(CORNERSTONE_FILE, 'utf8'));
-    if (csArray) {
-      posts = posts.concat(extractFromArray(csArray));
+export function getBlogPosts() {
+  const files = [BLOG_FILE, CORNERSTONE_FILE];
+  const posts = [];
+  for (const f of files) {
+    if (!fs.existsSync(f)) continue;
+    const txt = fs.readFileSync(f, 'utf8');
+    const slugRegex = /["']?slug["']?\s*:\s*["']([^"']+)["']/g;
+    let match;
+    while ((match = slugRegex.exec(txt)) !== null) {
+      const slug = match[1];
+      const snippet = txt.slice(match.index, match.index + 800);
+      const dateMatch = snippet.match(/["']?date["']?\s*:\s*["'](\d{4}-\d{2}-\d{2})["']/);
+      const modMatch = snippet.match(/["']?dateModified["']?\s*:\s*["'](\d{4}-\d{2}-\d{2})["']/);
+      const date = dateMatch ? dateMatch[1] : '2026-10-30';
+      const modified = modMatch ? modMatch[1] : date;
+      posts.push({ slug, date, modified });
     }
   }
-  posts = posts.concat(extractFromArray(mainArray));
 
-  if (!posts.length || new Set(posts.map(post => post.slug)).size !== posts.length) {
-    // Deduplicate by slug keeping first occurrence
-    const seen = new Set();
-    posts = posts.filter(p => {
-      if (seen.has(p.slug)) return false;
-      seen.add(p.slug);
-      return true;
-    });
-  }
-  return posts;
+  const seen = new Set();
+  return posts.filter(p => {
+    if (seen.has(p.slug)) return false;
+    seen.add(p.slug);
+    return true;
+  });
 }
 
 function buildBlock(posts) {
