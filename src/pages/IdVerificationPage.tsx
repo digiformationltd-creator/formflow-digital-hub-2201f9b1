@@ -129,8 +129,8 @@ const IdVerificationPage = () => {
 
   useSeo({
     title: "Companies House ID Verification UK 2026 | Director & PSC Check — £20",
-    description: "Official UK Companies House Identity Verification service under ECCTA 2023. Fast digital verification for UK & non-resident directors, PSCs, and officers for £20.",
-    keywords: "Companies House ID verification, UK LTD ID verification, director verification UK, PSC identity check, ECCTA 2023 identity verification, non resident director ID check, authorised corporate service provider ACSP, Companies House identity check online",
+    description: "Official UK Companies House Identity Verification service under ECCTA 2023. Fast digital verification for UK & non-resident directors, PSCs, and officers for £20. Get your Companies House personal code in 1 hour.",
+    keywords: "Companies House ID verification, UK LTD ID verification, director verification UK, PSC identity check, ECCTA 2023 identity verification, non resident director ID check, authorised corporate service provider ACSP, Companies House identity check online, Companies House personal code 1 hour",
     type: "website",
     path: "/id-verification",
     breadcrumbs: [
@@ -220,7 +220,7 @@ const IdVerificationPage = () => {
           <div className="max-w-4xl mx-auto text-center md:text-left">
             <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-semibold uppercase tracking-wider mb-6">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>ECCTA 2023 Mandate · Companies House Compliant</span>
+              <span>ECCTA 2023 Mandate · Get your Companies House personal code in 1 hour</span>
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] text-foreground">
@@ -230,7 +230,7 @@ const IdVerificationPage = () => {
             
             <p className="mt-6 text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl">
               Mandatory digital identity check for all UK and non-resident company directors, PSCs, and officers. 
-              Keep your company in full compliance with UK regulations in minutes.
+              Get your Companies House personal code in 1 hour and keep your company in full compliance.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
@@ -241,7 +241,7 @@ const IdVerificationPage = () => {
               </Button>
               <div className="flex items-center gap-2 text-sm text-muted-foreground px-2">
                 <Check className="w-4 h-4 text-primary shrink-0" />
-                <span>One-time fee · Non-UK residents accepted · 24h turnaround</span>
+                <span>Get your Companies House personal code in 1 hour · £20 Flat Fee</span>
               </div>
             </div>
 
@@ -256,8 +256,8 @@ const IdVerificationPage = () => {
                 <span className="text-xs text-muted-foreground mt-1">Flat One-Time Fee</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl md:text-3xl font-bold text-foreground">2-24h</span>
-                <span className="text-xs text-muted-foreground mt-1">Turnaround Time</span>
+                <span className="text-2xl md:text-3xl font-bold text-foreground">1 Hour</span>
+                <span className="text-xs text-muted-foreground mt-1">Personal Code Speed</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl md:text-3xl font-bold text-foreground">100%</span>
@@ -277,7 +277,7 @@ const IdVerificationPage = () => {
               <span>Official Verification Overview · Answer Engine Summary</span>
             </div>
             <p className="text-sm md:text-base leading-relaxed text-foreground">
-              <strong>What is Companies House ID Verification?</strong> Under the <em>Economic Crime and Corporate Transparency Act 2023 (ECCTA)</em>, every director and Person with Significant Control (PSC) of a UK Limited Company must verify their identity. DigiFormation enables both UK and non-UK residents to fulfill this requirement remotely for <strong>£20</strong> using biometric liveness matching, valid international passports, and address proof without requiring physical UK attendance.
+              <strong>What is Companies House ID Verification?</strong> Under the <em>Economic Crime and Corporate Transparency Act 2023 (ECCTA)</em>, every director and Person with Significant Control (PSC) of a UK Limited Company must verify their identity. DigiFormation enables both UK and non-UK residents to fulfill this requirement remotely for <strong>£20</strong> — get your Companies House personal code in 1 hour using biometric liveness matching, valid international passports, and address proof without physical UK attendance.
             </p>
           </div>
         </div>
@@ -430,7 +430,7 @@ const IdVerificationPage = () => {
               { num: "1", title: "Submit Order", text: "Choose the service and complete our secure £20 checkout." },
               { num: "2", title: "Upload Documents", text: "Securely upload your photo ID and recent residential proof of address." },
               { num: "3", title: "Biometric Selfie", text: "Complete our quick automated liveness verification on your phone or PC." },
-              { num: "4", title: "Get Verified", text: "Receive full verification clearance ready for official Companies House filings." },
+              { num: "4", title: "Personal Code in 1 Hour", text: "Get your Companies House personal code in 1 hour ready for official UK company filings and director compliance." },
             ].map((s) => (
               <div key={s.num} className="glass rounded-2xl p-6 border border-border/60 relative">
                 <div className="w-10 h-10 rounded-full bg-gradient-brand text-foreground font-bold flex items-center justify-center text-sm mb-4">
@@ -442,7 +442,11 @@ const IdVerificationPage = () => {
             ))}
           </div>
 
-          <div className="mt-12 text-center">
+          <div className="mt-12 text-center flex flex-col items-center gap-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs font-semibold">
+              <Clock className="w-3.5 h-3.5" />
+              <span>Get your Companies House personal code in 1 hour</span>
+            </div>
             <Button asChild variant="hero" size="lg" className="rounded-full shadow-lg shadow-primary/20 text-base py-6 px-8">
               <Link to="/uk-services/ltd-id-verification/checkout">
                 Begin Verification Now — £20 <ArrowRight className="w-5 h-5 ml-2" />
@@ -494,14 +498,16 @@ const IdVerificationPage = () => {
         <div className="container mx-auto px-4">
           <div className="glass glass-tint-cyan rounded-3xl p-8 sm:p-14 text-center max-w-4xl mx-auto border border-primary/30 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-primary/10 pointer-events-none" />
-            <span className="text-xs uppercase tracking-[0.2em] font-bold text-primary mb-3 block">
-              Fast · Secure · Guaranteed
-            </span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/15 border border-primary/30 text-primary text-xs font-bold uppercase tracking-wider mb-4">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Fast · Secure · Guaranteed — 1-Hour Turnaround</span>
+            </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground">
-              Verify your identity <span className="text-gradient">today</span>
+              Verify your identity today — <br className="hidden sm:inline" />
+              <span className="text-gradient">Get your Companies House personal code in 1 hour</span>
             </h2>
             <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Do not risk statutory penalties or blocked company filings. Secure your official Companies House identity check for just £20.
+              Do not risk statutory penalties or blocked company filings. Secure your official Companies House identity check for just £20 and get your personal code in 1 hour.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button asChild variant="hero" size="lg" className="rounded-full shadow-xl shadow-primary/25 text-base py-6 px-10">
@@ -511,7 +517,7 @@ const IdVerificationPage = () => {
               </Button>
             </div>
             <p className="mt-4 text-xs text-muted-foreground">
-              Accepted worldwide · 100% money-back guarantee if non-verifiable
+              Accepted worldwide · Get your Companies House personal code in 1 hour · 100% money-back guarantee
             </p>
           </div>
         </div>

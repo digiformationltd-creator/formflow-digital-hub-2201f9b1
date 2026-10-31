@@ -13,7 +13,7 @@ const LtdIdVerificationCheckout = () => {
     {
       id: "ltd-id-verification",
       name: "LTD ID Verification",
-      description: "Companies House identity verification for directors, PSCs, secretaries and shareholders.",
+      description: "Companies House identity verification for directors, PSCs, secretaries and shareholders. Get your Companies House personal code in 1 hour.",
       price: 20,
       fixed: true,
     },
@@ -28,7 +28,7 @@ const LtdIdVerificationCheckout = () => {
         items={items}
         defaultSelectedIds={["ltd-id-verification"]}
         lockSelection
-        contextLabel="Service: Companies House ID Verification"
+        contextLabel="Service: Companies House ID Verification · Get personal code in 1 hour"
         backHref="/uk-services/ltd-id-verification"
         backLabel="Back to ID Verification"
         eyebrow="UK · Compliance"

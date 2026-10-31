@@ -132,7 +132,7 @@ Behavior: When user asks anything, FIRST try to match the question to an FAQ bel
 16. How long to form a UK LTD? → 24 hours after submission (Companies House standard).
 17. Can foreigners open UK LTD? → Yes, 100% — no UK residency required.
 18. Do I need a UK address? → Yes, registered office. Included in Silver, or £40/yr separately.
-19. What is ID Verification (UK)? → New Companies House rule — every director must verify ID. We do it in 24h for £20.
+19. What is ID Verification (UK)? → New Companies House rule under ECCTA 2023 — every director & PSC must verify ID. We do it for £20. Get your Companies House personal code in 1 hour.
 20. What's in Silver £170 vs Starter £140? → Silver adds Registered Office, Auth Code, UTR assistance, ID Verification.
 21. UTR registration process? → Auto-issued by HMRC 2–3 weeks after incorporation. We assist if delayed.
 22. What is Auth Code? → 6-digit Companies House code to manage filings. We obtain it for you.

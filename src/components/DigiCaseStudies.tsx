@@ -22,8 +22,7 @@ const DigiCaseStudies = () => (
           </h2>
           <p className="mt-5 text-base md:text-lg opacity-80 max-w-xl">
             Companies House now requires every PSC, shareholder and director to
-            complete identity verification. We handle the entire process for
-            you — securely and in under 24 hours.
+            complete identity verification. Get your Companies House personal code in 1 hour — securely and handled end-to-end.
           </p>
 
           <ul className="mt-7 space-y-3 max-w-md">
@@ -33,7 +32,7 @@ const DigiCaseStudies = () => (
             </li>
             <li className="flex gap-3 text-sm md:text-base">
               <Clock className="w-5 h-5 mt-0.5 flex-shrink-0 text-primary" />
-              <span>Get verified in 24 hours</span>
+              <span>Get your Companies House personal code in 1 hour</span>
             </li>
             <li className="flex gap-3 text-sm md:text-base">
               <ShieldCheck className="w-5 h-5 mt-0.5 flex-shrink-0 text-primary" />
@@ -43,8 +42,8 @@ const DigiCaseStudies = () => (
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link
-              to="/uk-services/ltd-id-verification"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm uppercase tracking-[0.12em] hover:shadow-elegant hover:-translate-y-0.5 transition-all"
+              to="/id-verification"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm uppercase tracking-[0.12em] hover:shadow-elegant hover:-translate-y-0.5 transition-all shadow-glow"
             >
               Verify Now <ArrowRight className="w-4 h-4" />
             </Link>
@@ -52,6 +51,9 @@ const DigiCaseStudies = () => (
               <span className="opacity-60">Only</span>{" "}
               <span className="text-2xl font-bold text-gradient align-middle">£20</span>
             </div>
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/25">
+              ⚡ Personal code in 1 hour
+            </span>
           </div>
         </div>
 
@@ -89,8 +91,8 @@ const DigiCaseStudies = () => (
               </div>
 
               <div className="mt-7 pt-6 border-t border-border/60 flex items-center justify-between text-xs uppercase tracking-[0.14em] opacity-80">
-                <span>Turnaround</span>
-                <span className="font-semibold text-foreground">24 hours</span>
+                <span>Personal Code Speed</span>
+                <span className="font-semibold text-primary">In 1 hour</span>
               </div>
             </div>
           </div>

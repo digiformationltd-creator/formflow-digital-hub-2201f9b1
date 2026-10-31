@@ -25,7 +25,7 @@ const PRIVATE_PREFIXES = [
 
 const CORE = {
   "/": ["DigiFormation — Worldwide Company Formation & Business Setup", "Form a UK Ltd or US LLC remotely with company formation, compliance, banking guidance and websites for international founders."],
-  "/id-verification": ["UK Companies House ID Verification 2026 | Director & PSC Check — £20", "Official UK Companies House Identity Verification service under ECCTA 2023. Fast digital verification for UK & non-resident directors, PSCs, and officers for £20."],
+  "/id-verification": ["UK Companies House ID Verification 2026 | Director & PSC Check — £20", "Official UK Companies House Identity Verification service under ECCTA 2023. Fast digital verification for UK & non-resident directors, PSCs, and officers for £20. Get your Companies House personal code in 1 hour."],
   "/about": ["About DigiFormation — Worldwide Business Setup Specialists", "Meet DigiFormation: practical company formation, compliance and digital business support for founders worldwide."],
   "/contact": ["Contact DigiFormation — Talk to a Business Setup Specialist", "Contact DigiFormation for UK company formation, U.S. setup, compliance, banking guidance and website support."],
   "/packages": ["Company Formation Packages — DigiFormation", "Compare DigiFormation packages for UK LTD formation, U.S. LLC setup, compliance, banking guidance and digital services."],

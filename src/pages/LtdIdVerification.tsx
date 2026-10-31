@@ -14,7 +14,7 @@ const requiredFor = [
 
 const covers = [
   { icon: Lock, label: "Secure digital identity verification" },
-  { icon: FileCheck, label: "Fast document review" },
+  { icon: FileCheck, label: "Get your Companies House personal code in 1 hour" },
   { icon: Globe2, label: "For UK & non-UK officers" },
   { icon: ShieldCheck, label: "Accepted for Companies House" },
   { icon: UserCheck, label: "Compliance-ready processing" },
@@ -71,13 +71,13 @@ const LtdIdVerification = () => {
               LTD <em className="not-italic text-gradient">ID Verification</em>
             </h1>
             <p className="mt-8 text-lg md:text-xl leading-relaxed max-w-2xl opacity-90">
-              Ready to verify your identity and keep your UK LTD compliant? Begin your secure Companies House identity check in minutes.
+              Ready to verify your identity and keep your UK LTD compliant? Get your Companies House personal code in 1 hour with our secure digital identity check.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
               <Button asChild variant="hero" size="lg" className="rounded-full">
                 <Link to="/uk-services/ltd-id-verification/checkout">Get Started — £20 <ArrowRight className="w-4 h-4" /></Link>
               </Button>
-              <span className="text-sm opacity-80">One-time fee · Worldwide officers accepted</span>
+              <span className="text-sm opacity-80 font-medium">⚡ Get your Companies House personal code in 1 hour · £20 Flat</span>
             </div>
           </div>
         </div>
@@ -169,7 +169,7 @@ const LtdIdVerification = () => {
             <h3 className="text-3xl md:text-4xl font-bold">
               Verify your identity <em className="not-italic text-gradient">today</em>
             </h3>
-            <p className="mt-4 opacity-90">Stay compliant with UK regulations — secure, fast, and accepted by Companies House.</p>
+            <p className="mt-4 opacity-90">Stay compliant with UK regulations — get your Companies House personal code in 1 hour. Secure, fast, and accepted by Companies House.</p>
             <Button asChild variant="hero" size="lg" className="rounded-full mt-8">
               <Link to="/uk-services/ltd-id-verification/checkout">Start Verification — £20 <ArrowRight className="w-4 h-4" /></Link>
             </Button>

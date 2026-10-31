@@ -423,7 +423,7 @@ const UKLtdFormation = () => {
         items={[
           { name: "Registered Office Address", path: "/uk-services/registered-office-address", description: "Official UK address for Companies House correspondence and director records.", icon: "registered-office" },
           { name: "UTR Number Registration", path: "/uk-services/utr-codes", description: "Get your HMRC Unique Taxpayer Reference for Corporation Tax filings.", icon: "utr" },
-          { name: "LTD ID Verification", path: "/uk-services/ltd-id-verification", description: "Mandatory Companies House identity verification for directors and PSCs.", icon: "id-verify" },
+          { name: "LTD ID Verification", path: "/id-verification", description: "Mandatory Companies House identity verification for directors and PSCs. Get your Companies House personal code in 1 hour.", icon: "id-verify" },
           { name: "Business Bank Account", path: "/banks-payment-solutions", description: "Open Tide, Wise or Airwallex accounts paired with your new UK LTD.", icon: "banking" },
           { name: "Stripe & PayPal Setup", path: "/banks-payment-solutions", description: "Connect global payment gateways to your UK company in days.", icon: "payments" },
           { name: "Change of Company Details", path: "/uk-compliance/company-name-change", description: "Update name, address, or directors at Companies House.", icon: "change-service" },
