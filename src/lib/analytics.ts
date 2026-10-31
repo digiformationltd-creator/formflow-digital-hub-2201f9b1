@@ -105,11 +105,13 @@ export const trackBeginCheckout = (params: {
  */
 export const trackPurchase = (params: {
   orderRef: string;
+  invoiceNumber?: string | null;
   serviceTitle: string;
   packageName?: string;
   amount: number;
   currency: string;
 }) => {
+  if (!params.invoiceNumber?.trim() || !params.orderRef.trim() || !Number.isFinite(params.amount) || params.amount < 0) return false;
   // A successful invoice/order may be returned again after a refresh or retry.
   // Keep GA4 transaction IDs idempotent per browser session.
   if (typeof window !== "undefined") {

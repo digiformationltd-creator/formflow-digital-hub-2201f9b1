@@ -170,7 +170,7 @@ const UkLtdChooseJurisdiction = () => {
               <em className="not-italic text-gradient">Choose your jurisdiction</em> to register your UK LTD
             </h1>
             <p className="mt-6 text-lg md:text-xl leading-relaxed max-w-2xl opacity-90">
-              The UK has three Companies House jurisdictions. Pick the one where your registered office will be — your package and pricing stay the same.
+              The UK has three Companies House jurisdictions. Pick the one where your registered office will be — your package and pricing stay the same. Selecting an option here does not submit a company application or place an order. You can review the next step and contact us if you are unsure which registered-office arrangement suits your company.
             </p>
           </div>
         </div>

@@ -32,8 +32,8 @@ const SectionHub = ({ title, eyebrow, description, items, seo }: HubProps) => {
       "@type": "CollectionPage",
       name: seo.title,
       description: seo.description,
-      url: typeof window !== "undefined" ? window.location.origin + seo.path : seo.path,
-      hasPart: items.map((i) => ({ "@type": "Service", name: i.name, url: (typeof window !== "undefined" ? window.location.origin : "") + i.path })),
+      url: typeof window !== "undefined" ? "https://www.digiformation.co.uk" + seo.path : seo.path,
+      hasPart: items.map((i) => ({ "@type": "Service", name: i.name, url: "https://www.digiformation.co.uk" + i.path })),
     },
   });
 
@@ -108,7 +108,7 @@ export const USAServicesHub = () => (
   <SectionHub
     title="USA Business Services"
     eyebrow="USA Services"
-    description="Form your US LLC remotely, get your EIN and ITIN, and stay tax-compliant from anywhere in the world."
+    description="Compare US LLC formation, EIN assistance and ongoing filing support for international founders. Choose a service below to review its requirements and scope before ordering. An ITIN requires a qualifying federal tax purpose; it is not automatically needed by every LLC owner. US-created entities are currently exempt from FinCEN BOI reporting, while certain foreign entities may still have obligations. Company registration does not guarantee banking access or determine your personal tax position."
     items={usaServices}
     seo={{
       title: "USA Business Services 2026 — LLC Formation, EIN, ITIN & BOI | Digiformation",

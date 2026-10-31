@@ -5,10 +5,11 @@ const links = [...new Set(evidence.links.filter(x => /^https?:/.test(x.href)).ma
   const url = new URL(x.href); if (url.hostname === 'wa.me') url.search = ''; return url.href;
 }))];
 const rows = [];
-for (let i = 0; i < links.length; i += 6) {
-  await Promise.all(links.slice(i, i + 6).map(async url => {
+for (let i = 0; i < links.length; i += 3) {
+  await Promise.all(links.slice(i, i + 3).map(async url => {
     try {
-      const response = await fetch(url, { signal: AbortSignal.timeout(10000), headers: { 'User-Agent': 'Mozilla/5.0 DigiFormationLinkAudit/1.0' } });
+      let response = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(20000) });
+      if (response.status === 405) response = await fetch(url, { signal: AbortSignal.timeout(20000) });
       const status = response.status;
       const classification = status === 403 || status === 401 ? 'BLOCKED-BY-REMOTE' : status === 429 ? 'RATE-LIMITED' : status === 404 || status === 410 ? 'DEAD' : status >= 500 ? 'MANUAL-VERIFY' : response.redirected ? 'REDIRECTED' : status < 400 ? 'ACTIVE' : 'MANUAL-VERIFY';
       rows.push({ url, final_url: response.url, status, classification });

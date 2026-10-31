@@ -8,6 +8,9 @@
 // Logs to command_actions + agent_audit_log + automation_runs.
 
 import { createClient } from 'npm:@supabase/supabase-js@2.45.0'
+import { isRecord, readBoundedJson } from '../_shared/request-security.ts'
+type AdminClient = ReturnType<typeof createClient>
+type ExecutableAction = { intent: string; payload: Record<string, unknown> }
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -38,11 +41,11 @@ async function getAdminUser(req: Request) {
   const admin = createClient(SUPABASE_URL, SERVICE_KEY)
   const { data: roles } = await admin
     .from('user_roles').select('role').eq('user_id', user.id)
-  const isAdmin = (roles ?? []).some((r: any) => r.role === 'admin')
+  const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === 'admin')
   return isAdmin ? user : null
 }
 
-async function recordRun(admin: any, jobName: string, fn: () => Promise<any>) {
+async function recordRun<T>(admin: AdminClient, jobName: string, fn: () => Promise<T>) {
   const started = Date.now()
   const { data: run } = await admin.from('automation_runs').insert({
     job_name: jobName, kind: 'command', status: 'running',
@@ -106,7 +109,7 @@ const SYSTEM_OWNED_INTENTS = new Set<string>([
 
 
 // Deterministic dispatcher. Reuses existing tables, RPCs and Edge Functions.
-async function executeIntent(admin: any, action: any, user: any) {
+async function executeIntent(admin: AdminClient, action: ExecutableAction, user: { id: string }) {
   const { intent, payload } = action
   if (SYSTEM_OWNED_INTENTS.has(intent)) {
     throw new Error(
@@ -165,7 +168,7 @@ async function executeIntent(admin: any, action: any, user: any) {
     // ---------- Companies ----------
     case 'update_company_field':
     case 'update_company': {
-      if (!ALLOWED_COMPANY_FIELDS.has(payload.field)) {
+      if (typeof payload.field !== 'string' || !ALLOWED_COMPANY_FIELDS.has(payload.field)) {
         throw new Error(`Field "${payload.field}" not permitted via Command Center`)
       }
       const upd: Record<string, unknown> = { [payload.field]: payload.value }
@@ -241,7 +244,7 @@ async function executeIntent(admin: any, action: any, user: any) {
         if (!ALLOWED_META.has(k)) {
           throw new Error(`Field "${k}" not writable via CC. Allowed: ${[...ALLOWED_META].join(', ')}`)
         }
-        const v = (payload as any)[k]
+        const v = payload[k]
         if (v === '' || v == null) continue
         upd[k] = v
       }
@@ -292,7 +295,7 @@ async function executeIntent(admin: any, action: any, user: any) {
     case 'show_pending_compliance': {
       const { data, error } = await admin.rpc('reminder_inbox', { _limit: 200 })
       if (error) throw new Error(error.message)
-      return { items: (data ?? []).filter((r: any) => r.source === 'compliance') }
+      return { items: (data ?? []).filter((r: { source?: string }) => r.source === 'compliance') }
     }
     case 'show_reminders': {
       const { data, error } = await admin.rpc('reminder_inbox', { _limit: 100 })
@@ -338,12 +341,14 @@ Deno.serve(async (req) => {
   const userClient = createClient(SUPABASE_URL, ANON_KEY, {
     global: { headers: { Authorization: authHeader } },
   })
-  let body: any
-  try { body = await req.json() } catch { return json({ error: 'Bad JSON' }, 400) }
-  const action = body?.action
+  let body: unknown
+  try { body = await readBoundedJson(req) } catch { return json({ error: 'Bad or oversized JSON' }, 400) }
+  if (!isRecord(body) || typeof body.action !== 'string') return json({ error: 'Object action required' }, 400)
+  const action = body.action
 
   try {
     if (action === 'preview') {
+      if (typeof body.intent !== 'string' || (body.payload !== undefined && !isRecord(body.payload))) return json({ error: 'Intent and object payload required' }, 400)
       if (SYSTEM_OWNED_INTENTS.has(body.intent)) {
         return json({
           error: `Intent "${body.intent}" is system-owned (auto-triggered by backend). Command Center cannot duplicate it.`,
@@ -380,15 +385,18 @@ Deno.serve(async (req) => {
       // user-scoped so auth.uid() satisfies has_role()
       await userClient.rpc('command_action_mark_executing', { _id: act.id })
 
-      let result: any, errMsg: string | null = null
+      let result: unknown, errMsg: string | null = null
       try {
         result = await recordRun(admin, `command:${act.intent}`,
-          () => executeIntent(admin, act, user))
+          () => {
+            if (typeof act.intent !== 'string' || !isRecord(act.payload)) throw new Error('Invalid stored action contract')
+            return executeIntent(admin, { intent: act.intent, payload: act.payload }, user)
+          })
       } catch (e) { errMsg = (e as Error).message }
 
       const finalStatus = errMsg ? 'failed' : 'executed'
       // Capture after_snapshot for update_* intents (Phase 2 diff lifecycle)
-      let afterSnapshot: any = null
+      let afterSnapshot: unknown = null
       if (!errMsg) {
         try {
           if (act.intent === 'update_invoice_status' || act.intent === 'update_invoice_meta') {

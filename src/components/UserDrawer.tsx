@@ -66,7 +66,7 @@ const UserDrawer = () => {
 
   const go = (path: string) => { setOpen(false); navigate(path); };
 
-  const dashSections: { id: string; label: string; icon: any }[] = [
+  const dashSections: { id: string; label: string; icon: import("lucide-react").LucideIcon }[] = [
     { id: "overview", label: "Dashboard", icon: LayoutDashboard },
     { id: "subscriptions", label: "Subscriptions", icon: CalendarDays },
     { id: "orders", label: "My Orders", icon: ShoppingBag },

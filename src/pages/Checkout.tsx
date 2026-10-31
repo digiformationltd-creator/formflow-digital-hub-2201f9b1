@@ -60,9 +60,12 @@ const CATALOG_GROUPS: CatalogGroup[] = [
 
 const Checkout = () => {
   const [params] = useSearchParams();
+  const serviceParam = params.get("service") || "";
+  const titleParam = params.get("title");
+  const catalogEntry = useMemo(() => findServiceBySlug(serviceParam), [serviceParam]);
 
   useSeo({
-    title: "Checkout | Digiformation Ltd",
+    title: catalogEntry ? `Checkout — ${titleParam || catalogEntry.name} | Digiformation Ltd` : "Checkout | Digiformation Ltd",
     description: "Secure checkout for Digiformation services — UK LTD, US LLC, banking, payments and compliance.",
     noindex: true,
   });
@@ -72,13 +75,8 @@ const Checkout = () => {
     return raw.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
   }, [params]);
 
-  const serviceParam = params.get("service") || "";
-  const titleParam = params.get("title");
-
   // 1) Priority: single-service slug from the central catalog.
   //    This is the standard, priced, locked checkout (same flow as IDV).
-  const catalogEntry = useMemo(() => findServiceBySlug(serviceParam), [serviceParam]);
-
   if (catalogEntry) {
     const item: CheckoutItem = {
       id: catalogEntry.slug,

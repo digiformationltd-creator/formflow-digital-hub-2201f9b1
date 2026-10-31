@@ -1,27 +1,27 @@
+import { errorMessage } from "@/businessos/lib/dataContracts";
 import { useState } from "react";
 import JSZip from "jszip";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Download, Database, FileJson, FileArchive, Loader2 } from "lucide-react";
 
-type ExportPayload = {
-  generated_at: string;
-  table_count: number;
-  total_rows: number;
-  counts: Record<string, number>;
-  errors?: Record<string, string>;
-  tables: Record<string, any[]>;
-};
+const exportPayloadSchema = z.object({
+  generated_at: z.string(), table_count: z.number(), total_rows: z.number(),
+  counts: z.record(z.number()), errors: z.record(z.string()).optional(),
+  tables: z.record(z.array(z.record(z.unknown()))),
+});
+type ExportPayload = z.infer<typeof exportPayloadSchema>;
 
-function csvCell(value: any) {
+function csvCell(value: unknown) {
   if (value === null || value === undefined) return "";
   const s = typeof value === "object" ? JSON.stringify(value) : String(value);
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-function toCsv(rows: any[]) {
+function toCsv(rows: Record<string, unknown>[]) {
   if (!rows.length) return "";
   const set = new Set<string>();
   for (const r of rows) Object.keys(r ?? {}).forEach((k) => set.add(k));
@@ -49,8 +49,9 @@ export default function OsDataExport() {
       body: {},
     });
     if (error) throw new Error(error.message);
-    if ((data as any)?.error) throw new Error((data as any).error);
-    return data as ExportPayload;
+    const failure = z.object({ error: z.string() }).safeParse(data);
+    if (failure.success) throw new Error(failure.data.error);
+    return exportPayloadSchema.parse(data);
   }
 
   const stamp = () => new Date().toISOString().slice(0, 10);
@@ -93,8 +94,8 @@ export default function OsDataExport() {
         `Exported ${payload.table_count} tables · ${payload.total_rows.toLocaleString()} rows`,
       );
       if (payload.errors) toast.warning("Some tables reported errors — see the list below.");
-    } catch (e: any) {
-      toast.error(e?.message ?? "Export failed");
+    } catch (e: unknown) {
+      toast.error(errorMessage(e, "") ?? "Export failed");
     } finally {
       setBusy(null);
     }

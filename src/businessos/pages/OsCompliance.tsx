@@ -1,6 +1,8 @@
+import { errorMessage } from "@/businessos/lib/dataContracts";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { DbRow } from "@/businessos/lib/dataContracts";
 import { toast } from "sonner";
 import { CalendarClock, AlertCircle, CheckCircle2, Mail } from "lucide-react";
 
@@ -57,11 +59,11 @@ export default function OsCompliance() {
     if (addrRes.error) toast.error(addrRes.error.message);
     if (compRes.error) toast.error(compRes.error.message);
 
-    const profById = new Map<string, any>();
-    (profRes.data || []).forEach((p: any) => profById.set(p.user_id, p));
+    const profById = new Map<string, Pick<DbRow<"profiles">, "user_id" | "full_name" | "email" | "company_name">>();
+    (profRes.data || []).forEach((p) => profById.set(p.user_id, p));
 
     const remByTarget = new Map<string, { count: number; last: string | null }>();
-    (remRes.data || []).forEach((r: any) => {
+    (remRes.data || []).forEach((r) => {
       // Key by (target_id, reminder_type) so confirmation_statement and
       // annual_accounts rows on the same company stay separate, and manual
       // sends (which now write the same shape as the cron scheduler) line up.
@@ -74,7 +76,7 @@ export default function OsCompliance() {
 
     const out: Row[] = [];
 
-    (addrRes.data || []).forEach((a: any) => {
+    (addrRes.data || []).forEach((a) => {
       if (!a.expire_date) return;
       const prof = profById.get(a.user_id);
       const rem = remByTarget.get(`${a.id}::address_expiry`) || { count: 0, last: null };
@@ -91,7 +93,7 @@ export default function OsCompliance() {
       });
     });
 
-    (compRes.data || []).forEach((c: any) => {
+    (compRes.data || []).forEach((c) => {
       const prof = profById.get(c.user_id);
       if (c.confirmation_due) {
         const rem = remByTarget.get(`${c.id}::confirmation_statement`) || { count: 0, last: null };
@@ -170,7 +172,7 @@ export default function OsCompliance() {
       const days = daysUntil(r.due_date);
       // Build templateData in the shape the registered templates expect
       // (same fields the cron scheduler passes — see send-scheduled-reminders).
-      const templateData: Record<string, any> =
+      const templateData: Record<string, string | number | null> =
         r.kind === "address_expire"
           ? {
               customerName: r.client_name,
@@ -212,8 +214,8 @@ export default function OsCompliance() {
       });
       toast.success("Reminder queued");
       load();
-    } catch (e: any) {
-      toast.error(e.message || "Send failed");
+    } catch (e: unknown) {
+      toast.error(errorMessage(e, "") || "Send failed");
     } finally {
       setSending(null);
     }

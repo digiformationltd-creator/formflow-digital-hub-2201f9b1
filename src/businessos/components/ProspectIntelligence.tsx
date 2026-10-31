@@ -3,6 +3,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { DbRow } from "@/businessos/lib/dataContracts";
 import {
   Loader2, X, Sparkles, Send, Reply, Calendar, ShoppingCart,
   CheckCircle2, XCircle, Target, Activity,
@@ -207,7 +208,7 @@ export function ProspectTimelineDrawer({
   confidence?: number | null;
   onClose: () => void;
 }) {
-  const [rows, setRows] = useState<any[] | null>(null);
+  const [rows, setRows] = useState<DbRow<"prospect_timeline">[] | null>(null);
   useEffect(() => {
     let cancelled = false;
     (async () => {

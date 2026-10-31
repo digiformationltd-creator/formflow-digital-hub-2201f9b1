@@ -48,7 +48,7 @@ const AddressRenewalReminderEmail = ({ customerName, address, expireDate, daysRe
 
 export const template = {
   component: AddressRenewalReminderEmail,
-  subject: (d: Record<string, any>) => `${subjectPrefix(urgencyFor(d.daysRemaining))}Registered Office Address Expiring`,
+  subject: (d: Props) => `${subjectPrefix(urgencyFor(d.daysRemaining))}Registered Office Address Expiring`,
   displayName: 'Address renewal reminder',
   previewData: {
     customerName: 'Sanaullah Malik',

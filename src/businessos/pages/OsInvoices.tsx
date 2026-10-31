@@ -1,3 +1,4 @@
+import { errorMessage } from "@/businessos/lib/dataContracts";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -172,8 +173,8 @@ export default function OsInvoices() {
       if (error) throw error;
       toast.success(`Marked ${i.invoice_number} as ${newStatus}`);
       load();
-    } catch (e: any) {
-      toast.error(e?.message || "Failed to update invoice");
+    } catch (e: unknown) {
+      toast.error(errorMessage(e, "") || "Failed to update invoice");
     } finally {
       setBusyId(null);
     }
@@ -416,7 +417,7 @@ export default function OsInvoices() {
 
 function IconBtn({
   children, onClick, title, disabled, tone,
-}: { children: any; onClick: () => void; title: string; disabled?: boolean; tone?: "good" | "warn" }) {
+}: { children: import("react").ReactNode; onClick: () => void; title: string; disabled?: boolean; tone?: "good" | "warn" }) {
   const base = "h-7 w-7 rounded-lg grid place-items-center text-white/70 hover:text-white disabled:opacity-40 transition";
   const bg =
     tone === "good" ? "bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-200" :
@@ -431,7 +432,7 @@ function IconBtn({
 
 function MobileAction({
   icon: Icon, label, onClick, disabled, loading, tone,
-}: { icon: any; label: string; onClick: () => void; disabled?: boolean; loading?: boolean; tone?: "good" | "warn" }) {
+}: { icon: import("lucide-react").LucideIcon; label: string; onClick: () => void; disabled?: boolean; loading?: boolean; tone?: "good" | "warn" }) {
   const toneCls =
     tone === "good" ? "bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20" :
     tone === "warn" ? "bg-amber-500/10 text-amber-200 hover:bg-amber-500/20" :
@@ -448,7 +449,7 @@ function MobileAction({
   );
 }
 
-function StatCard({ label, value, icon: Icon, glow }: { label: string; value: string; icon: any; glow: string }) {
+function StatCard({ label, value, icon: Icon, glow }: { label: string; value: string; icon: import("lucide-react").LucideIcon; glow: string }) {
   return (
     <div className={`os-glass os-glow-${glow} p-4`}>
       <div className="flex items-center justify-between mb-2">

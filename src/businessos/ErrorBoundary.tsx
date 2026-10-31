@@ -23,7 +23,6 @@ export default class OsErrorBoundary extends Component<{ children: ReactNode; ro
   }
 
   componentDidCatch(error: Error, info: unknown) {
-    // eslint-disable-next-line no-console
     console.error("[BusinessOS] page crashed:", error, info);
   }
 

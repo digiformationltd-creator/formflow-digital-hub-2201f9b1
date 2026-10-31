@@ -26,9 +26,6 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (id.includes("react") || id.includes("react-dom") || id.includes("react-router-dom")) {
-              return "vendor-react";
-            }
             if (id.includes("@tanstack")) {
               return "vendor-tanstack";
             }
@@ -43,6 +40,11 @@ export default defineConfig(({ mode }) => ({
             }
             if (id.includes("@supabase")) {
               return "vendor-supabase";
+            }
+            // Match React itself after more specific packages. A substring
+            // match also captured lucide-react and every Radix React module.
+            if (/node_modules\/(?:react|react-dom|react-router|react-router-dom|scheduler)\//.test(id)) {
+              return 'vendor-react';
             }
           }
         },

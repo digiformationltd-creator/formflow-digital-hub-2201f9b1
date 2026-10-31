@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { DbInsert } from "@/businessos/lib/dataContracts";
 import {
   DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
   closestCorners, type DragEndEvent, type DragStartEvent, useDroppable,
@@ -155,9 +156,12 @@ function NewLeadModal({ onClose, onCreated }: { onClose: ()=>void; onCreated: ()
   const submit = async () => {
     if (!f.name.trim()) { toast.error("Name is required"); return; }
     setSaving(true);
-    const payload: any = { ...f, value_gbp: Number(f.value_gbp||0) };
-    if (!payload.follow_up_date) delete payload.follow_up_date;
-    Object.keys(payload).forEach(k => { if (payload[k] === "") payload[k] = null; });
+    const payload: DbInsert<"leads"> = {
+      ...f, name: f.name.trim(), value_gbp: Number(f.value_gbp || 0),
+      email: f.email || null, whatsapp: f.whatsapp || null, country: f.country || null,
+      source: f.source || null, service: f.service || null,
+      follow_up_date: f.follow_up_date || null, notes: f.notes || null,
+    };
     const { error } = await supabase.from("leads").insert(payload);
     setSaving(false);
     if (error) { toast.error(error.message); return; }

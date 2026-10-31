@@ -1,3 +1,5 @@
+import type { DbInsert } from "@/businessos/lib/dataContracts";
+import { errorMessage } from "@/businessos/lib/dataContracts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +29,7 @@ type Row = {
   updated_at: string;
 };
 
-const STATUS_META: Record<Status, { label: string; color: string; icon: any }> = {
+const STATUS_META: Record<Status, { label: string; color: string; icon: import("lucide-react").LucideIcon }> = {
   available:   { label: "Available",   color: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40", icon: CheckCircle2 },
   reserved:    { label: "Reserved",    color: "bg-amber-500/20 text-amber-300 border-amber-500/40",       icon: Clock },
   sold_out:    { label: "Sold Out",    color: "bg-rose-500/20 text-rose-300 border-rose-500/40",          icon: XCircle },
@@ -58,7 +60,7 @@ const HEADER_MAP: Record<string, string> = {
   "notes": "notes",
 };
 
-function parseDate(v: any): string | null {
+function parseDate(v: unknown): string | null {
   if (v === null || v === undefined || v === "") return null;
   if (v instanceof Date) return v.toISOString().slice(0, 10);
   if (typeof v === "number") {
@@ -67,9 +69,10 @@ function parseDate(v: any): string | null {
   }
   const s = String(v).trim();
   if (!s) return null;
-  const dmy = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+  const dmy = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})$/);
   if (dmy) {
-    let [, d, m, y] = dmy;
+    const [, d, m] = dmy;
+    let y = dmy[3];
     if (y.length === 2) y = "20" + y;
     return `${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`;
   }
@@ -80,7 +83,7 @@ function parseDate(v: any): string | null {
   return null;
 }
 
-function normaliseStatus(rawStatus: any, addressStatus: any): Status {
+function normaliseStatus(rawStatus: unknown, addressStatus: unknown): Status {
   const s = String(rawStatus || "").toLowerCase().trim();
   const a = String(addressStatus || "").toLowerCase().trim();
   if (s.includes("sold")) return "sold_out";
@@ -90,7 +93,7 @@ function normaliseStatus(rawStatus: any, addressStatus: any): Status {
   return "available";
 }
 
-function cleanStr(v: any): string | null {
+function cleanStr(v: unknown): string | null {
   if (v === null || v === undefined) return null;
   const s = String(v).trim();
   if (!s || s.toLowerCase() === "nan") return null;
@@ -151,15 +154,15 @@ export default function OsManagedCompanies() {
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf, { type: "array", cellDates: true });
       const sheet = wb.Sheets[wb.SheetNames[0]];
-      const raw = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { defval: null, raw: false });
+      const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: null, raw: false });
       if (!raw.length) { toast.error("File is empty"); return; }
 
       const batch = `import-${new Date().toISOString()}`;
-      const records: any[] = [];
+      const records: DbInsert<"managed_companies">[] = [];
       const errors: string[] = [];
 
       for (const [i, row] of raw.entries()) {
-        const mapped: any = { imported_batch: batch };
+        const mapped: Partial<DbInsert<"managed_companies">> & Record<string, unknown> = { imported_batch: batch };
         for (const [k, v] of Object.entries(row)) {
           const key = HEADER_MAP[k.toLowerCase().trim()];
           if (!key) continue;
@@ -187,7 +190,7 @@ export default function OsManagedCompanies() {
         const rawStatus = mapped.raw_status;
         mapped.raw_status = cleanStr(rawStatus);
         mapped.status     = normaliseStatus(rawStatus, mapped.address_status);
-        records.push(mapped);
+        records.push({ ...mapped, company_name: mapped.company_name });
       }
 
       if (!records.length) { toast.error("No valid rows"); return; }
@@ -215,8 +218,8 @@ export default function OsManagedCompanies() {
       toast.success(`Import complete: ${inserted} new, ${updated} updated${failed?`, ${failed} failed`:""}${errors.length?`, ${errors.length} skipped`:""}`);
       if (errors.length) console.warn("Skipped rows:", errors);
       load();
-    } catch (e: any) {
-      toast.error("Import failed: " + (e?.message || String(e)));
+    } catch (e: unknown) {
+      toast.error("Import failed: " + (errorMessage(e, "") || String(e)));
     } finally {
       setImporting(false);
       if (fileInput.current) fileInput.current.value = "";
@@ -288,7 +291,7 @@ export default function OsManagedCompanies() {
             placeholder="Search by name, number, SIC, notes…"
             className="w-full pl-9 pr-3 py-2 rounded-lg bg-zinc-900/60 border border-zinc-800 text-sm focus:outline-none focus:border-blue-500" />
         </div>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as any)}
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value === "all" ? "all" : normaliseStatus(e.target.value, ""))}
           className="px-3 py-2 rounded-lg bg-zinc-900/60 border border-zinc-800 text-sm">
           <option value="all">All statuses</option>
           <option value="available">Available</option>
@@ -368,7 +371,7 @@ export default function OsManagedCompanies() {
   );
 }
 
-function Stat({ label, value, icon: Icon, color }: any) {
+function Stat({ label, value, icon: Icon, color }: { label: string; value: number; icon: import("lucide-react").LucideIcon; color: string }) {
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-4">
       <div className="flex items-center justify-between">

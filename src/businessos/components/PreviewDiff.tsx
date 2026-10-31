@@ -73,8 +73,8 @@ export function PreviewDiff({ action }: Props) {
     } else if (f === "notes") proposed[f] = payload.notes;
     else if (f === "due_date") proposed[f] = payload.due_date;
     else if (f === "status") proposed[f] = payload.status;
-    else if ((payload as any).field === f) proposed[f] = payload.value;
-    else proposed[f] = (payload as any)[f];
+    else if (payload.field === f) proposed[f] = payload.value;
+    else proposed[f] = payload[f];
   }
 
   const tier = (action.risk_tier ?? "safe") as RiskTier;

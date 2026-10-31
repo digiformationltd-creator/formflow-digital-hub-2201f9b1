@@ -5,7 +5,6 @@ import {
 } from "@/components/ui/dialog";
 import { Sparkles, ChevronRight, ChevronLeft } from "lucide-react";
 
-const FLAG = "businessos.welcomeTour.v1.done";
 
 const STEPS = [
   {
@@ -38,17 +37,7 @@ const STEPS = [
   },
 ];
 
-export function shouldShowTourOnMount(): boolean {
-  try { return localStorage.getItem(FLAG) !== "1"; } catch { return false; }
-}
-
-export function markTourDone() {
-  try { localStorage.setItem(FLAG, "1"); } catch { /* ignore */ }
-}
-
-export function resetTour() {
-  try { localStorage.removeItem(FLAG); } catch { /* ignore */ }
-}
+import { markTourDone } from '../lib/tourState';
 
 export default function WelcomeTour({
   open, onOpenChange,

@@ -14,7 +14,7 @@ type Row = {
   due_date: string | null;
   target_type: string | null;
   target_id: string | null;
-  payload: Record<string, any> | null;
+  payload: Record<string, unknown> | null;
 };
 
 const SEV_BADGE: Record<Row["severity"], string> = {
@@ -142,7 +142,7 @@ export default function OsReminderCenter() {
   );
 }
 
-function KPI({ label, value, icon: Icon, tint }: any) {
+function KPI({ label, value, icon: Icon, tint }: { label: string; value: string | number; icon: import("lucide-react").LucideIcon; tint: string }) {
   return (
     <div className="os-glass p-4">
       <div className="flex items-start justify-between">
@@ -156,7 +156,7 @@ function KPI({ label, value, icon: Icon, tint }: any) {
   );
 }
 
-function FilterChip({ active, onClick, children }: any) {
+function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: import("react").ReactNode }) {
   return (
     <button onClick={onClick}
       className={`px-2.5 py-1 rounded-md border transition ${

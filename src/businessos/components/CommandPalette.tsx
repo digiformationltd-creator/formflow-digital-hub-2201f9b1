@@ -27,8 +27,8 @@ const RISK_TINT: Record<string, string> = {
 
 export function CommandPalette({ open, onOpenChange, onPick }: Props) {
   const [favTick, setFavTick] = useState(0);
-  const favorites = useMemo(() => new Set(getFavorites()), [favTick, open]);
-  const recents = useMemo(() => getRecents(), [open]);
+  const favorites = new Set(getFavorites());
+  const recents = getRecents();
 
   const pick = (prompt: string, id?: string) => {
     onPick(prompt, id);
@@ -142,16 +142,4 @@ function CommandRow({
   );
 }
 
-// Global ⌘K / Ctrl+K hook
-export function useCommandPaletteHotkey(toggle: () => void) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        toggle();
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [toggle]);
-}
+

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { z } from "zod";
 import { Link, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
@@ -232,14 +233,14 @@ const CheckoutFlow = ({
       const u = data.session?.user;
       setIsAuthed(!!u);
       setAuthedEmail(u?.email ?? null);
-      setAuthedName((u?.user_metadata as any)?.full_name ?? null);
+      setAuthedName(typeof u?.user_metadata?.full_name === "string" ? u.user_metadata.full_name : null);
       setAuthChecked(true);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       const u = session?.user;
       setIsAuthed(!!u);
       setAuthedEmail(u?.email ?? null);
-      setAuthedName((u?.user_metadata as any)?.full_name ?? null);
+      setAuthedName(typeof u?.user_metadata?.full_name === "string" ? u.user_metadata.full_name : null);
     });
     return () => {
       mounted = false;
@@ -265,12 +266,19 @@ const CheckoutFlow = ({
   // Draft persistence: keep form data alive across refresh / network glitches for 10 min
   const DRAFT_TTL_MS = 10 * 60 * 1000;
   const draftKey = `checkout-draft:${serviceTitle}`;
-  const loadDraft = (): any | null => {
+  const draftSchema = z.object({
+    savedAt: z.number(), form: z.record(z.string()).optional(), extra: z.record(z.string()).optional(),
+    selected: z.array(z.string()).max(100).optional(), stepIdx: z.number().int().min(0).max(2).optional(),
+    serviceMode: z.enum(["ltd-only", "both"]).optional(),
+    declaredSource: z.object({ id: z.string(), label: z.string(), category: z.enum(["ai", "search", "social", "direct", "referral"]) }).nullable().optional(),
+  });
+  const loadDraft = (): z.infer<typeof draftSchema> | null => {
     try {
       const raw = typeof window !== "undefined" ? window.localStorage.getItem(draftKey) : null;
       if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed.savedAt !== "number") return null;
+      const result = draftSchema.safeParse(JSON.parse(raw));
+      if (!result.success) return null;
+      const parsed = result.data;
       if (Date.now() - parsed.savedAt > DRAFT_TTL_MS) {
         window.localStorage.removeItem(draftKey);
         return null;
@@ -340,7 +348,7 @@ const CheckoutFlow = ({
   // regardless of what customer email is entered.
   useEffect(() => {
     if (!isAuthed) return;
-    setForm((prev: any) => {
+    setForm((prev) => {
       const next = { ...prev };
       if (authedEmail && !prev.email) next.email = authedEmail;
       if (authedName && !prev.full_name) {
@@ -370,7 +378,10 @@ const CheckoutFlow = ({
   const [serviceModeOpen, setServiceModeOpen] = useState(true);
   const idVerificationActive = !showServiceMode || serviceMode === "both";
   const [declaredSource, setDeclaredSource] = useState<DeclaredSource | null>(() => {
-    return draft?.declaredSource ?? null;
+    const source = draft?.declaredSource;
+    return source?.id && source.label && source.category
+      ? { id: source.id, label: source.label, category: source.category }
+      : null;
   });
   const [sourceError, setSourceError] = useState(false);
 
@@ -443,15 +454,18 @@ const CheckoutFlow = ({
   const vat = +(subtotal * vatRate).toFixed(2);
   const total = subtotal + vat;
 
-  // Track begin_checkout in Google Analytics 4
+  // Record one begin_checkout per mounted checkout; selection changes are not new checkouts.
+  const beginCheckoutTracked = useRef(false);
   useEffect(() => {
+    if (beginCheckoutTracked.current) return;
+    beginCheckoutTracked.current = true;
     trackBeginCheckout({
       serviceTitle,
       packageName: selectedItems[0]?.name,
       price: total,
       currency,
     });
-  }, []);
+  }, [serviceTitle, selectedItems, total, currency]);
 
   // Compute which extraSections are active (their item is selected)
   const activeExtraSections = useMemo(
@@ -698,7 +712,7 @@ const CheckoutFlow = ({
     let documentLinks: { label: string; url: string; filename: string }[] = [];
     let finalOrderRef = orderRef;
     try {
-      const { data: inv, error: invErr } = await supabase.functions.invoke("generate-invoice", {
+      const { data: inv, error: invErr } = await supabase.functions.invoke<{ invoiceNumber?: string; invoiceUrl?: string; documentLinks?: { label: string; url: string; filename: string }[]; orderRef?: string }>("generate-invoice", {
         body: {
           service: serviceTitle,
           packageName,
@@ -727,10 +741,10 @@ const CheckoutFlow = ({
         },
       });
       if (invErr) throw invErr;
-      invoiceNumber = (inv as any)?.invoiceNumber;
-      invoiceUrl = (inv as any)?.invoiceUrl;
-      documentLinks = (inv as any)?.documentLinks ?? [];
-      if ((inv as any)?.orderRef) finalOrderRef = (inv as any).orderRef;
+      invoiceNumber = inv?.invoiceNumber;
+      invoiceUrl = inv?.invoiceUrl;
+      documentLinks = inv?.documentLinks ?? [];
+      if (inv?.orderRef) finalOrderRef = inv.orderRef;
     } catch (err) {
       console.error("invoice generation failed", err);
     }
@@ -763,6 +777,7 @@ const CheckoutFlow = ({
     if (orderSucceeded) {
       trackPurchase({
         orderRef: finalOrderRef,
+        invoiceNumber,
         serviceTitle,
         packageName,
         amount: total,
@@ -1813,7 +1828,7 @@ const ReviewLine = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-const Info = ({ icon: Icon, title, body }: { icon: any; title: string; body: string }) => (
+const Info = ({ icon: Icon, title, body }: { icon: import("lucide-react").LucideIcon; title: string; body: string }) => (
   <div className="rounded-2xl border border-border/40 p-4">
     <Icon className="w-5 h-5 text-primary mb-2" />
     <div className="font-semibold text-sm mb-1">{title}</div>

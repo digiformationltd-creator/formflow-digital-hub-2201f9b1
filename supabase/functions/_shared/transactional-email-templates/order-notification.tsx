@@ -119,7 +119,7 @@ const OrderNotificationEmail = ({
 export const template = {
   component: OrderNotificationEmail,
   to: BUSINESS_EMAIL,
-  subject: (d: Record<string, any>) => {
+  subject: (d: Props) => {
     const who = (d.customerName && String(d.customerName).trim()) || d.customerEmail || 'New customer'
     const svc = d.service || 'Digiformation'
     const ref = d.orderRef ? ` [${d.orderRef}]` : ''

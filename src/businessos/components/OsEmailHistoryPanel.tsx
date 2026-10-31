@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Mail, CheckCircle2, XCircle, Clock, RefreshCw } from "lucide-react";
 
@@ -11,7 +11,7 @@ type EmailRow = {
   trigger_source: string | null;
   message_id: string | null;
   error_message: string | null;
-  metadata: Record<string, any> | null;
+  metadata: Record<string, unknown> | null;
 };
 
 type Scope =
@@ -53,27 +53,30 @@ export default function OsEmailHistoryPanel({ scope, title = "Email History", de
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const load = async () => {
+  const scopeType = 'orderId' in scope ? 'order' : 'invoiceId' in scope ? 'invoice' : 'ticketId' in scope ? 'ticket' : 'client';
+  const scopeId = 'orderId' in scope ? scope.orderId : 'invoiceId' in scope ? scope.invoiceId : 'ticketId' in scope ? scope.ticketId : scope.clientUserId;
+  const scopeEmail = 'clientEmail' in scope ? scope.clientEmail : null;
+  const load = useCallback(async () => {
     setLoading(true);
     const cols = "id, template_name, recipient_email, status, created_at, trigger_source, message_id, error_message, metadata";
     let q = supabase.from("email_send_log").select(cols).order("created_at", { ascending: false }).limit(50);
 
-    if ("orderId" in scope) q = q.eq("order_id", scope.orderId);
-    else if ("invoiceId" in scope) q = q.eq("invoice_id", scope.invoiceId);
-    else if ("ticketId" in scope) q = q.eq("ticket_id", scope.ticketId);
+    if (scopeType === "order") q = q.eq("order_id", scopeId);
+    else if (scopeType === "invoice") q = q.eq("invoice_id", scopeId);
+    else if (scopeType === "ticket") q = q.eq("ticket_id", scopeId);
     else {
       // Client scope: prefer client_user_id, but fall back to recipient_email for legacy rows
-      const ors: string[] = [`client_user_id.eq.${scope.clientUserId}`];
-      if (scope.clientEmail) ors.push(`recipient_email.eq.${scope.clientEmail}`);
+      const ors: string[] = [`client_user_id.eq.${scopeId}`];
+      if (scopeEmail) ors.push(`recipient_email.eq.${scopeEmail}`);
       q = q.or(ors.join(","));
     }
 
     const { data, error } = await q;
     if (!error && data) setRows(data as EmailRow[]);
     setLoading(false);
-  };
+  }, [scopeType, scopeId, scopeEmail]);
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, [JSON.stringify(scope)]);
+  useEffect(() => { load();  }, [load]);
 
   return (
     <div className={density === "compact" ? "rounded-xl border border-white/10 bg-white/[0.02] p-3" : "rounded-2xl border border-white/10 bg-white/[0.02] p-4"}>

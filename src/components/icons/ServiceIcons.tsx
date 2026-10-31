@@ -48,7 +48,7 @@ const Defs = ({ id }: { id: string }) => (
 );
 
 const ServiceIcon = memo(({ name, size = 56, className, strokeWidth = 2, gradientId }: Props) => {
-  const instanceId = useId().replaceAll(':', '');
+  const instanceId = useId().replace(/:/g, '');
   const gid = `${gradientId ?? `svc-grad-${name}`}-${instanceId}`;
   const stroke = `url(#${gid})`;
   const fill = `url(#${gid}-soft)`;

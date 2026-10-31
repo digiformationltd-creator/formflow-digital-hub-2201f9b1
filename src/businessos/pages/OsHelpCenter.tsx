@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   BookOpen, Search, Sparkles, ShieldCheck, Keyboard, Compass, Wrench,
@@ -14,11 +14,12 @@ import {
   FAQS, MODULES, SHORTCUTS, SAFETY_LEVELS, TROUBLESHOOTING,
 } from "@/businessos/lib/helpContent";
 import { COMMANDS, CATEGORIES } from "@/businessos/lib/commandLibrary";
-import WelcomeTour, { resetTour } from "@/businessos/components/WelcomeTour";
+import WelcomeTour from "@/businessos/components/WelcomeTour";
+import { resetTour } from "@/businessos/lib/tourState";
 
 type TabId = "start" | "command" | "examples" | "safety" | "shortcuts" | "modules" | "faq" | "troubleshooting";
 
-const TABS: { id: TabId; label: string; icon: any }[] = [
+const TABS: { id: TabId; label: string; icon: import("lucide-react").LucideIcon }[] = [
   { id: "start",           label: "Get Started",     icon: PlayCircle },
   { id: "command",         label: "Command Center",  icon: Sparkles },
   { id: "examples",        label: "Examples",        icon: BookOpen },
@@ -35,29 +36,29 @@ export default function OsHelpCenter() {
   const [tourOpen, setTourOpen] = useState(false);
 
   const q = query.trim().toLowerCase();
-  const match = (s: string) => !q || s.toLowerCase().includes(q);
+  const match = useCallback((s: string) => !q || s.toLowerCase().includes(q), [q]);
 
   const filteredFaqs = useMemo(
     () => FAQS.filter((f) => match(f.q) || match(f.a) || f.tags.some(match)),
-    [q],
+    [match],
   );
   const filteredModules = useMemo(
     () => MODULES.filter((m) => match(m.name) || match(m.what) || match(m.when)),
-    [q],
+    [match],
   );
   const filteredShortcuts = useMemo(
     () => SHORTCUTS.filter((s) => match(s.label) || match(s.keys) || match(s.scope)),
-    [q],
+    [match],
   );
   const filteredExamples = useMemo(
     () => COMMANDS.filter((c) =>
       !c.systemOwned && (match(c.title) || match(c.description) || c.examples.some(match)),
     ),
-    [q],
+    [match],
   );
   const filteredTrouble = useMemo(
     () => TROUBLESHOOTING.filter((t) => match(t.problem) || match(t.fix)),
-    [q],
+    [match],
   );
 
   return (

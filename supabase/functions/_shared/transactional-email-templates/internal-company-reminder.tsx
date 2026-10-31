@@ -52,7 +52,7 @@ const InternalCompanyReminder = ({
 
 export const template = {
   component: InternalCompanyReminder,
-  subject: (d: Record<string, any>) =>
+  subject: (d: Props) =>
     `[Internal] ${d.companyName || 'Company'} — ${(labels[d.reminderType] || 'compliance')} due in ${d.daysRemaining}d`,
   displayName: 'Internal company reminder (admin only)',
   to: 'digiformationltd@gmail.com',

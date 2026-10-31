@@ -9,6 +9,21 @@ const LS_LAST = "df_attribution_last";
 const COOKIE_DAYS = 180;
 
 export type SourceCategory = "ai" | "search" | "social" | "direct" | "referral";
+type StoredTouch = { source?: string; category?: SourceCategory; campaign?: string; referrer?: string; landing?: string; at?: string };
+const readStoredTouch = (key: string): StoredTouch | null => {
+  try {
+    const value: unknown = JSON.parse(localStorage.getItem(key) || 'null');
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+    const record = value as Record<string, unknown>;
+    if (typeof record.source !== 'string') return null;
+    const stringValue = (name: string) => typeof record[name] === 'string' ? record[name] as string : undefined;
+    return {
+      source: record.source,
+      category: ['ai','search','social','direct','referral'].includes(String(record.category)) ? record.category as SourceCategory : undefined,
+      campaign: stringValue('campaign'), referrer: stringValue('referrer'), landing: stringValue('landing'), at: stringValue('at'),
+    };
+  } catch { return null; }
+};
 
 export type AttributionSnapshot = {
   visitor_id: string;
@@ -163,7 +178,7 @@ export const trackPageView = async () => {
       const cat = (utm.utm_medium || "").toLowerCase();
       category = cat.includes("social") ? "social"
         : cat.includes("cpc") || cat.includes("ppc") || cat.includes("paid") ? "search"
-        : cat.includes("ai") ? "ai"
+        : /^(?:ai(?:[_ -]|$)|llm$)/.test(cat) ? "ai"
         : cat.includes("referral") ? "referral"
         : /^(?:www\.)?google\.[a-z.]+$/.test(source) || source === "google" || source === "bing" ? "search"
         : "referral";
@@ -185,8 +200,7 @@ export const trackPageView = async () => {
     };
 
     // First touch → store permanently if absent
-    let first: any = null;
-    try { first = JSON.parse(localStorage.getItem(LS_FIRST) || "null"); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
+    let first = readStoredTouch(LS_FIRST);
     if (!first) {
       first = { ...visit, at: new Date().toISOString() };
       try { localStorage.setItem(LS_FIRST, JSON.stringify(first)); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
@@ -230,7 +244,7 @@ export const trackPageView = async () => {
         last_visit_at: new Date().toISOString(),
         device_type: device,
       },
-    } as any)).then(({ error }) => {
+    })).then(({ error }) => {
       if (error) console.warn("[attribution] attribution upsert failed", error);
     }).catch((error) => console.warn("[attribution] attribution dispatch failed", error));
   } catch (err) {
@@ -242,9 +256,8 @@ export const trackPageView = async () => {
 // ---------- snapshot for form submission ----------
 export const getAttributionSnapshot = (): AttributionSnapshot => {
   const visitor_id = getVisitorId();
-  let first: any = {}; let last: any = {};
-  try { first = JSON.parse(localStorage.getItem(LS_FIRST) || "{}"); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
-  try { last = JSON.parse(localStorage.getItem(LS_LAST) || "{}"); } catch { /* Browser storage may be unavailable; preserve the in-memory UI state. */ }
+  const first = readStoredTouch(LS_FIRST) ?? {};
+  const last = readStoredTouch(LS_LAST) ?? {};
   const url = typeof window !== "undefined" ? new URL(window.location.href) : null;
   return {
     visitor_id,

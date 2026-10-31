@@ -159,7 +159,7 @@ function drawPhoneHandset(doc: jsPDF, cx: number, cy: number, s: number, rgb: [n
   doc.setFillColor(...rgb)
   doc.setDrawColor(...rgb)
   doc.setLineWidth(s * 0.22)
-  doc.setLineCap?.('round' as any)
+  doc.setLineCap?.('round')
   const ox = s * 0.32
   // Diagonal handset bar
   doc.line(cx - ox, cy - ox, cx + ox, cy + ox)
@@ -175,8 +175,8 @@ function drawWhatsAppIcon(doc: jsPDF, cx: number, cy: number, s: number) {
   // Speech-bubble circle (outline only, white interior to keep footer bg showing through)
   doc.setDrawColor(...green)
   doc.setLineWidth(stroke)
-  doc.setLineCap?.('round' as any)
-  doc.setLineJoin?.('round' as any)
+  doc.setLineCap?.('round')
+  doc.setLineJoin?.('round')
   doc.circle(cx, cy, r - stroke / 2)
   // Tail (small triangle pointing down-left)
   const tx = cx - r * 0.55, ty = cy + r * 0.55
@@ -266,10 +266,9 @@ function drawPinterestIcon(doc: jsPDF, cx: number, cy: number, s: number) {
 
 function drawWatermark(doc: jsPDF, W: number, H: number) {
   doc.saveGraphicsState()
-  // @ts-ignore
-  const GState = (doc as any).GState
+  // Keep the runtime guard: this constructor is optional across PDF builds.
+  const GState = doc.GState as unknown as new (options: { opacity: number }) => ReturnType<jsPDF['GState']>
   if (GState) {
-    // @ts-ignore
     doc.setGState(new GState({ opacity: 0.05 }))
   }
   // Smaller, subtle watermark — full brand name still legible
@@ -909,7 +908,7 @@ Deno.serve(async (req) => {
     if (orderErr) {
       // Race: another concurrent call inserted the same checkout_request_id
       // a few ms ago. Return the existing order/invoice instead of erroring.
-      if (checkoutRequestId && (orderErr as any).code === '23505') {
+      if (checkoutRequestId && orderErr.code === '23505') {
         console.warn('[generate-invoice] unique-violation race on checkout_request_id', {
           checkoutRequestId,
         })

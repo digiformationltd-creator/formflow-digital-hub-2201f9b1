@@ -102,10 +102,9 @@ const drawWaves = (doc: jsPDF, W: number, H: number) => {
 /** Diagonal watermark "DIGIFORMATION LTD" — single large, professional */
 const drawWatermark = (doc: jsPDF, W: number, H: number) => {
   doc.saveGraphicsState();
-  // @ts-ignore
-  const GState = (doc as any).GState;
+  // jsPDF exposes a callable constructor; keep the existing availability guard.
+  const GState = doc.GState as unknown as new (options: { opacity: number }) => ReturnType<jsPDF['GState']>;
   if (GState) {
-    // @ts-ignore
     doc.setGState(new GState({ opacity: 0.08 }));
   }
   // Main diagonal watermark — corner-to-corner, very large
@@ -117,7 +116,6 @@ const drawWatermark = (doc: jsPDF, W: number, H: number) => {
 
   // Two smaller vertical watermarks on the sides
   if (GState) {
-    // @ts-ignore
     doc.setGState(new GState({ opacity: 0.06 }));
   }
   doc.setFontSize(26);

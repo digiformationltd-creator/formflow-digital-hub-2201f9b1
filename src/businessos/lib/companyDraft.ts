@@ -184,7 +184,7 @@ export function buildDraft(args: {
     }
   }
   return {
-    id: (crypto as any).randomUUID?.() ?? `d_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    id: crypto.randomUUID?.() ?? `d_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     userId: args.userId,
     companyName: args.companyName,
     source: args.source,

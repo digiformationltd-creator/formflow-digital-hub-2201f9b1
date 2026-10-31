@@ -2,7 +2,7 @@
 // Reuses production tables (invoices, client_orders).
 // No schema changes, no new edge functions.
 // Invoice notifications are handled at checkout by the order-confirmation email.
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -74,7 +74,7 @@ export default function OsInvoiceDrawer({
   const [notes, setNotes] = useState("");
   const [dueDate, setDueDate] = useState<string>("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!invoiceId) return;
     setLoading(true);
     const { data: inv, error } = await supabase.from("invoices").select("*").eq("id", invoiceId).maybeSingle();
@@ -90,7 +90,7 @@ export default function OsInvoiceDrawer({
       setOrder(null);
     }
     setLoading(false);
-  };
+  }, [invoiceId]);
 
   useEffect(() => {
     if (open && invoiceId) {
@@ -107,7 +107,7 @@ export default function OsInvoiceDrawer({
       setNotes("");
       setDueDate("");
     }
-  }, [open, invoiceId]);
+  }, [open, invoiceId, load]);
 
   const downloadPdf = async () => {
     if (!invoice?.pdf_url) { toast.error("No PDF stored for this invoice"); return; }
@@ -306,7 +306,7 @@ export default function OsInvoiceDrawer({
   );
 }
 
-function Row({ icon: Icon, label }: { icon: any; label: string }) {
+function Row({ icon: Icon, label }: { icon: import("lucide-react").LucideIcon; label: string }) {
   return (
     <div className="flex items-center gap-2 min-w-0">
       <Icon className="w-3.5 h-3.5 text-white/40 shrink-0" />

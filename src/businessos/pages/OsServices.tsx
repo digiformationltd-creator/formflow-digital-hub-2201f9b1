@@ -21,7 +21,8 @@ export default function OsServices() {
 
   const save = async () => {
     if (!editing) return;
-    const payload: any = { ...editing, price_gbp: Number(editing.price_gbp||0), display_order: Number(editing.display_order||0) };
+    if (!editing.name?.trim()) { toast.error("Service name is required"); return; }
+    const payload = { ...editing, name: editing.name.trim(), price_gbp: Number(editing.price_gbp||0), display_order: Number(editing.display_order||0) };
     let res;
     if (editing.id) res = await supabase.from("services").update(payload).eq("id", editing.id);
     else res = await supabase.from("services").insert(payload);

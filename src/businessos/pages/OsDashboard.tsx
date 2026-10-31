@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { DbRow } from "@/businessos/lib/dataContracts";
 import {
   TrendingUp, ShoppingBag, Clock, Users, UserPlus, FileWarning, BadgePoundSterling, AlertTriangle,
 } from "lucide-react";
@@ -13,7 +14,7 @@ import { analyzePending, commandCenterUrl, type PendingItem, type ManagedCompany
 
 
 type Glow = "blue"|"purple"|"green"|"amber"|"red"|"cyan"|"pink"|"lime";
-type Kpi = { label: string; value: string; sub?: string; icon: any; glow: Glow };
+type Kpi = { label: string; value: string; sub?: string; icon: import("lucide-react").LucideIcon; glow: Glow };
 
 function KpiCard({ k }: { k: Kpi }) {
   const Icon = k.icon;
@@ -38,9 +39,9 @@ export default function OsDashboard() {
   const [kpi, setKpi] = useState<Kpi[]>([]);
   const [revenue, setRevenue] = useState<{m:string;v:number}[]>([]);
   
-  const [payments, setPayments] = useState<any[]>([]);
-  const [followups, setFollowups] = useState<any[]>([]);
-  const [activity, setActivity] = useState<any[]>([]);
+  const [payments, setPayments] = useState<Pick<DbRow<"invoices">, "total_gbp" | "status" | "issue_date" | "created_at" | "bill_to_name" | "invoice_number">[]>([]);
+  const [followups, setFollowups] = useState<Pick<DbRow<"leads">, "source" | "stage" | "follow_up_date" | "name" | "whatsapp" | "service" | "created_at">[]>([]);
+  const [activity, setActivity] = useState<{ type: string; text: string; at: string }[]>([]);
   const [pendingTasks, setPendingTasks] = useState<
     { company: ManagedCompanyRow; item: PendingItem }[]
   >([]);

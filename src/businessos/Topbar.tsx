@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { NAV } from "./nav";
 import MobileNav from "./MobileNav";
-import WelcomeTour, { shouldShowTourOnMount } from "./components/WelcomeTour";
+import WelcomeTour from "./components/WelcomeTour";
+import { shouldShowTourOnMount } from "./lib/tourState";
 
 export default function Topbar() {
   const { pathname } = useLocation();

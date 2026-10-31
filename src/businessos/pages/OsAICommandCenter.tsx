@@ -2,10 +2,12 @@
 // Professional ChatGPT/Claude/Gemini-style operating surface.
 // UI only — no backend, no AI calls, no persistence.
 
+import { isRecord } from "@/businessos/lib/dataContracts";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useCommandMachine, STATE_LABELS, STATE_TINT, type CommandAction } from "@/businessos/lib/useCommandMachine";
 import { PreviewDiff } from "@/businessos/components/PreviewDiff";
-import { CommandPalette, useCommandPaletteHotkey } from "@/businessos/components/CommandPalette";
+import { CommandPalette } from "@/businessos/components/CommandPalette";
+import { useCommandPaletteHotkey } from "@/businessos/lib/useCommandPaletteHotkey";
 import { CommandLibraryPanel } from "@/businessos/components/CommandLibraryPanel";
 import { BusinessPreviewCard, type AgentPlan } from "@/businessos/components/BusinessPreviewCard";
 import { pushRecent } from "@/businessos/lib/commandLibrary";
@@ -188,8 +190,9 @@ export default function OsAICommandCenter() {
   const [rolling, setRolling] = useState(false);
   const undoTimer = useRef<number | null>(null);
 
+  const undoActive = undoLeft > 0;
   useEffect(() => {
-    if (undoLeft <= 0) {
+    if (!undoActive) {
       if (undoTimer.current) window.clearInterval(undoTimer.current);
       return;
     }
@@ -205,7 +208,7 @@ export default function OsAICommandCenter() {
       });
     }, 1000);
     return () => { if (undoTimer.current) window.clearInterval(undoTimer.current); };
-  }, [undoLeft > 0 ? 1 : 0]); // re-arm only when window opens
+  }, [undoActive]); // re-arm only when window opens
 
   const startUndoWindow = (id: string, tier: "safe" | "sensitive" | "destructive") => {
     if (tier === "destructive") return; // never auto-undo destructive
@@ -224,7 +227,7 @@ export default function OsAICommandCenter() {
   // Deterministic fallback parser — used only when the AI service is
   // unreachable. Maps obvious natural-language hints to typed intents
   // supported by `os-command-execute`. Defaults to create_task.
-  const fallbackParse = (text: string): { intent: string; payload: Record<string, any> } => {
+  const fallbackParse = (text: string): { intent: string; payload: Record<string, unknown> } => {
     const t = text.toLowerCase().trim();
     const emailMatch = text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
     const email = emailMatch?.[0];
@@ -255,7 +258,7 @@ export default function OsAICommandCenter() {
       if (error || !data?.ok) return null;
       return data as {
         ok: true; intent: string;
-        payload: Record<string, any>;
+        payload: Record<string, unknown>;
         plan: AgentPlan; message: string;
       };
     } catch { return null; }
@@ -303,7 +306,7 @@ export default function OsAICommandCenter() {
     // 1) Ask the AI agent to understand the instruction.
     const ai = await aiParse(t, paste);
     let intent: string;
-    let payload: Record<string, any>;
+    let payload: Record<string, unknown>;
     let plan: AgentPlan;
     let message: string;
     if (ai) {
@@ -391,7 +394,7 @@ export default function OsAICommandCenter() {
       }
       // Try to match an existing address of the same service_type so we
       // present old vs new instead of always creating a new row.
-      const desiredType = String((payload.fields as any)?.service_type ?? "").trim() || null;
+      const desiredType = String((isRecord(payload.fields) ? payload.fields.service_type : undefined) ?? "").trim() || null;
       let matchId: string | null = null;
       if (desiredType) {
         const { data: existing } = await supabase
@@ -493,15 +496,15 @@ export default function OsAICommandCenter() {
     });
     const ok = !error && data?.ok;
     // Update business memory after successful company-scoped action.
-    const pl = (pendingAction?.payload ?? {}) as Record<string, any>;
-    const res = (data?.result ?? {}) as Record<string, any>;
+    const pl = (pendingAction?.payload ?? {}) as Record<string, unknown>;
+    const res = (data?.result ?? {}) as Record<string, unknown>;
     if (ok && pl.company_id) {
       const cname = (res.company_name ?? activeCompany?.company_name ?? "Company") as string;
       updateActiveCompany({ id: String(pl.company_id), company_name: cname });
     }
     if (ok && pendingAction?.intent === "lookup_company" && Array.isArray(res.results) && res.results.length === 1) {
-      const r = res.results[0];
-      updateActiveCompany({ id: r.id, company_name: r.company_name, company_number: r.company_number });
+      const r: unknown = res.results[0];
+      if (isRecord(r) && typeof r.id === "string" && typeof r.company_name === "string") updateActiveCompany({ id: r.id, company_name: r.company_name, company_number: typeof r.company_number === "string" ? r.company_number : undefined });
     }
     if (ok && (pl.customer_email || pl.recipient_email)) {
       updateActiveCustomer({ email: String(pl.customer_email ?? pl.recipient_email) });
@@ -1081,7 +1084,7 @@ function ThreadRow({ thread, active, onClick }: { thread: Thread; active: boolea
 
 function ContextCard({
   icon: Icon, label, title, subtitle, tint,
-}: { icon: any; label: string; title: string; subtitle: string; tint: string }) {
+}: { icon: import("lucide-react").LucideIcon; label: string; title: string; subtitle: string; tint: string }) {
   return (
     <div className="rounded-lg bg-white/[0.02] border border-white/5 p-2.5 hover:border-white/15 transition cursor-pointer">
       <div className="flex items-center gap-2 mb-1">
@@ -1096,7 +1099,7 @@ function ContextCard({
   );
 }
 
-function FuturePill({ icon: Icon, label, desc }: { icon: any; label: string; desc: string }) {
+function FuturePill({ icon: Icon, label, desc }: { icon: import("lucide-react").LucideIcon; label: string; desc: string }) {
   return (
     <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg border border-dashed border-white/10 bg-white/[0.01] mb-1">
       <Icon className="w-3.5 h-3.5 text-white/40" />
@@ -1111,7 +1114,7 @@ function FuturePill({ icon: Icon, label, desc }: { icon: any; label: string; des
 
 function ActionBtn({
   icon: Icon, label, tint, onClick, disabled,
-}: { icon: any; label: string; tint: string; onClick?: () => void; disabled?: boolean }) {
+}: { icon: import("lucide-react").LucideIcon; label: string; tint: string; onClick?: () => void; disabled?: boolean }) {
   return (
     <button
       onClick={onClick}

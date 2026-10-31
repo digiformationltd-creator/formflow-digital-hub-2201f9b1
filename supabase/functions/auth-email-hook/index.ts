@@ -26,7 +26,17 @@ const EMAIL_SUBJECTS: Record<string, string> = {
 }
 
 // Template mapping
-const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
+interface AuthEmailProps {
+  siteName: string
+  siteUrl: string
+  recipient: string
+  confirmationUrl: string
+  token: string
+  email: string
+  oldEmail: string
+  newEmail: string
+}
+const EMAIL_TEMPLATES: Record<string, React.ComponentType<AuthEmailProps>> = {
   signup: SignupEmail,
   invite: InviteEmail,
   magiclink: MagicLinkEmail,
@@ -48,7 +58,7 @@ const FROM_DOMAIN = "digiformation.co.uk" // Domain shown in From address (root,
 // even if the project's domain has changed since the template was scaffolded.
 const SAMPLE_PROJECT_URL = "https://digiformation.co.uk"
 const SAMPLE_EMAIL = "user@example.test"
-const SAMPLE_DATA: Record<string, object> = {
+const SAMPLE_DATA: Record<string, Partial<AuthEmailProps>> = {
   signup: {
     siteName: SITE_NAME,
     siteUrl: SAMPLE_PROJECT_URL,
@@ -121,7 +131,7 @@ async function handlePreview(req: Request): Promise<Response> {
     })
   }
 
-  const sampleData = SAMPLE_DATA[type] || {}
+  const sampleData: AuthEmailProps = { siteName: SITE_NAME, siteUrl: SAMPLE_PROJECT_URL, recipient: SAMPLE_EMAIL, confirmationUrl: SAMPLE_PROJECT_URL, token: '', email: SAMPLE_EMAIL, oldEmail: SAMPLE_EMAIL, newEmail: SAMPLE_EMAIL, ...SAMPLE_DATA[type] }
   const html = await renderAsync(React.createElement(EmailTemplate, sampleData))
 
   return new Response(html, {
@@ -143,7 +153,7 @@ async function handleWebhook(req: Request): Promise<Response> {
   }
 
   // Verify signature + timestamp, then parse payload.
-  let payload: any
+  let payload: Awaited<ReturnType<typeof parseEmailWebhookPayload>>
   let run_id = ''
   try {
     const verified = await verifyWebhookRequest({
@@ -222,12 +232,12 @@ async function handleWebhook(req: Request): Promise<Response> {
   const templateProps = {
     siteName: SITE_NAME,
     siteUrl: `https://${ROOT_DOMAIN}`,
-    recipient: payload.data.email,
-    confirmationUrl: payload.data.url,
-    token: payload.data.token,
-    email: payload.data.email,
-    oldEmail: payload.data.old_email,
-    newEmail: payload.data.new_email,
+    recipient: payload.data.email ?? '',
+    confirmationUrl: payload.data.url ?? '',
+    token: payload.data.token ?? '',
+    email: payload.data.email ?? '',
+    oldEmail: payload.data.old_email ?? '',
+    newEmail: payload.data.new_email ?? '',
   }
 
   // Render React Email to HTML and plain text

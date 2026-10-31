@@ -1,5 +1,5 @@
 import { useSeo } from "@/lib/seo";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -35,11 +35,11 @@ const Auth = () => {
   const [showSignInPassword, setShowSignInPassword] = useState(false);
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
 
-  const destinationForEmail = (email?: string | null) => {
-    if (redirectTo && redirectTo.startsWith("/")) return redirectTo;
+  const destinationForEmail = useCallback((email?: string | null) => {
+    if (redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//") && !redirectTo.includes("\\")) return redirectTo;
     const em = email?.toLowerCase();
     return (em === "info@digiformation.co.uk" || em === "info@digiformation.uk") ? "/admin" : "/dashboard";
-  };
+  }, [redirectTo]);
 
   const handleGoogle = async () => {
     setGoogleLoading(true);
@@ -86,7 +86,7 @@ const Auth = () => {
       }
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, destinationForEmail]);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

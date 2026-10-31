@@ -7,7 +7,7 @@ import GlowingEarth from "@/components/GlowingEarth";
 const headlines = [
   { pre: "Establish Your", accent: "UK & US Company", post: "in Days" },
   { pre: "Bespoke", accent: "Software & Web Development", post: "for Global Scale" },
-  { pre: "Over", accent: "500+ Companies", post: "Successfully Formed Worldwide" },
+  { pre: "Practical", accent: "Company Formation", post: "Support for Global Founders" },
   { pre: "Next-Gen", accent: "AI Agents & 3D Interactive Web", post: "Solutions" },
   { pre: "Banking, Payments &", accent: "Corporate Compliance", post: "— All In One Place" },
 ];
@@ -78,7 +78,7 @@ const DigiHero = () => {
     }
 
     return () => clearTimeout(timeout);
-  }, [charIndex, isDeleting, fullText.length, headlines.length, isFirstRun]);
+  }, [charIndex, isDeleting, fullText, isFirstRun]);
 
   // Slice segments based on current typed character count
   const displayedPre = fullText.slice(0, Math.min(charIndex, preEnd));

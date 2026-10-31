@@ -1,8 +1,10 @@
+import { errorMessage } from "@/businessos/lib/dataContracts";
 // Native Business OS client workspace — /admin/clients/:id
 // Replaces Legacy Admin's per-client workspace. All tabs read/write
 // directly against existing tables (admin RLS already in place).
 // No schema changes, no new edge functions.
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { DbInsert, DbRow } from "@/businessos/lib/dataContracts";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -29,7 +31,7 @@ type TabKey =
   | "company" | "addresses" | "orders" | "invoices" | "documents"
   | "wallet" | "subscriptions" | "tickets" | "emails";
 
-const TABS: { key: TabKey; label: string; icon: any }[] = [
+const TABS: { key: TabKey; label: string; icon: import("lucide-react").LucideIcon }[] = [
   { key: "company",       label: "Company",       icon: Building2 },
   { key: "addresses",     label: "Addresses",     icon: MapPin },
   { key: "orders",        label: "Orders",        icon: ShoppingBag },
@@ -55,19 +57,19 @@ export default function OsClientDetail() {
   const navigate = useNavigate();
   const tab = (params.get("tab") as TabKey) || "company";
 
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<DbRow<"profiles"> | null>(null);
   const [loading, setLoading] = useState(true);
 
   const setTab = (t: TabKey) => { params.set("tab", t); setParams(params); };
 
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     if (!userId) return;
     setLoading(true);
     const { data } = await supabase.from("profiles").select("*").eq("user_id", userId).maybeSingle();
     setProfile(data);
     setLoading(false);
-  };
-  useEffect(() => { loadProfile(); }, [userId]);
+  }, [userId]);
+  useEffect(() => { loadProfile(); }, [loadProfile]);
 
   if (!userId) return null;
 
@@ -139,14 +141,14 @@ function CompanyTab({ userId }: { userId: string }) {
   const [params, setParams] = useSearchParams();
   const draftId = params.get("draft");
 
-  const [liveRow, setLiveRow] = useState<any>(null);   // server copy
-  const [row, setRow] = useState<any>(null);           // currently displayed (live ∪ draft overlays)
+  const [liveRow, setLiveRow] = useState<DbInsert<"client_company_details"> | null>(null);   // server copy
+  const [row, setRow] = useState<DbInsert<"client_company_details"> | null>(null);           // live and draft overlays
   const [draft, setDraft] = useState<CompanyDraft | null>(null);
   const [editDraft, setEditDraft] = useState(false);   // when true, fields become editable mid-draft
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from("client_company_details").select("*").eq("user_id", userId).maybeSingle();
     const base = data || { user_id: userId };
@@ -156,7 +158,7 @@ function CompanyTab({ userId }: { userId: string }) {
     const d = draftId ? getDraft(draftId) : null;
     setDraft(d);
     if (d && d.userId === userId) {
-      const merged: any = { ...base };
+      const merged: DbInsert<"client_company_details"> = { ...base };
       for (const [k, p] of Object.entries(d.proposed)) {
         if (p?.value != null && String(p.value).trim() !== "") merged[k] = p.value;
       }
@@ -166,7 +168,7 @@ function CompanyTab({ userId }: { userId: string }) {
       setRow(base);
     }
     setLoading(false);
-  };
+  }, [userId, draftId]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, [userId, draftId]);
 
@@ -199,15 +201,15 @@ function CompanyTab({ userId }: { userId: string }) {
     toast.message("Draft discarded");
   };
 
-  const f = (k: string) => row?.[k] ?? "";
-  const set = (k: string, v: string) => setRow({ ...row, [k]: v });
-  const setDate = (k: string, v: string) => setRow({ ...row, [k]: v || null });
+  const f = (k: keyof DbInsert<"client_company_details">) => row?.[k] ?? "";
+  const set = (k: keyof DbInsert<"client_company_details">, v: string) => setRow({ ...row, [k]: v });
+  const setDate = (k: keyof DbInsert<"client_company_details">, v: string) => setRow({ ...row, [k]: v || null });
 
   // Field tone: derive from draft proposal vs live value.
-  const toneFor = (k: string): "default" | "new" | "changed" | "warn" => {
+  const toneFor = (k: DraftField): "default" | "new" | "changed" | "warn" => {
     if (!draft) return "default";
     const liveVal = liveRow?.[k];
-    const prop = (draft.proposed as any)?.[k];
+    const prop = draft.proposed[k];
     const status = fieldDraftStatus(liveVal, prop);
     if (status === "unchanged") return "default";
     if (prop?.confidence === "low") return "warn";
@@ -223,8 +225,8 @@ function CompanyTab({ userId }: { userId: string }) {
     if (!draft) return null;
     const changes: { field: string; from: string; to: string; confidence?: string }[] = [];
     for (const k of DRAFT_FIELDS) {
-      const prop = (draft.proposed as any)?.[k] as { value: string | null; confidence?: "high" | "medium" | "low" } | undefined;
-      const status = fieldDraftStatus(liveRow?.[k], prop as any);
+      const prop = draft.proposed[k];
+      const status = fieldDraftStatus(liveRow?.[k], prop);
       if (status !== "unchanged" && prop) {
         changes.push({
           field: k,
@@ -359,26 +361,26 @@ function AddressesTab({ userId }: { userId: string }) {
   const [params, setParams] = useSearchParams();
   const draftId = params.get("draft_addr");
 
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<DbRow<"client_addresses">[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<any | null>(null);
-  const [baseline, setBaseline] = useState<any | null>(null);  // live row before draft merge
+  const [editing, setEditing] = useState<DbInsert<"client_addresses"> | null>(null);
+  const [baseline, setBaseline] = useState<DbRow<"client_addresses"> | null>(null);  // live row before draft merge
   const [saving, setSaving] = useState(false);
   const [draft, setDraft] = useState<AddressDraft | null>(null);
   const [editDraftMode, setEditDraftMode] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from("client_addresses").select("*").eq("user_id", userId).order("created_at", { ascending: false });
     setRows(data || []);
     setLoading(false);
     return data || [];
-  };
+  }, [userId]);
 
   // Apply a draft from sessionStorage (AI Command Center handoff).
-  const applyDraft = (d: AddressDraft, list: any[]) => {
+  const applyDraft = (d: AddressDraft, list: DbRow<"client_addresses">[]) => {
     const match = d.matchAddressId ? list.find((r) => r.id === d.matchAddressId) : null;
-    const base: any = match ? { ...match } : {
+    const base: DbInsert<"client_addresses"> = match ? { ...match } : {
       user_id: userId,
       label: "Registered Office",
       service_type: "registered_office",
@@ -386,7 +388,7 @@ function AddressesTab({ userId }: { userId: string }) {
       status: "active",
     };
     setBaseline(match ? { ...match } : null);
-    const merged: any = { ...base };
+    const merged: DbInsert<"client_addresses"> = { ...base };
     for (const [k, p] of Object.entries(d.proposed)) {
       if (p?.value != null && String(p.value).trim() !== "") merged[k] = p.value;
     }
@@ -451,13 +453,13 @@ function AddressesTab({ userId }: { userId: string }) {
     load();
   };
 
-  const f = (k: string) => editing?.[k] ?? "";
-  const set = (k: string, v: any) => setEditing({ ...editing, [k]: v });
+  const f = (k: keyof DbInsert<"client_addresses">) => editing?.[k] ?? "";
+  const set = (k: keyof DbInsert<"client_addresses">, v: string | null) => setEditing({ ...editing, [k]: v });
 
   // Tone for a given field while a draft is active.
   const toneFor = (k: AddressDraftField): FieldTone => {
     if (!draft) return "default";
-    const prop = (draft.proposed as any)?.[k];
+    const prop = draft.proposed[k];
     if (!prop) return "default";
     const status = addressFieldStatus(baseline?.[k], prop);
     if (status === "new") return "new";
@@ -643,27 +645,27 @@ function AddressesTab({ userId }: { userId: string }) {
 // Everything is fetched here and split in-memory so the admin sees combined
 // totals + a per-managed-client breakdown without leaving the client workspace.
 function OrdersTab({ userId, email }: { userId: string; email?: string | null }) {
-  const [rows, setRows] = useState<any[]>([]);
-  const [managedClients, setManagedClients] = useState<any[]>([]);
+  const [rows, setRows] = useState<DbRow<"client_orders">[]>([]);
+  const [managedClients, setManagedClients] = useState<DbRow<"managed_clients">[]>([]);
   const [invCounts, setInvCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
   const [view, setView] = useState<"direct" | "b2b">("direct");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const [{ data: linked }, { data: guest }, { data: placed }, { data: mc }] = await Promise.all([
       supabase.from("client_orders").select("*").eq("user_id", userId).order("order_date", { ascending: false }),
       email
         ? supabase.from("client_orders").select("*").is("user_id", null).ilike("customer_email", email).order("order_date", { ascending: false })
-        : Promise.resolve({ data: [] as any[] }),
+        : Promise.resolve({ data: [] as DbRow<"client_orders">[] }),
       // B2B: orders this client placed from their portal for other customers.
       supabase.from("client_orders").select("*").eq("placed_by_user_id", userId).order("order_date", { ascending: false }),
       supabase.from("managed_clients").select("*").eq("portal_owner_user_id", userId),
     ]);
-    const merged: any[] = [];
+    const merged: DbRow<"client_orders">[] = [];
     const seen = new Set<string>();
-    const push = (row: any) => { if (row && !seen.has(row.id)) { seen.add(row.id); merged.push(row); } };
+    const push = (row: DbRow<"client_orders">) => { if (row && !seen.has(row.id)) { seen.add(row.id); merged.push(row); } };
     (linked || []).forEach(push);
     (guest || []).forEach(push);
     (placed || []).forEach(push);
@@ -685,7 +687,7 @@ function OrdersTab({ userId, email }: { userId: string; email?: string | null })
       setInvCounts({});
     }
     setLoading(false);
-  };
+  }, [userId, email]);
   useEffect(() => {
     load();
     const ch = supabase.channel(`os-cd-orders-${userId}`)
@@ -693,10 +695,10 @@ function OrdersTab({ userId, email }: { userId: string; email?: string | null })
       .on("postgres_changes", { event: "*", schema: "public", table: "client_orders", filter: `placed_by_user_id=eq.${userId}` }, load)
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [userId, email]);
+  }, [userId, email, load]);
 
   const emailLc = (email || "").toLowerCase();
-  const isB2B = (o: any) => {
+  const isB2B = useCallback((o: DbRow<"client_orders">) => {
     if (o.placed_by_user_id !== userId) return false;
     if (o.managed_client_id) return true;
     if (o.user_id && o.user_id !== userId) return true;
@@ -705,10 +707,10 @@ function OrdersTab({ userId, email }: { userId: string; email?: string | null })
       return !!ce && !!emailLc && ce !== emailLc;
     }
     return false;
-  };
+  }, [userId, emailLc]);
 
-  const directRows = useMemo(() => rows.filter((o) => !isB2B(o)), [rows, userId, emailLc]);
-  const b2bRows = useMemo(() => rows.filter(isB2B), [rows, userId, emailLc]);
+  const directRows = useMemo(() => rows.filter((o) => !isB2B(o)), [rows, isB2B]);
+  const b2bRows = useMemo(() => rows.filter(isB2B), [rows, isB2B]);
   const directTotal = useMemo(() => directRows.reduce((s, o) => s + Number(o.amount_gbp || 0), 0), [directRows]);
   const b2bTotal = useMemo(() => b2bRows.reduce((s, o) => s + Number(o.amount_gbp || 0), 0), [b2bRows]);
 
@@ -886,17 +888,17 @@ function SummaryStat({ label, value, sub, tone }: { label: string; value: number
 
 // ─────────────────────────── INVOICES ───────────────────────────
 function InvoicesTab({ userId, email }: { userId: string; email?: string | null }) {
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<DbRow<"invoices">[]>([]);
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const [{ data: linked }, { data: guest }] = await Promise.all([
       supabase.from("invoices").select("*").eq("user_id", userId).order("issue_date", { ascending: false }),
       email
         ? supabase.from("invoices").select("*").is("user_id", null).ilike("bill_to_email", email).order("issue_date", { ascending: false })
-        : Promise.resolve({ data: [] as any[] }),
+        : Promise.resolve({ data: [] as DbRow<"invoices">[] }),
     ]);
     const merged = [...(linked || [])];
     for (const row of guest || []) {
@@ -905,14 +907,14 @@ function InvoicesTab({ userId, email }: { userId: string; email?: string | null 
     merged.sort((a, b) => new Date(b.issue_date || b.created_at).getTime() - new Date(a.issue_date || a.created_at).getTime());
     setRows(merged);
     setLoading(false);
-  };
+  }, [userId, email]);
   useEffect(() => {
     load();
     const ch = supabase.channel(`os-cd-inv-${userId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "invoices", filter: `user_id=eq.${userId}` }, load)
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [userId, email]);
+  }, [userId, email, load]);
 
   if (loading) return <div className="os-glass p-8 text-center"><Loader2 className="w-5 h-5 animate-spin mx-auto text-white/40" /></div>;
   if (!rows.length) return <div className="os-glass p-8 text-center text-sm text-white/50">No invoices.</div>;
@@ -939,19 +941,19 @@ function InvoicesTab({ userId, email }: { userId: string; email?: string | null 
 
 // ─────────────────────────── DOCUMENTS ───────────────────────────
 function DocumentsTab({ userId, email, name }: { userId: string; email?: string; name?: string }) {
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<DbRow<"client_documents">[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [docName, setDocName] = useState("");
   const [notify, setNotify] = useState(true);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from("client_documents").select("*").eq("user_id", userId).order("created_at", { ascending: false });
     setRows(data || []);
     setLoading(false);
-  };
-  useEffect(() => { load(); }, [userId]);
+  }, [userId]);
+  useEffect(() => { load(); }, [load]);
 
   const onUpload = async (file: File) => {
     setUploading(true);
@@ -983,8 +985,8 @@ function DocumentsTab({ userId, email, name }: { userId: string; email?: string;
       toast.success("Document uploaded" + (notify && email ? " · client notified" : ""));
       setDocName("");
       load();
-    } catch (e: any) {
-      toast.error(e?.message || "Upload failed");
+    } catch (e: unknown) {
+      toast.error(errorMessage(e, "") || "Upload failed");
     } finally {
       setUploading(false);
     }
@@ -996,7 +998,7 @@ function DocumentsTab({ userId, email, name }: { userId: string; email?: string;
     if (data?.signedUrl) window.open(data.signedUrl, "_blank");
   };
 
-  const remove = async (row: any) => {
+  const remove = async (row: DbRow<"client_documents">) => {
     if (!confirm(`Delete "${row.name}"?`)) return;
     if (row.file_url && !row.file_url.startsWith("http")) {
       await supabase.storage.from("client-docs").remove([row.file_url]);
@@ -1047,18 +1049,18 @@ function DocumentsTab({ userId, email, name }: { userId: string; email?: string;
 
 // ─────────────────────────── WALLET ───────────────────────────
 function WalletTab({ userId }: { userId: string }) {
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<DbRow<"client_wallet_transactions">[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<{ type: string; amount: string; desc: string }>({ type: "credit", amount: "", desc: "" });
   const [saving, setSaving] = useState(false);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from("client_wallet_transactions").select("*").eq("user_id", userId).order("txn_date", { ascending: false });
     setRows(data || []);
     setLoading(false);
-  };
-  useEffect(() => { load(); }, [userId]);
+  }, [userId]);
+  useEffect(() => { load(); }, [load]);
 
   const balance = useMemo(() => rows.reduce((a, r) => a + (r.txn_type === "credit" ? Number(r.amount_gbp) : -Number(r.amount_gbp)), 0), [rows]);
 
@@ -1120,16 +1122,16 @@ function WalletTab({ userId }: { userId: string }) {
 
 // ─────────────────────────── SUBSCRIPTIONS ───────────────────────────
 function SubscriptionsTab({ userId }: { userId: string }) {
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<DbRow<"client_subscriptions">[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from("client_subscriptions").select("*").eq("user_id", userId).order("created_at", { ascending: false });
     setRows(data || []);
     setLoading(false);
-  };
-  useEffect(() => { load(); }, [userId]);
+  }, [userId]);
+  useEffect(() => { load(); }, [load]);
 
   if (loading) return <div className="os-glass p-8 text-center"><Loader2 className="w-5 h-5 animate-spin mx-auto text-white/40" /></div>;
   if (!rows.length) return <div className="os-glass p-8 text-center text-sm text-white/50">No subscriptions.</div>;
@@ -1154,22 +1156,22 @@ function SubscriptionsTab({ userId }: { userId: string }) {
 
 // ─────────────────────────── TICKETS ───────────────────────────
 function TicketsTab({ userId }: { userId: string }) {
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState<DbRow<"client_tickets">[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase.from("client_tickets").select("*").eq("user_id", userId).order("created_at", { ascending: false });
     setRows(data || []);
     setLoading(false);
-  };
+  }, [userId]);
   useEffect(() => {
     load();
     const ch = supabase.channel(`os-cd-tickets-${userId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "client_tickets", filter: `user_id=eq.${userId}` }, load)
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [userId]);
+  }, [userId, load]);
 
   const updateStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("client_tickets").update({ status }).eq("id", id);
@@ -1217,7 +1219,7 @@ const EMAIL_TEMPLATES = [
   { name: "annual-accounts-reminder",         label: "Annual accounts reminder" },
 ];
 
-function EmailsTab({ userId, profile }: { userId: string; profile: any }) {
+function EmailsTab({ userId, profile }: { userId: string; profile: DbRow<"profiles"> | null }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -1301,7 +1303,7 @@ function toneBadge(tone: FieldTone | undefined) {
   return <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded-full ${cls}`}>{label}</span>;
 }
 
-function Field({ label, value, onChange, type, colSpan, tone, readOnly }: { label: string; value: any; onChange: (v: string) => void; type?: string; colSpan?: number; tone?: FieldTone; readOnly?: boolean }) {
+function Field({ label, value, onChange, type, colSpan, tone, readOnly }: { label: string; value: string | number | null; onChange: (v: string) => void; type?: string; colSpan?: number; tone?: FieldTone; readOnly?: boolean }) {
   return (
     <label className={`block text-xs text-white/60 ${colSpan === 2 ? "md:col-span-2" : ""}`}>
       <div className="mb-1 flex items-center">{label}{toneBadge(tone)}</div>
@@ -1315,7 +1317,7 @@ function Field({ label, value, onChange, type, colSpan, tone, readOnly }: { labe
     </label>
   );
 }
-function DateField({ label, value, onChange, tone, readOnly }: { label: string; value: any; onChange: (v: string) => void; tone?: FieldTone; readOnly?: boolean }) {
+function DateField({ label, value, onChange, tone, readOnly }: { label: string; value: string | null; onChange: (v: string) => void; tone?: FieldTone; readOnly?: boolean }) {
   return (
     <label className="block text-xs text-white/60">
       <div className="mb-1 flex items-center">{label}{toneBadge(tone)}</div>
@@ -1329,7 +1331,7 @@ function DateField({ label, value, onChange, tone, readOnly }: { label: string; 
     </label>
   );
 }
-function SelectField({ label, value, onChange, options, tone, disabled }: { label: string; value: any; onChange: (v: string) => void; options: string[]; tone?: FieldTone; disabled?: boolean }) {
+function SelectField({ label, value, onChange, options, tone, disabled }: { label: string; value: string | null; onChange: (v: string) => void; options: string[]; tone?: FieldTone; disabled?: boolean }) {
   return (
     <label className="block text-xs text-white/60">
       <div className="mb-1 flex items-center">{label}{toneBadge(tone)}</div>

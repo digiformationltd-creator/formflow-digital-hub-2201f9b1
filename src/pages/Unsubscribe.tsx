@@ -47,7 +47,7 @@ const Unsubscribe = () => {
   const confirm = async () => {
     if (!token) return;
     setState("submitting");
-    const { data, error } = await supabase.functions.invoke("handle-email-unsubscribe", {
+    const { data, error } = await supabase.functions.invoke<{ success?: boolean; reason?: string }>("handle-email-unsubscribe", {
       body: { token },
     });
     if (error) {
@@ -55,8 +55,8 @@ const Unsubscribe = () => {
       setState("error");
       return;
     }
-    if ((data as any)?.success) setState("done");
-    else if ((data as any)?.reason === "already_unsubscribed") setState("already");
+    if (data?.success) setState("done");
+    else if (data?.reason === "already_unsubscribed") setState("already");
     else setState("error");
   };
 

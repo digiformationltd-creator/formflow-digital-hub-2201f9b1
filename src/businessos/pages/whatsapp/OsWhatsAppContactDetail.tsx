@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { DbRow } from "@/businessos/lib/dataContracts";
+import type { ReactNode } from "react";
 import { ArrowLeft, Building2, FileText, ShoppingBag, Clock, MessageSquare, ShieldAlert, Lock } from "lucide-react";
 
 export default function OsWhatsAppContactDetail() {
   const { id } = useParams();
-  const [contact, setContact] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
-  const [company, setCompany] = useState<any>(null);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [invoices, setInvoices] = useState<any[]>([]);
-  const [docs, setDocs] = useState<any[]>([]);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [contact, setContact] = useState<DbRow<"whatsapp_contacts"> | null>(null);
+  const [profile, setProfile] = useState<DbRow<"profiles"> | null>(null);
+  const [company, setCompany] = useState<DbRow<"client_company_details"> | null>(null);
+  const [orders, setOrders] = useState<DbRow<"client_orders">[]>([]);
+  const [invoices, setInvoices] = useState<DbRow<"invoices">[]>([]);
+  const [docs, setDocs] = useState<DbRow<"client_documents">[]>([]);
+  const [messages, setMessages] = useState<DbRow<"whatsapp_message_log">[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -69,7 +71,7 @@ export default function OsWhatsAppContactDetail() {
           <div className="flex flex-col items-end gap-1">
             <span className={`text-[11px] px-2.5 py-1 rounded-full ${
               contact.opt_in_status === "opted_in" ? "bg-green-500/20 text-green-300" :
-              contact.opt_in_status === "opted_out" || contact.opt_in_status === "blocked" ? "bg-red-500/20 text-red-300" :
+              contact.opt_in_status === "opted_out" ? "bg-red-500/20 text-red-300" :
               "bg-white/10 text-white/70"
             }`}>{contact.opt_in_status}</span>
             <span className="text-[10px] text-white/40">Source: {contact.source || "manual"}</span>
@@ -131,10 +133,10 @@ export default function OsWhatsAppContactDetail() {
         <Section icon={FileText} title={`Invoices (${invoices.length})`}>
           {invoices.length === 0 ? <Empty>No invoices.</Empty> : (
             <ul className="divide-y divide-white/5 text-sm">
-              {invoices.slice(0, 8).map((i: any) => (
+              {invoices.slice(0, 8).map((i) => (
                 <li key={i.id} className="py-2 flex items-center justify-between">
                   <span className="mono text-xs">{i.invoice_number}</span>
-                  <span className="mono text-xs text-white/60">£{Number(i.total || 0).toFixed(2)}</span>
+                  <span className="mono text-xs text-white/60">£{Number(i.total_gbp || 0).toFixed(2)}</span>
                 </li>
               ))}
             </ul>
@@ -144,8 +146,8 @@ export default function OsWhatsAppContactDetail() {
         <Section icon={FileText} title={`Documents (${docs.length})`}>
           {docs.length === 0 ? <Empty>No documents.</Empty> : (
             <ul className="divide-y divide-white/5 text-sm">
-              {docs.map((d: any) => (
-                <li key={d.id} className="py-2 text-xs text-white/70">{d.title || d.file_name}</li>
+              {docs.map((d) => (
+                <li key={d.id} className="py-2 text-xs text-white/70">{d.name}</li>
               ))}
             </ul>
           )}
@@ -157,7 +159,7 @@ export default function OsWhatsAppContactDetail() {
             {orders.slice(0, 5).map(o => (
               <TimelineItem key={o.id} date={o.created_at} text={`Order ${o.order_ref} — ${o.service} (${o.status})`} />
             ))}
-            {invoices.slice(0, 3).map((i: any) => (
+            {invoices.slice(0, 3).map((i) => (
               <TimelineItem key={i.id} date={i.created_at} text={`Invoice ${i.invoice_number} generated`} />
             ))}
             {company?.address_expire && <TimelineItem date={company.address_expire} text="Registered address renewal due" />}
@@ -174,7 +176,7 @@ export default function OsWhatsAppContactDetail() {
           </div>
         ) : (
           <ul className="divide-y divide-white/5 text-sm">
-            {messages.map((m: any) => (
+            {messages.map((m) => (
               <li key={m.id} className="py-2">
                 <div className="flex justify-between text-xs text-white/50">
                   <span>{m.direction} · {m.template_name || m.category}</span>
@@ -189,7 +191,7 @@ export default function OsWhatsAppContactDetail() {
   );
 }
 
-function Section({ icon: Icon, title, children }: any) {
+function Section({ icon: Icon, title, children }: { icon: import("lucide-react").LucideIcon; title: string; children: ReactNode }) {
   return (
     <div className="os-glass p-4 rounded-2xl">
       <h3 className="font-semibold text-sm mb-3 flex items-center gap-2"><Icon className="w-4 h-4 text-white/60" /> {title}</h3>
@@ -197,7 +199,7 @@ function Section({ icon: Icon, title, children }: any) {
     </div>
   );
 }
-function Kv({ label, value, tone }: any) {
+function Kv({ label, value, tone }: { label: string; value: ReactNode; tone?: "amber" | "green" }) {
   return (
     <div>
       <div className="text-[10px] uppercase tracking-wider text-white/40">{label}</div>
@@ -205,8 +207,8 @@ function Kv({ label, value, tone }: any) {
     </div>
   );
 }
-function Empty({ children }: any) { return <div className="text-xs text-white/40">{children}</div>; }
-function Row({ label, ok, children }: any) {
+function Empty({ children }: { children: ReactNode }) { return <div className="text-xs text-white/40">{children}</div>; }
+function Row({ label, ok, children }: { label: string; ok: boolean; children: ReactNode }) {
   return (
     <div className="flex items-center justify-between">
       <span className="text-white/60">{label}</span>

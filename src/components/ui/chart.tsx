@@ -1,5 +1,8 @@
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
+import type { Payload, ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+import type { LegendPayload } from "recharts/types/component/DefaultLegendContent";
+type TooltipItem = Omit<Payload<ValueType, NameType>, "payload"> & { payload?: Record<string, unknown> };
 
 import { cn } from "@/lib/utils";
 
@@ -93,11 +96,11 @@ const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
     active?: boolean;
-    payload?: any[];
-    label?: any;
-    labelFormatter?: (value: any, payload: any) => React.ReactNode;
+    payload?: TooltipItem[];
+    label?: React.ReactNode;
+    labelFormatter?: (value: React.ReactNode, payload: TooltipItem[]) => React.ReactNode;
     labelClassName?: string;
-    formatter?: (value: any, name: any, item: any, index: number, payload: any) => React.ReactNode;
+    formatter?: (value: ValueType, name: NameType, item: TooltipItem, index: number, payload: Record<string, unknown>) => React.ReactNode;
     color?: string;
     hideLabel?: boolean;
     hideIndicator?: boolean;
@@ -169,11 +172,11 @@ const ChartTooltipContent = React.forwardRef<
           {payload.map((item, index) => {
             const key = `${nameKey || item.name || item.dataKey || "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
-            const indicatorColor = color || item.payload.fill || item.color;
+            const indicatorColor = color || (typeof item.payload?.fill === "string" ? item.payload.fill : item.color);
 
             return (
               <div
-                key={item.dataKey}
+                key={String(item.dataKey ?? index)}
                 className={cn(
                   "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground",
                   indicator === "dot" && "items-center",
@@ -236,7 +239,7 @@ const ChartLegend = RechartsPrimitive.Legend;
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
-    payload?: any[];
+    payload?: LegendPayload[];
     verticalAlign?: "top" | "middle" | "bottom";
     hideIcon?: boolean;
     nameKey?: string;

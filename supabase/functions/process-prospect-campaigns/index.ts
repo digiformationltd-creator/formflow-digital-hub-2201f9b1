@@ -13,6 +13,7 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
+import { authorizeAutomation, jsonResponse } from '../_shared/request-security.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -122,14 +123,14 @@ Use 2–3 short paragraphs. No greeting line (the template adds "Dear X,").`
     if (!content) return null
     const parsed = JSON.parse(content)
     if (!parsed?.subject || !Array.isArray(parsed?.paragraphs) || parsed.paragraphs.length === 0) return null
-    return { subject: String(parsed.subject).slice(0, 140), paragraphs: parsed.paragraphs.map((p: any) => String(p)).slice(0, 5) }
+    return { subject: String(parsed.subject).slice(0, 140), paragraphs: parsed.paragraphs.filter((p: unknown): p is string => typeof p === 'string').slice(0, 5) }
   } catch (e) {
     console.error('AI generate failed', e)
     return null
   }
 }
 
-async function sendEmail(supabase: any, prospect: Prospect, subject: string, paragraphs: string[], run: Run, step: number): Promise<{ ok: boolean; messageId: string; error?: string }> {
+async function sendEmail(supabase: ReturnType<typeof createClient>, prospect: Prospect, subject: string, paragraphs: string[], run: Run, step: number): Promise<{ ok: boolean; messageId: string; error?: string }> {
   const greeting = (prospect.contact_name || prospect.business_name || 'there').split(' ')[0]
   const messageId = `outreach-${run.id}-${step}`
   const body = {
@@ -139,6 +140,7 @@ async function sendEmail(supabase: any, prospect: Prospect, subject: string, par
     trigger_source: 'automation',
     template_data: {
       greeting,
+      subject,
       heading: subject,
       preview: subject,
       paragraphs,
@@ -146,9 +148,6 @@ async function sendEmail(supabase: any, prospect: Prospect, subject: string, par
     // Carry the dynamic subject into the registry's subject function:
     // (registry uses (d) => d.subject || default; templateData.subject works)
   }
-  // The registry subject() reads from templateData, but send-transactional-email
-  // passes templateData → subject(). We add subject to templateData too:
-  ;(body.template_data as any).subject = subject
 
   const res = await fetch(`${SUPABASE_URL}/functions/v1/send-transactional-email`, {
     method: 'POST',
@@ -169,6 +168,9 @@ async function sendEmail(supabase: any, prospect: Prospect, subject: string, par
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
 
+  if (req.method !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405, corsHeaders)
+  const authorization = await authorizeAutomation(req)
+  if (authorization !== 200) return jsonResponse({ error: authorization === 403 ? 'Admin role required' : 'Unauthorized or unavailable' }, authorization, corsHeaders)
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY)
   const summary = {
     processed: 0, sent: 0, completed: 0, failed: 0, skipped_reply: 0,
@@ -343,7 +345,7 @@ Deno.serve(async (req) => {
     })
   } catch (e) {
     console.error('process-prospect-campaigns fatal', e)
-    return new Response(JSON.stringify({ ok: false, error: String(e), summary }), {
+    return new Response(JSON.stringify({ ok: false, error: 'Campaign processing unavailable', summary }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }

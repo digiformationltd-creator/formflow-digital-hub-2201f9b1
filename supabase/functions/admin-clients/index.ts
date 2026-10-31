@@ -143,8 +143,8 @@ Deno.serve(async (req) => {
       return json({ error: "An internal error occurred" }, 500);
     }
 
-    const adminIds = new Set((roles || []).filter((r: any) => r.role === "admin").map((r: any) => r.user_id));
-    const clients = (profiles || []).filter((p: any) => !adminIds.has(p.user_id));
+    const adminIds = new Set((roles || []).filter((r: { role: string; user_id: string }) => r.role === "admin").map((r: { user_id: string }) => r.user_id));
+    const clients = (profiles || []).filter((p: { user_id: string }) => !adminIds.has(p.user_id));
 
     return json({ clients, totalAuthUsers: authUsers.length, totalProfiles: profiles?.length || 0 });
   } catch (error) {

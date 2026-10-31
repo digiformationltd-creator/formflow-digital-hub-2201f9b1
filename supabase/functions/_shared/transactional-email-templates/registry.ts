@@ -1,12 +1,13 @@
 /// <reference types="npm:@types/react@18.3.1" />
 import * as React from 'npm:react@18.3.1'
+import type { EmailTemplateData } from '../email-template-data.ts'
 
 export interface TemplateEntry {
-  component: React.ComponentType<any>
-  subject: string | ((data: Record<string, any>) => string)
+  component: React.ComponentType<EmailTemplateData>
+  subject: string | ((data: EmailTemplateData) => string)
   to?: string
   displayName?: string
-  previewData?: Record<string, any>
+  previewData?: Partial<EmailTemplateData>
 }
 
 import { template as orderConfirmation } from './order-confirmation.tsx'

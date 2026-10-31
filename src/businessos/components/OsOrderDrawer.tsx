@@ -8,7 +8,7 @@
 //   - send-transactional-email  (order-in-progress / order-completed)
 //
 // No schema changes, no new edge functions, no automation changes.
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -100,7 +100,7 @@ export default function OsOrderDrawer({
   const [emailBusy, setEmailBusy] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     if (!orderId) return;
     setLoading(true);
     const [{ data: o, error: oErr }, { data: invs }] = await Promise.all([
@@ -129,7 +129,7 @@ export default function OsOrderDrawer({
       setPortalOwner(null);
       setOwnerOrderCount(null);
     }
-  };
+  }, [orderId]);
 
   useEffect(() => {
     if (open && orderId) {
@@ -148,7 +148,7 @@ export default function OsOrderDrawer({
       setPortalOwner(null);
       setOwnerOrderCount(null);
     }
-  }, [open, orderId]);
+  }, [open, orderId, load]);
 
   const isGuest = useMemo(() => !!order && !order.user_id, [order]);
   const isB2B = !!portalOwner;
@@ -441,7 +441,7 @@ export default function OsOrderDrawer({
   );
 }
 
-function Row({ icon: Icon, label }: { icon: any; label: string }) {
+function Row({ icon: Icon, label }: { icon: import("lucide-react").LucideIcon; label: string }) {
   return (
     <div className="flex items-center gap-2 min-w-0">
       <Icon className="w-3.5 h-3.5 text-white/40 shrink-0" />

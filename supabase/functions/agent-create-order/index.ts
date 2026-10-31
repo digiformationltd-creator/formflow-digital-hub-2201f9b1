@@ -22,6 +22,8 @@
 // ------------------------------------------------------------------
 
 import { createClient } from 'jsr:@supabase/supabase-js@2'
+import { isRecord, readBoundedText } from '../_shared/request-security.ts'
+import { isValidAgentOrder } from '../_shared/order-agent-request.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -118,20 +120,21 @@ function safeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 120) || 'file.bin'
 }
 
-function validateBody(body: any): { ok: true; data: AgentRequestBody } | { ok: false; error: string; missing: string[] } {
+function validateBody(body: unknown): { ok: true; data: AgentRequestBody } | { ok: false; error: string; missing: string[] } {
   const missing: string[] = []
-  if (!body || typeof body !== 'object') return { ok: false, error: 'Body must be a JSON object', missing: ['body'] }
+  if (!isRecord(body)) return { ok: false, error: 'Body must be a JSON object', missing: ['body'] }
   if (!body.service_slug || typeof body.service_slug !== 'string') missing.push('service_slug')
   if (!body.checkout_request_id || typeof body.checkout_request_id !== 'string') missing.push('checkout_request_id')
   if (typeof body.amount_gbp !== 'number' || !Number.isFinite(body.amount_gbp) || body.amount_gbp < 0) missing.push('amount_gbp')
   const c = body.customer
-  if (!c || typeof c !== 'object') missing.push('customer')
+  if (!isRecord(c)) missing.push('customer')
   else {
     if (!c.full_name || typeof c.full_name !== 'string') missing.push('customer.full_name')
     if (!c.email || typeof c.email !== 'string' || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.email)) missing.push('customer.email')
   }
   if (missing.length) return { ok: false, error: 'Missing or invalid required fields', missing }
-  return { ok: true, data: body as AgentRequestBody }
+  if (!isValidAgentOrder(body)) return { ok: false, error: 'Invalid or oversized nested order, customer or document fields', missing: ['nested_fields'] }
+  return { ok: true, data: body }
 }
 
 Deno.serve(async (req) => {
@@ -150,6 +153,9 @@ Deno.serve(async (req) => {
   const requestId = req.headers.get('x-request-id') ?? crypto.randomUUID()
 
   const audit = async (entry: Record<string, unknown>) => {
+    // Never persist raw base64 documents or arbitrary request fields in audit logs.
+    const payload = entry.request_payload
+    if (isRecord(payload)) entry = { ...entry, request_payload: { service_slug: payload.service_slug, checkout_request_id: payload.checkout_request_id, amount_gbp: payload.amount_gbp, currency: payload.currency, document_count: Array.isArray(payload.documents) ? payload.documents.length : 0 } }
     try {
       await admin.from('agent_audit_log').insert({
         agent_name: 'odysseus',
@@ -174,7 +180,9 @@ Deno.serve(async (req) => {
   }
 
   // ---------- Read raw body for HMAC + JSON parsing ----------
-  const rawBody = await req.text()
+  let rawBody: string
+  try { rawBody = await readBoundedText(req, 8 * 1024 * 1024) }
+  catch (error) { return jsonResponse({ error: 'Invalid or oversized body' }, error instanceof RangeError ? 413 : 400) }
   if (webhookSecret) {
     const presentedSig = (req.headers.get('x-agent-signature') ?? '').toLowerCase().replace(/^sha256=/, '')
     const expectedSig = await hmacSha256Hex(webhookSecret, rawBody)
@@ -184,7 +192,7 @@ Deno.serve(async (req) => {
     }
   }
 
-  let parsed: any
+  let parsed: unknown
   try {
     parsed = JSON.parse(rawBody)
   } catch {
@@ -194,14 +202,16 @@ Deno.serve(async (req) => {
 
   const validation = validateBody(parsed)
   if (!validation.ok) {
+    const fields = isRecord(parsed) ? parsed : {}
+    const customer = isRecord(fields.customer) ? fields.customer : {}
     await audit({
       action: 'create_order',
       status: 'validation_failed',
-      checkout_request_id: parsed?.checkout_request_id ?? null,
-      customer_email: parsed?.customer?.email ?? null,
-      service_slug: parsed?.service_slug ?? null,
-      amount_gbp: typeof parsed?.amount_gbp === 'number' ? parsed.amount_gbp : null,
-      request_payload: parsed,
+      checkout_request_id: typeof fields.checkout_request_id === 'string' ? fields.checkout_request_id : null,
+      customer_email: typeof customer.email === 'string' ? customer.email : null,
+      service_slug: typeof fields.service_slug === 'string' ? fields.service_slug : null,
+      amount_gbp: typeof fields.amount_gbp === 'number' ? fields.amount_gbp : null,
+      request_payload: fields,
       error_message: validation.error,
       flags: validation.missing,
     })

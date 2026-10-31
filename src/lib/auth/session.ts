@@ -8,7 +8,7 @@ export type AdminSessionResult =
 const OWNER_EMAILS = ["info@digiformation.co.uk", "info@digiformation.uk"];
 
 export const isOwnerEmail = (email?: string | null) =>
-  email?.toLowerCase() === OWNER_EMAIL;
+  typeof email === 'string' && OWNER_EMAILS.includes(email.trim().toLowerCase());
 
 /**
  * Get the current session WITHOUT ever calling refreshSession() manually.

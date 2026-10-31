@@ -1,3 +1,4 @@
+import { errorMessage } from "@/businessos/lib/dataContracts";
 // Email Marketing — LIVE backend wiring (Phase 8).
 // All KPIs, queue, logs and campaign data come from public.email_send_log,
 // public.email_campaigns and public.leads. Tabs without a backend show
@@ -20,7 +21,7 @@ type Tab =
   | "overview" | "prospects" | "sequences" | "campaigns" | "templates"
   | "queue" | "logs" | "analytics" | "operations";
 
-const TABS: { id: Tab; label: string; icon: any }[] = [
+const TABS: { id: Tab; label: string; icon: import("lucide-react").LucideIcon }[] = [
   { id: "overview",   label: "Overview",   icon: BarChart3 },
   { id: "prospects",  label: "Prospects",  icon: Target },
   { id: "sequences",  label: "Sequences",  icon: Sparkles },
@@ -124,8 +125,8 @@ export default function OsEmailMarketing() {
         pending: pendingC.count ?? 0,
         suppressed: suppressedC.count ?? 0,
       });
-    } catch (e: any) {
-      setErr(e?.message ?? "Failed to load");
+    } catch (e: unknown) {
+      setErr(errorMessage(e, "") ?? "Failed to load");
     } finally {
       setLoading(false);
     }
@@ -216,7 +217,7 @@ export default function OsEmailMarketing() {
 
 /* ------------------------------ OVERVIEW -------------------------------- */
 
-function KPI({ label, value, sub, icon: Icon, tint }: any) {
+function KPI({ label, value, sub, icon: Icon, tint }: { label: string; value: string | number; sub?: string; icon: import("lucide-react").LucideIcon; tint: string }) {
   return (
     <div className="os-glass p-4">
       <div className="flex items-center justify-between">

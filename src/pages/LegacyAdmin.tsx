@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { parseClientAdminTab } from '@/lib/client-models';
+import type { ClientAdminTab, ClientCompany, ClientAddress, ClientOrder, ClientInvoice, ClientSubscription, ClientWalletTransaction, ClientDocument, ClientProfile, ClientCompanyPatch, ClientAddressPatch, ClientOrderPatch, ClientInvoicePatch, ClientSubscriptionPatch, ClientWalletPatch, ClientDocumentPatch, ClientMutableTable } from '@/lib/client-models';
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { checkAdminSession } from "@/lib/auth/session";
@@ -32,7 +34,7 @@ const LegacyAdmin = () => {
   const [clients, setClients] = useState<ClientRow[]>([]);
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(searchParams.get("client"));
-  const [initialTab, setInitialTab] = useState<"company" | "addresses" | "orders" | "invoices" | "wallet" | "docs" | "emails">((searchParams.get("tab") as any) || "company");
+  const [initialTab, setInitialTab] = useState<"company" | "addresses" | "orders" | "invoices" | "wallet" | "docs" | "emails">(parseClientAdminTab(searchParams.get("tab")));
   const [loadingClients, setLoadingClients] = useState(false);
   // affiliate view removed
 
@@ -165,7 +167,7 @@ const addDays = (dateStr: string, days: number): string => {
   return d.toISOString().slice(0, 10);
 };
 
-const computeAddressExpireDate = (a: any): string | null => {
+const computeAddressExpireDate = (a: ClientAddress): string | null => {
   if (a?.expire_date) return a.expire_date;
   if (a?.start_date) return addDays(a.start_date, 365);
   if (a?.created_at) return addDays(String(a.created_at).slice(0, 10), 365);
@@ -174,7 +176,7 @@ const computeAddressExpireDate = (a: any): string | null => {
 
 const computeCompanyDueDate = (
   template: "confirmation-statement-reminder" | "annual-accounts-reminder",
-  c: any,
+  c: ClientCompany,
 ): string | null => {
   if (template === "confirmation-statement-reminder") {
     if (c?.confirmation_due) return c.confirmation_due;
@@ -326,17 +328,17 @@ const CreateClientPanel = ({ onCreated }: { onCreated: () => void }) => {
 
 const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: string; initialTab?: "company" | "addresses" | "orders" | "invoices" | "wallet" | "docs" | "emails"; onBack: () => void }) => {
   const [tab, setTab] = useState<"company" | "addresses" | "orders" | "invoices" | "wallet" | "docs" | "emails">(initialTab);
-  const [profile, setProfile] = useState<any>({});
-  const [companies, setCompanies] = useState<any[]>([]);
-  const [addresses, setAddresses] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [invoices, setInvoices] = useState<any[]>([]);
-  const [subs, setSubs] = useState<any[]>([]);
-  const [wallet, setWallet] = useState<any[]>([]);
-  const [docs, setDocs] = useState<any[]>([]);
+  const [profile, setProfile] = useState<ClientProfile>({});
+  const [companies, setCompanies] = useState<ClientCompany[]>([]);
+  const [addresses, setAddresses] = useState<ClientAddress[]>([]);
+  const [orders, setOrders] = useState<ClientOrder[]>([]);
+  const [invoices, setInvoices] = useState<ClientInvoice[]>([]);
+  const [subs, setSubs] = useState<ClientSubscription[]>([]);
+  const [wallet, setWallet] = useState<ClientWalletTransaction[]>([]);
+  const [docs, setDocs] = useState<ClientDocument[]>([]);
   const [saving, setSaving] = useState(false);
 
-  const reload = async () => {
+  const reload = useCallback(async () => {
     const [p, c, a, o, inv, s, w, d] = await Promise.all([
       supabase.from("profiles").select("*").eq("user_id", userId).maybeSingle(),
       supabase.from("client_company_details").select("*").eq("user_id", userId).order("created_at", { ascending: true }),
@@ -355,9 +357,9 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
     setSubs(s.data || []);
     setWallet(w.data || []);
     setDocs(d.data || []);
-  };
+  }, [userId]);
 
-  useEffect(() => { reload(); }, [userId]);
+  useEffect(() => { reload(); }, [reload]);
 
   const saveProfile = async () => {
     setSaving(true);
@@ -368,13 +370,13 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
     if (error) toast.error(error.message); else toast.success("Profile updated");
   };
 
-  const updateCompanyField = (id: string, patch: any) => {
+  const updateCompanyField = (id: string, patch: ClientCompanyPatch) => {
     setCompanies(prev => prev.map(c => c.id === id ? { ...c, ...patch } : c));
   };
-  const saveCompany = async (c: any) => {
+  const saveCompany = async (c: ClientCompany) => {
     setSaving(true);
     const { id, created_at, updated_at, ...payload } = c;
-    const cleaned: any = { ...payload };
+    const cleaned: ClientCompanyPatch = { ...payload };
     ["incorporation_date", "address_start", "address_expire", "confirmation_due", "accounts_filing_due"].forEach(k => {
       if (cleaned[k] === "") cleaned[k] = null;
     });
@@ -383,13 +385,13 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
     if (error) toast.error(error.message); else toast.success("Company saved");
   };
 
-  const updateAddressField = (id: string, patch: any) => {
+  const updateAddressField = (id: string, patch: ClientAddressPatch) => {
     setAddresses(prev => prev.map(a => a.id === id ? { ...a, ...patch } : a));
   };
-  const saveAddress = async (a: any) => {
+  const saveAddress = async (a: ClientAddress) => {
     setSaving(true);
     const { id, created_at, updated_at, ...payload } = a;
-    const cleaned: any = { ...payload };
+    const cleaned: ClientAddressPatch = { ...payload };
     ["start_date", "expire_date"].forEach(k => { if (cleaned[k] === "") cleaned[k] = null; });
     const { error } = await supabase.from("client_addresses").update(cleaned).eq("id", id);
     setSaving(false);
@@ -434,7 +436,7 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
     }
     reload();
   };
-  const updateOrder = async (id: string, patch: any) => {
+  const updateOrder = async (id: string, patch: ClientOrderPatch) => {
     const prev = orders.find(o => o.id === id);
     const { error } = await supabase.from("client_orders").update(patch).eq("id", id);
     if (error) { toast.error(error.message); return; }
@@ -462,7 +464,7 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
     }
     reload();
   };
-  const deleteRow = async (table: any, id: string) => {
+  const deleteRow = async (table: ClientMutableTable, id: string) => {
     const { error } = await supabase.from(table).delete().eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Deleted"); reload(); }
   };
@@ -481,13 +483,13 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
     });
     if (error) toast.error(error.message); else { toast.success(`Invoice ${number} created`); reload(); }
   };
-  const updateInvoice = async (id: string, patch: any) => {
+  const updateInvoice = async (id: string, patch: ClientInvoicePatch) => {
     const current = invoices.find(i => i.id === id);
     const prevStatus = current?.status;
     if (current) {
       const merged = { ...current, ...patch };
-      const amount = parseFloat(merged.amount_gbp) || 0;
-      const rate = parseFloat(merged.vat_rate) || 0;
+      const amount = Number(merged.amount_gbp) || 0;
+      const rate = Number(merged.vat_rate) || 0;
       const vat = +(amount * rate / 100).toFixed(2);
       const total = +(amount + vat).toFixed(2);
       patch = { ...patch, vat_gbp: vat, total_gbp: total };
@@ -501,7 +503,7 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
     const { error } = await supabase.from("client_subscriptions").insert({ user_id: userId, plan_name: "New Plan", price_gbp: 0, period: "year", status: "ACTIVE" });
     if (error) toast.error(error.message); else { toast.success("Subscription added"); reload(); }
   };
-  const updateSub = async (id: string, patch: any) => {
+  const updateSub = async (id: string, patch: ClientSubscriptionPatch) => {
     const { error } = await supabase.from("client_subscriptions").update(patch).eq("id", id);
     if (error) toast.error(error.message); else reload();
   };
@@ -511,7 +513,7 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
     const { error } = await supabase.from("client_wallet_transactions").insert({ user_id: userId, txn_ref: ref, txn_type: "Credit", description: "Manual entry", amount_gbp: 0 });
     if (error) toast.error(error.message); else { toast.success("Transaction added"); reload(); }
   };
-  const updateWallet = async (id: string, patch: any) => {
+  const updateWallet = async (id: string, patch: ClientWalletPatch) => {
     const { error } = await supabase.from("client_wallet_transactions").update(patch).eq("id", id);
     if (error) toast.error(error.message); else reload();
   };
@@ -520,7 +522,7 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
     const { error } = await supabase.from("client_documents").insert({ user_id: userId, name: "New Document", file_url: "", file_type: "PDF", file_size: "—" });
     if (error) toast.error(error.message); else { toast.success("Document added"); reload(); }
   };
-  const updateDoc = async (id: string, patch: any) => {
+  const updateDoc = async (id: string, patch: ClientDocumentPatch) => {
     const { error } = await supabase.from("client_documents").update(patch).eq("id", id);
     if (error) toast.error(error.message); else reload();
   };
@@ -545,7 +547,7 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
 
       <div className="flex gap-2 mb-4 overflow-x-auto">
         {tabs.map(t => (
-          <Button key={t.id} variant={tab === t.id ? "default" : "outline"} size="sm" onClick={() => setTab(t.id as any)}>{t.label}</Button>
+          <Button key={t.id} variant={tab === t.id ? "default" : "outline"} size="sm" onClick={() => setTab(t.id)}>{t.label}</Button>
         ))}
       </div>
 
@@ -954,9 +956,9 @@ const ClientDetail = ({ userId, initialTab = "company", onBack }: { userId: stri
 const EmailsSection = ({
   orders, companies, addresses, clientEmail, clientName,
 }: {
-  orders: any[];
-  companies: any[];
-  addresses: any[];
+  orders: ClientOrder[];
+  companies: ClientCompany[];
+  addresses: ClientAddress[];
   clientEmail?: string | null;
   clientName?: string | null;
 }) => {
@@ -965,7 +967,7 @@ const EmailsSection = ({
     return true;
   };
 
-  const sendOrderComplete = async (o: any) => {
+  const sendOrderComplete = async (o: ClientOrder) => {
     if (!requireEmail()) return;
     const { error } = await supabase.functions.invoke("send-transactional-email", {
       body: {
@@ -978,7 +980,7 @@ const EmailsSection = ({
     if (error) toast.error(error.message); else toast.success(`Order Completed email sent for ${o.order_ref}`);
   };
 
-  const sendCompanyReminder = async (template: "confirmation-statement-reminder" | "annual-accounts-reminder", c: any, label: string) => {
+  const sendCompanyReminder = async (template: "confirmation-statement-reminder" | "annual-accounts-reminder", c: ClientCompany, label: string) => {
     if (!requireEmail()) return;
     const dueDate = computeCompanyDueDate(template, c);
     if (!dueDate) return toast.error(`Please set the ${label} due date or Incorporation Date in Company tab first`);
@@ -999,7 +1001,7 @@ const EmailsSection = ({
     if (error) toast.error(error.message); else toast.success(`${label} reminder sent (${daysRemaining} days remaining) — admin copy sent to info@digiformation.co.uk`);
   };
 
-  const sendAddressReminder = async (a: any) => {
+  const sendAddressReminder = async (a: ClientAddress) => {
     if (!requireEmail()) return;
     const expireDate = computeAddressExpireDate(a);
     if (!expireDate) return toast.error("Cannot determine expiry date — set Start Date or Expire Date first");
@@ -1109,7 +1111,7 @@ const EmailsSection = ({
   );
 };
 
-const Field = ({ label, value, onChange, type = "text" }: { label: string; value: any; onChange: (v: string) => void; type?: string }) => (
+const Field = ({ label, value, onChange, type = "text" }: { label: string; value: string | number | null | undefined; onChange: (v: string) => void; type?: string }) => (
   <div>
     <Label>{label}</Label>
     <Input type={type} value={value || ""} onChange={(e) => onChange(e.target.value)} />
@@ -1183,18 +1185,18 @@ const CompanyFormSection = ({
   userId, companies, saving, updateCompanyField, saveCompany, deleteRow, reload, clientEmail, clientName,
 }: {
   userId: string;
-  companies: any[];
+  companies: ClientCompany[];
   saving: boolean;
-  updateCompanyField: (id: string, patch: any) => void;
-  saveCompany: (c: any) => void;
-  deleteRow: (table: any, id: string) => void;
+  updateCompanyField: (id: string, patch: ClientCompanyPatch) => void;
+  saveCompany: (c: ClientCompany) => void;
+  deleteRow: (table: ClientMutableTable, id: string) => void;
   reload: () => Promise<void>;
   clientEmail?: string | null;
   clientName?: string | null;
 }) => {
   const sendCompanyReminder = async (
     template: "confirmation-statement-reminder" | "annual-accounts-reminder",
-    c: any,
+    c: ClientCompany,
     label: string,
   ) => {
     if (!clientEmail) return toast.error("Client has no email");
@@ -1216,7 +1218,7 @@ const CompanyFormSection = ({
     if (error) toast.error(error.message); else toast.success(`${label} reminder sent — admin copy sent`);
   };
 
-  const sendAddressRenewalFromCompany = async (c: any) => {
+  const sendAddressRenewalFromCompany = async (c: ClientCompany) => {
     if (!clientEmail) return toast.error("Client has no email");
     const expireDate: string | null = c.address_expire || null;
     if (!expireDate) return toast.error("Please set the Address Expiry Date first");
@@ -1275,8 +1277,8 @@ const CompanyFormSection = ({
             <p className="text-xs text-muted-foreground">Enter the 11-character personal code for each director. Add one per line for multiple directors.</p>
             <Textarea
               rows={4}
-              value={(c as any).companies_house_personal_code || ""}
-              onChange={(e) => updateCompanyField(c.id, { companies_house_personal_code: e.target.value } as any)}
+              value={(c).companies_house_personal_code || ""}
+              onChange={(e) => updateCompanyField(c.id, { companies_house_personal_code: e.target.value })}
               placeholder={"Director 1: XXXXXXXXXXX\nDirector 2: XXXXXXXXXXX"}
             />
           </div>
@@ -1286,8 +1288,8 @@ const CompanyFormSection = ({
             <Field label="Confirmation Statement Due" type="date" value={c.confirmation_due} onChange={(v) => updateCompanyField(c.id, { confirmation_due: v })} />
             <Field label="Annual Filing Due" type="date" value={c.accounts_filing_due} onChange={(v) => updateCompanyField(c.id, { accounts_filing_due: v })} />
             <Field label="Authentication Code" value={c.auth_code} onChange={(v) => updateCompanyField(c.id, { auth_code: v })} />
-            <Field label="Activation Code" value={(c as any).activation_code} onChange={(v) => updateCompanyField(c.id, { activation_code: v } as any)} />
-            <Field label="UTR Number" value={(c as any).utr_number} onChange={(v) => updateCompanyField(c.id, { utr_number: v } as any)} />
+            <Field label="Activation Code" value={(c).activation_code} onChange={(v) => updateCompanyField(c.id, { activation_code: v })} />
+            <Field label="UTR Number" value={(c).utr_number} onChange={(v) => updateCompanyField(c.id, { utr_number: v })} />
             <Field label="Director Name" value={c.director_name} onChange={(v) => updateCompanyField(c.id, { director_name: v })} />
             <Field label="SIC Code" value={c.sic_code} onChange={(v) => updateCompanyField(c.id, { sic_code: v })} />
           </div>
@@ -1302,7 +1304,7 @@ const CompanyFormSection = ({
               <Textarea value={c.correspondence_address || ""} onChange={(e) => updateCompanyField(c.id, { correspondence_address: e.target.value })} placeholder="Leave blank if not purchased" />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
-              <Field label="Address Start Date" type="date" value={(c as any).address_start} onChange={(v) => updateCompanyField(c.id, { address_start: v } as any)} />
+              <Field label="Address Start Date" type="date" value={(c).address_start} onChange={(v) => updateCompanyField(c.id, { address_start: v })} />
               <Field label="Address Expiry Date" type="date" value={c.address_expire} onChange={(v) => updateCompanyField(c.id, { address_expire: v })} />
             </div>
           </div>
@@ -1343,17 +1345,17 @@ const AddressFormSection = ({
   userId, addresses, docs, saving, updateAddressField, saveAddress, deleteRow, reload, clientEmail, clientName,
 }: {
   userId: string;
-  addresses: any[];
-  docs: any[];
+  addresses: ClientAddress[];
+  docs: ClientDocument[];
   saving: boolean;
-  updateAddressField: (id: string, patch: any) => void;
-  saveAddress: (a: any) => void;
-  deleteRow: (table: any, id: string) => void;
+  updateAddressField: (id: string, patch: ClientAddressPatch) => void;
+  saveAddress: (a: ClientAddress) => void;
+  deleteRow: (table: ClientMutableTable, id: string) => void;
   reload: () => Promise<void>;
   clientEmail?: string | null;
   clientName?: string | null;
 }) => {
-  const sendAddressReminder = async (a: any) => {
+  const sendAddressReminder = async (a: ClientAddress) => {
     if (!clientEmail) return toast.error("Client has no email");
     const expireDate = computeAddressExpireDate(a);
     if (!expireDate) return toast.error("Cannot determine expiry date — set Start Date or Expire Date first");
@@ -1397,7 +1399,7 @@ const AddressFormSection = ({
         </div>
       )}
       {addresses.map((a, idx) => {
-        const addressDocs = (docs || []).filter((d: any) => d.address_id === a.id);
+        const addressDocs = (docs || []).filter((d: ClientDocument) => d.address_id === a.id);
         return (
         <div key={a.id} className="border border-border/40 rounded-xl p-4 space-y-4">
           <div className="flex items-center justify-between">
@@ -1420,9 +1422,9 @@ const AddressFormSection = ({
             <Field label="Expiry Date" type="date" value={a.expire_date} onChange={(v) => updateAddressField(a.id, { expire_date: v })} />
           </div>
           <div className="grid md:grid-cols-3 gap-4">
-            <Field label="UTR Number" value={(a as any).utr_number} onChange={(v) => updateAddressField(a.id, { utr_number: v } as any)} />
-            <Field label="Auth Code" value={(a as any).auth_code} onChange={(v) => updateAddressField(a.id, { auth_code: v } as any)} />
-            <Field label="Activation Code" value={(a as any).activation_code} onChange={(v) => updateAddressField(a.id, { activation_code: v } as any)} />
+            <Field label="UTR Number" value={(a).utr_number} onChange={(v) => updateAddressField(a.id, { utr_number: v })} />
+            <Field label="Auth Code" value={(a).auth_code} onChange={(v) => updateAddressField(a.id, { auth_code: v })} />
+            <Field label="Activation Code" value={(a).activation_code} onChange={(v) => updateAddressField(a.id, { activation_code: v })} />
           </div>
           <div className="flex flex-wrap gap-2">
             <Button onClick={() => saveAddress(a)} disabled={saving} size="sm"><Save className="w-4 h-4 mr-2" />Save Address</Button>
@@ -1469,7 +1471,7 @@ const AddressFormSection = ({
                   const ext = file.name.split(".").pop()?.toUpperCase() || "FILE";
                   const { error: insErr } = await supabase.from("client_documents").insert({
                     user_id: userId, name: file.name, file_url: path, file_type: ext, file_size: sizeKb, address_id: a.id,
-                  } as any);
+                  });
                   if (insErr) toast.error(insErr.message);
                   else { toast.success("Document uploaded"); await reload(); }
                   e.target.value = "";
@@ -1483,7 +1485,7 @@ const AddressFormSection = ({
               <p className="text-xs text-muted-foreground italic">No documents attached to this address yet.</p>
             ) : (
               <div className="space-y-2">
-                {addressDocs.map((d: any) => (
+                {addressDocs.map((d: ClientDocument) => (
                   <div key={d.id} className="flex items-center justify-between gap-2 border border-border/40 rounded-lg p-2 text-sm">
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{d.name}</p>

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type DependencyList } from "react";
 
 export type Crumb = { name: string; path: string };
 
@@ -20,7 +20,9 @@ export const DEFAULT_IMAGE =
   "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e1a9b0ff-8dd8-4ac0-9e91-93c8f05bf262/id-preview-c28e8368--7fdd4386-cc12-4de2-bfa1-e37e725edfcd.lovable.app-1777405986202.png";
 
 const upsertMeta = (selector: string, attr: "name" | "property", key: string, content: string) => {
-  let el = document.querySelector(selector) as HTMLMetaElement | null;
+  const [first, ...duplicates] = document.querySelectorAll<HTMLMetaElement>(selector);
+  duplicates.forEach((duplicate) => duplicate.remove());
+  let el = first ?? null;
   if (!el) {
     el = document.createElement("meta");
     el.setAttribute(attr, key);
@@ -45,6 +47,14 @@ const setCanonical = (href: string) => {
   el.href = href;
 };
 
+// Prerender serializes script text into HTML. Escape HTML delimiters while
+// preserving the original JSON value after parsing.
+export const serializeJsonLd = (data: unknown): string => {
+  const json = JSON.stringify(data);
+  if (json === undefined) throw new TypeError('JSON-LD requires a serializable value');
+  return json.replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+};
+
 const setJsonLd = (id: string, data: unknown) => {
   let el = document.getElementById(id) as HTMLScriptElement | null;
   if (!el) {
@@ -53,13 +63,14 @@ const setJsonLd = (id: string, data: unknown) => {
     el.id = id;
     document.head.appendChild(el);
   }
-  el.text = JSON.stringify(data);
+  el.text = serializeJsonLd(data);
 };
 
 const removeJsonLd = (id: string) => document.getElementById(id)?.remove();
 
 const normalizePath = (path: string) => {
-  const withLeadingSlash = path.startsWith("/") ? path : `/${path}`;
+  const pathname = path.split(/[?#]/, 1)[0];
+  const withLeadingSlash = pathname.startsWith("/") ? pathname : `/${pathname}`;
   if (withLeadingSlash === "/") return "/";
   return withLeadingSlash.replace(/\/+$/, "");
 };
@@ -73,13 +84,16 @@ export const applySeo = (opts: SeoOptions) => {
     ? (opts.image.startsWith("http") ? opts.image : `${CANONICAL_DOMAIN}${opts.image.startsWith("/") ? "" : "/"}${opts.image}`)
     : DEFAULT_IMAGE;
 
+  document.querySelectorAll("title").forEach((title, index) => { if (index > 0) title.remove(); });
   document.title = opts.title;
   setName("description", opts.description);
   if (opts.keywords) setName("keywords", opts.keywords);
+  else document.querySelectorAll('meta[name="keywords"]').forEach((meta) => meta.remove());
   setName(
     "robots",
     opts.noindex ? "noindex, nofollow" : "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
   );
+  setName('googlebot', opts.noindex ? 'noindex, nofollow' : 'index, follow');
   setName("author", ORG_NAME);
 
   // Open Graph
@@ -101,14 +115,13 @@ export const applySeo = (opts: SeoOptions) => {
   setName("twitter:creator", "@Digiformation00");
 
   setCanonical(fullCanonical);
+  // This site currently has one English edition, not invented regional editions.
+  document.querySelectorAll('link[rel="alternate"][hreflang]').forEach((link) => link.remove());
   for (const language of ['en', 'x-default']) {
-    let alternate = document.querySelector<HTMLLinkElement>(`link[rel="alternate"][hreflang="${language}"]`);
-    if (!alternate) {
-      alternate = document.createElement('link');
-      alternate.rel = 'alternate';
-      alternate.hreflang = language;
-      document.head.appendChild(alternate);
-    }
+    const alternate = document.createElement('link');
+    alternate.rel = 'alternate';
+    alternate.hreflang = language;
+    document.head.appendChild(alternate);
     alternate.href = fullCanonical;
   }
 
@@ -137,9 +150,28 @@ export const applySeo = (opts: SeoOptions) => {
   }
 };
 
-export const useSeo = (opts: SeoOptions, deps: React.DependencyList = []) => {
+export const useSeo = (opts: SeoOptions, _deps: DependencyList = []) => {
+  // Applying after every committed render also handles route/parameter changes.
+  // This writes head DOM only, never React state, and avoids stale captured options.
   useEffect(() => {
     applySeo(opts);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+  });
+};
+
+/** Reset route-owned head state before a new route applies its specific SEO. */
+export const resetRouteSeo = (pathname: string) => {
+  const path = normalizePath(pathname);
+  document.querySelectorAll<HTMLScriptElement>('script[type="application/ld+json"]').forEach((script) => {
+    // The source document owns the global graph; every other schema belongs to
+    // the outgoing route and must not survive a lazy SPA transition.
+    if (script.id !== 'ldjson-global') script.remove();
+  });
+  const noindex = /(?:\/checkout$|^\/(?:auth|reset-password|dashboard|admin|checkout|unsubscribe|client-area)(?:\/|$))/.test(path);
+  applySeo({
+    title: `${path.split('/').filter(Boolean).join(' — ').replace(/-/g, ' ') || 'DigiFormation'} | DigiFormation`,
+    description: 'DigiFormation company formation, compliance and digital business services.',
+    path,
+    noindex,
+    jsonLd: { '@context': 'https://schema.org', '@type': 'WebPage', '@id': `${CANONICAL_DOMAIN}${path}#webpage`, url: `${CANONICAL_DOMAIN}${path}` },
+  });
 };

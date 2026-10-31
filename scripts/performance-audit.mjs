@@ -11,6 +11,9 @@ try {
     const lhr = result.lhr, audits = lhr.audits;
     const row = { route, score: lhr.categories.performance.score, LCP_ms: audits['largest-contentful-paint'].numericValue, CLS: audits['cumulative-layout-shift'].numericValue, TBT_ms: audits['total-blocking-time'].numericValue, FCP_ms: audits['first-contentful-paint'].numericValue, speed_index_ms: audits['speed-index'].numericValue, warnings: lhr.runWarnings };
     rows.push(row); console.log(JSON.stringify(row));
+    const resources = audits['resource-summary']?.details?.items || [];
+    row.JS_transfer_bytes = resources.find(x => x.resourceType === 'script')?.transferSize ?? null;
+    row.image_transfer_bytes = resources.find(x => x.resourceType === 'image')?.transferSize ?? null;
     fs.writeFileSync(new URL(`lighthouse-${routes.indexOf(route)}.json`, out), JSON.stringify(lhr));
   }
   fs.writeFileSync(new URL('performance-lab-metrics.json', out), JSON.stringify(rows, null, 2));

@@ -1,0 +1,47 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import ts from 'typescript';
+import { JSDOM } from 'jsdom';
+import { ROOT, SITE } from './seo-runtime.mjs';
+const out=path.join(ROOT,'reports/seo/stage-12');fs.mkdirSync(out,{recursive:true});
+const write=(name,value)=>fs.writeFileSync(path.join(out,name),value+'\n');
+const csv=(name,rows)=>{const keys=Object.keys(rows[0]||{}),q=value=>'"'+String(value??'').replaceAll('"','""')+'"';write(name,[keys.map(q).join(','),...rows.map(row=>keys.map(key=>q(row[key])).join(','))].join('\r\n'));};
+const source=ts.createSourceFile('blog.ts',fs.readFileSync(path.join(ROOT,'src/data/blog.ts'),'utf8'),ts.ScriptTarget.Latest,true);
+const property=(node,key)=>node.properties.find(p=>ts.isPropertyAssignment(p)&&(ts.isIdentifier(p.name)||ts.isStringLiteral(p.name))&&p.name.text===key)?.initializer;
+const literal=(node,key)=>{const value=property(node,key);return value&&ts.isStringLiteralLike(value)?value.text:'';};
+let posts;
+for(const statement of source.statements)if(ts.isVariableStatement(statement))for(const declaration of statement.declarationList.declarations)if(declaration.name.getText(source)==='blogPosts')posts=declaration.initializer;
+if(!posts||!ts.isArrayLiteralExpression(posts))throw new Error('Blog array unavailable');
+const crawl=JSON.parse(fs.readFileSync(path.join(ROOT,'reports/seo-stage-04/four-mode-audit.json')));
+const inventory=[],flags=[],links=[],scorecards=[];
+for(const post of posts.elements){
+  if(!ts.isObjectLiteralExpression(post))throw new Error('Unexpected blog object');
+  const slug=literal(post,'slug'),url=SITE+'/blog/'+slug,content=property(post,'content');
+  if(!content||!ts.isArrayLiteralExpression(content))throw new Error('Missing content array: '+slug);
+  const bodies=content.elements.map(section=>{if(!ts.isObjectLiteralExpression(section))throw new Error('Nonliteral section');return literal(section,'body');});
+  const doc=new JSDOM('<main>'+bodies.join('\n')+'</main>').window.document;
+  const text=doc.querySelector('main').textContent.replace(/\s+/g,' ').trim();
+  const anchors=[...doc.querySelectorAll('a[href]')].map(a=>({href:a.getAttribute('href'),anchor:a.textContent.trim()}));
+  const primary=anchors.filter(a=>{try{return /(?:\.gov|\.gov\.uk)$/.test(new URL(a.href,SITE).hostname);}catch{return false;}});
+  const saved=crawl.rows.find(r=>r.mode==='raw-http'&&r.path==='/blog/'+slug);
+  const matches=[];
+  for(const [label,pattern]of [['guarantee terminology',/guarantee\w*|100%|fully compliant/i],['tax outcome terminology',/tax[- ]free|zero tax|no (?:federal|corporation|income) tax/i],['regulatory affiliation terminology',/ACSP|authori[sz]ed provider|FCA[- ]regulat/i],['comparative performance claim',/\b\d+(?:\.\d+)?%|\b\d+x\b|unlimited|zero[- ](?:cost|risk)/i]]){
+    const match=pattern.exec(text);if(match){matches.push(label);flags.push({URL:url,signal:label,excerpt:text.slice(Math.max(0,match.index-60),match.index+160),source:'src/data/blog.ts — existing public content',severity:'REVIEW SIGNAL; not proof of a false claim',verifiedPrimaryEvidence:'NOT VERIFIED for this claim',fix:'No automated factual rewrite',humanReview:'REQUIRED'});}
+  }
+  inventory.push({URL:url,slug,title:literal(post,'title'),sourcePublicationDate:literal(post,'date'),sourceModifiedDate:literal(post,'dateModified'),datesVerification:'Author-supplied content fields; not independently certified editorial events',bodyWords:text.split(/\s+/).filter(Boolean).length,sections:content.elements.length,category:literal(post,'category'),author:'See rendered schema; qualifications NOT VERIFIED',language:'English inferred; manual review pending',canonical:saved?.canonicals[0]||'',status:saved?.status??'NOT CAPTURED',indexability:saved?.robots.join('; ')||'NOT VERIFIED',internalBodyLinks:anchors.filter(a=>a.href.startsWith('/')).length,governmentReferenceLinks:primary.length,citationsVerification:'Links observed in source, not all fetched/fact-checked',claimReviewSignals:matches.join('; '),disposition:'UPDATE (provisional editorial triage)',priority:matches.includes('tax outcome terminology')?'P0 qualified factual review':matches.length?'P1 evidence/wording review':'P2 editorial review',trafficMetrics:'NOT CONNECTED; not zero',imageWeight:'NOT MEASURED',editorialScore:'NOT SCORED'});
+  anchors.forEach(a=>links.push({source:url,target:a.href,anchor:a.anchor,scope:'Source body link; global navigation excluded',verification:'Latest phase06 local graph where applicable; external destinations not all verified'}));
+  scorecards.push({URL:url,factualAccuracy25:'NOT SCORED',intent20:'NOT SCORED',originality15:'NOT SCORED',coverage10:'NOT SCORED',readability10:'NOT SCORED',authorship10:'NOT SCORED',links5:'NOT SCORED',freshness5:'NOT SCORED',total:'NOT SCORED',reason:'Automated inventory is insufficient for an individual editorial/qualified factual score'});
+  doc.defaultView.close();
+}
+csv('BLOG_INVENTORY.csv',inventory);csv('BLOG_FACT_CHECK_REGISTER.csv',flags);csv('BLOG_INTERNAL_LINK_MAP.csv',links);csv('BLOG_EDITORIAL_SCORECARD.csv',scorecards);
+csv('BLOG_KEYWORD_INTENT_MAP.csv',inventory.map(r=>({URL:r.URL,declaredTopic:r.title,intent:'Informational inferred; validate article individually',market:'Searcher country demand NOT VERIFIED',volumeRankDifficulty:'NOT VERIFIED',competingServiceURL:'Resolve from actual topic/service catalog before insertion',provenance:'Current source title/category; not external keyword research'})));
+const result={at:new Date().toISOString(),state:'PARTIAL — full source inventory, automated triage and targeted heading remediation',sourceBlogs:inventory.length,crawledBlogs:crawl.rows.filter(r=>r.mode==='raw-http'&&r.path.startsWith('/blog/')).length,historicalBlogs:47,addedUserBlogs:4,provisionalUpdate:inventory.length,confirmedKeep:0,confirmedRewrite:0,confirmedConsolidate:0,unscoredArticles:inventory.length,claimSignals:flags.length,verifiedFalseClaimsFromPatternScan:0,publication:'NONE'};
+write('BLOG_RESULTS.json',JSON.stringify(result,null,2));
+write('STAGE12_EXECUTIVE_SUMMARY.md',`# Blog audit — PARTIAL\n\n${inventory.length} current source articles accounted for; previous47 plus four externally committed user articles. Automated triage is not a licensed or human editorial review. ${flags.length} claim-language signals require contextual verification; none are automatically called false. All${inventory.length} remain NOT SCORED. No article deleted, merged or noindexed.\n\nThree known article heading outlines receive a mechanical h4→h3 correction only; inspect HEADING_SOURCE_CHANGE.json and latest crawl before calling it verified. No dates refreshed, wording rewritten or qualifications invented.`);
+write('BLOG_REMEDIATION_PLAN.md','# Provisional queue\n\nP0: individually verify tax-outcome, residency, banking eligibility and regulatory claims against current primary sources, with qualified review where appropriate. P1: source comparative/percentage/unlimited/software claims, review the four new articles, remove unsupported guarantees only after contextual reading. P2: editorial clarity, original value, heading structure and contextual service links.\n\nAll51 provisionally UPDATE for triage; this is not51 completed updates. Historical1KEEP/24UPDATE/21REWRITE/1MERGE is not re-certified. No forced rewrite/consolidation without article-level evidence.');
+write('CONTENT_SOURCE_REGISTER.md','# Source boundaries\n\nInventory reads all blog source objects and sections. Government/provider links in article HTML are observed citations, not a fresh fact-check of every linked page. Stage11 primary UTR/code guidance was checked25October2026; do not extrapolate it to all legal/tax articles. No full plagiarism service, first-party analytics, author-qualification verification or controlled SERP dataset connected.');
+write('BLOG_CHANGELOG.md','# Changes\n\nTargeted mechanical helper: scripts/fix-blog-heading-levels.mjs. Only h4 tag levels in three identified article bodies are promoted to h3 under h2 sections. Source backup and before/after hashes recorded before mutation. No prose, canonical, dates, URLs, author fields, prices or other article source bytes changed by this helper. Other source differences include earlier work and preserved user commits.');
+write('BLOG_QA_RESULTS.md','# QA\n\nRun inventory plus typecheck/lint/build, complete four-mode crawl and phase07 heading scan after source edits. Compare sourceBlogs/crawledBlogs in BLOG_RESULTS.json; a mismatch requires investigation. No parser-based inventory certifies factual accuracy, article originality or search demand. Actual changed-URL browser results remain required.');
+write('BLOG_DEPLOYMENT_AND_ROLLBACK.md','# Release\n\nNo commit, push, deployment, redirects or article deletion. Restore only the bounded heading-tag edits from the fresh backup; preserve prior/user changes. Missing factual evidence, failing critical tests or accidental indexing changes block release. Do not publish this unreviewed corpus automatically.');
+write('STAGE12_FINAL_AUDIT.md','# Partial audit\n\nEvery source article enumerated. Editorial scores and qualified factual review remain NOT SCORED/REQUIRED; no readiness score is manufactured. Technical heading remediation is one narrow batch, not an all-blog factual rewrite. Stage13 must verify authorship/entity claims and unresolved factual/source evidence; full stage13 prompt must be read before work.');
+console.log(JSON.stringify(result,null,2));

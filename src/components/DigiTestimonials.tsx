@@ -121,7 +121,7 @@ const DigiTestimonials = () => {
                   key={i}
                   onClick={() => setActive(i)}
                   aria-label={`Go to testimonial ${i + 1}`}
-                  className="p-3 -m-1.5 inline-flex items-center justify-center focus:outline-none"
+                  className="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <span
                     className={`h-1.5 rounded-full transition-colors duration-200 block ${

@@ -4,11 +4,11 @@ import { ArrowRight, Calendar, Clock, ExternalLink, FileText } from "lucide-reac
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { findInsight, insights, type Insight } from "@/data/insights";
-import { applySeo } from "@/lib/seo";
+import { applySeo, CANONICAL_DOMAIN } from "@/lib/seo";
 
 const Article = ({ insight }: { insight: Insight }) => {
   useEffect(() => {
-    const origin = window.location.origin;
+    const origin = CANONICAL_DOMAIN;
     const url = `${origin}/insights/${insight.slug}`;
     const articleLd: Record<string, unknown> = {
       "@context": "https://schema.org",
@@ -280,7 +280,7 @@ export const InsightsIndex = () => {
         hasPart: insights.map((i) => ({
           "@type": "Article",
           headline: i.title,
-          url: `${typeof window !== "undefined" ? window.location.origin : ""}/insights/${i.slug}`,
+          url: `https://www.digiformation.co.uk/insights/${i.slug}`,
         })),
       },
     });

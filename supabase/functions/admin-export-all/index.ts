@@ -40,19 +40,19 @@ Deno.serve(async (req) => {
     auth: { persistSession: false },
   })
   const { data: roles } = await admin.from('user_roles').select('role').eq('user_id', user.id)
-  if (!(roles ?? []).some((r: any) => r.role === 'admin')) {
+  if (!(roles ?? []).some((r: { role: string }) => r.role === 'admin')) {
     return json({ error: 'Forbidden — admin only' }, 403)
   }
 
   const { data: tableList, error: listErr } = await admin.rpc('list_public_tables')
   if (listErr) return json({ error: listErr.message }, 500)
 
-  const tables: Record<string, any[]> = {}
+  const tables: Record<string, Record<string, unknown>[]> = {}
   const counts: Record<string, number> = {}
   const errors: Record<string, string> = {}
 
   for (const table of (tableList as string[] ?? [])) {
-    const rows: any[] = []
+    const rows: Record<string, unknown>[] = []
     let from = 0
     for (;;) {
       const { data, error } = await admin

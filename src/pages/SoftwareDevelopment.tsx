@@ -82,7 +82,7 @@ const setMeta = (title: string, description: string, keywords?: string) => {
   setProp("og:title", title);
   setProp("og:description", description);
   setProp("og:type", "website");
-  setProp("og:url", window.location.href);
+  setProp("og:url", `https://www.digiformation.co.uk${window.location.pathname}`);
   setName("twitter:card", "summary_large_image");
   setName("twitter:title", title);
   setName("twitter:description", description);

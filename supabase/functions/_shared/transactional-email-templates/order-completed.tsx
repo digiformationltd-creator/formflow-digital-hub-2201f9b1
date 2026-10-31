@@ -20,7 +20,7 @@ const OrderCompletedEmail = ({ customerName, orderRef, service }: Props) => (
 
 export const template = {
   component: OrderCompletedEmail,
-  subject: (d: Record<string, any>) => `Order Completed${d.orderRef ? ` — ${d.orderRef}` : ''}`,
+  subject: (d: Props) => `Order Completed${d.orderRef ? ` — ${d.orderRef}` : ''}`,
   displayName: 'Order completed',
   previewData: { customerName: 'Sanaullah Malik', orderRef: 'GB102512APR26', service: 'UK LTD Formation' },
 } satisfies TemplateEntry

@@ -31,7 +31,7 @@ const TicketReceivedEmail = ({ customerName, ticketRef, subject, message }: Prop
 
 export const template = {
   component: TicketReceivedEmail,
-  subject: (d: Record<string, any>) => `Ticket Received${d.ticketRef ? ` — ${d.ticketRef}` : ''}`,
+  subject: (d: Props) => `Ticket Received${d.ticketRef ? ` — ${d.ticketRef}` : ''}`,
   displayName: 'Ticket received',
   previewData: { customerName: 'Jane', ticketRef: 'TKT-123456', subject: 'Address forwarding query', message: 'Hi, I have a question about...' },
 } satisfies TemplateEntry

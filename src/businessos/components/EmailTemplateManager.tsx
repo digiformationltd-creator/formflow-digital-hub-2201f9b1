@@ -1,3 +1,4 @@
+import { errorMessage } from "@/businessos/lib/dataContracts";
 // Email Template Manager — manages template metadata only.
 // Sending is NOT implemented here. Test send routes through the existing
 // `send-transactional-email` Edge Function so it lands in `email_send_log`
@@ -274,8 +275,8 @@ export default function EmailTemplateManager() {
       });
       if (error) throw error;
       toast.success(`Test queued via "${testBase}" — check email_send_log.`);
-    } catch (e: any) {
-      toast.error(e.message || "Test send failed");
+    } catch (e: unknown) {
+      toast.error(errorMessage(e, "") || "Test send failed");
     } finally {
       setSending(false);
     }

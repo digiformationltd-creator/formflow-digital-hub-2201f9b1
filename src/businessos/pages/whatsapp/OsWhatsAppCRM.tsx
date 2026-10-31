@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { DbRow } from "@/businessos/lib/dataContracts";
+import type { ReactNode } from "react";
 import { toast } from "sonner";
 import {
   Users, UserPlus, Building2, CalendarClock, Send, MessageSquare, ShieldAlert,
@@ -42,8 +44,11 @@ type Broadcast = {
 };
 
 type Tab = "dashboard" | "contacts" | "templates" | "broadcasts" | "reminders" | "audit";
+type Company = Pick<DbRow<"client_company_details">, "user_id" | "company_name" | "confirmation_due" | "accounts_filing_due" | "address_expire">;
+type Order = Pick<DbRow<"client_orders">, "id" | "user_id" | "customer_whatsapp" | "customer_email" | "order_ref" | "service" | "status" | "created_at">;
+type ContactStats = Record<"total" | "newThisMonth" | "guests" | "portal" | "withCompany" | "missingCompany" | "upcomingReminders" | "broadcastReady" | "optedOut", number>;
 
-const TABS: { id: Tab; label: string; icon: any }[] = [
+const TABS: { id: Tab; label: string; icon: import("lucide-react").LucideIcon }[] = [
   { id: "dashboard", label: "Dashboard", icon: MessageSquare },
   { id: "contacts", label: "Contacts", icon: Users },
   { id: "templates", label: "Templates", icon: FileText },
@@ -57,8 +62,8 @@ export default function OsWhatsAppCRM() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
-  const [companies, setCompanies] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
@@ -160,7 +165,7 @@ export default function OsWhatsAppCRM() {
 
 /* ---------------- Dashboard ---------------- */
 
-function StatCard({ label, value, icon: Icon, tone = "blue" }: any) {
+function StatCard({ label, value, icon: Icon, tone = "blue" }: { label: string; value: ReactNode; icon: import("lucide-react").LucideIcon; tone?: string }) {
   const tones: Record<string, string> = {
     blue: "from-blue-500/20 to-cyan-500/10 text-blue-300",
     green: "from-green-500/20 to-emerald-500/10 text-green-300",
@@ -182,7 +187,7 @@ function StatCard({ label, value, icon: Icon, tone = "blue" }: any) {
   );
 }
 
-function DashboardView({ stats, contacts, broadcasts }: any) {
+function DashboardView({ stats, contacts, broadcasts }: { stats: ContactStats; contacts: Contact[]; broadcasts: Broadcast[] }) {
   const recent = contacts.slice(0, 8);
   return (
     <div className="space-y-5">
@@ -246,20 +251,20 @@ const CONTACT_FILTERS = [
   { id: "opted_out", label: "Suppressed" },
 ] as const;
 
-function ContactsView({ contacts, companies, orders }: any) {
+function ContactsView({ contacts, companies, orders }: { contacts: Contact[]; companies: Company[]; orders: Order[] }) {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<typeof CONTACT_FILTERS[number]["id"]>("all");
 
-  const usersWithCompany = useMemo(() => new Set(companies.map((c: any) => c.user_id)), [companies]);
+  const usersWithCompany = useMemo(() => new Set(companies.map((c) => c.user_id)), [companies]);
   const cutoff = Date.now() + 60 * 24 * 60 * 60 * 1000;
   const upcomingUsers = useMemo(() => new Set(
-    companies.filter((c: any) => {
+    companies.filter((c) => {
       const dates = [c.confirmation_due, c.accounts_filing_due, c.address_expire].filter(Boolean);
       return dates.some((d: string) => new Date(d).getTime() <= cutoff);
-    }).map((c: any) => c.user_id),
+    }).map((c) => c.user_id),
   ), [companies, cutoff]);
   const lastOrderByContact = useMemo(() => {
-    const m: Record<string, any> = {};
+    const m: Record<string, Order> = {};
     for (const o of orders) {
       const k = (o.customer_whatsapp || "").replace(/\D/g, "");
       if (!k) continue;
@@ -268,7 +273,7 @@ function ContactsView({ contacts, companies, orders }: any) {
     return m;
   }, [orders]);
   const companyByUser = useMemo(() => {
-    const m: Record<string, any> = {};
+    const m: Record<string, Company> = {};
     for (const c of companies) if (c.user_id && !m[c.user_id]) m[c.user_id] = c;
     return m;
   }, [companies]);
@@ -427,7 +432,7 @@ function TemplateEditor({ template, onClose, onSaved }: { template: Template; on
 
 /* ---------------- Broadcasts ---------------- */
 
-function BroadcastsView({ broadcasts, templates, contacts, onChanged }: any) {
+function BroadcastsView({ broadcasts, templates, contacts, onChanged }: { broadcasts: Broadcast[]; templates: Template[]; contacts: Contact[]; onChanged: () => void }) {
   const [showNew, setShowNew] = useState(false);
   return (
     <div className="space-y-3">
@@ -461,7 +466,7 @@ function BroadcastsView({ broadcasts, templates, contacts, onChanged }: any) {
   );
 }
 
-function NewBroadcast({ templates, contacts, onClose, onSaved }: any) {
+function NewBroadcast({ templates, contacts, onClose, onSaved }: { templates: Template[]; contacts: Contact[]; onClose: () => void; onSaved: () => void }) {
   const [name, setName] = useState("");
   const [templateId, setTemplateId] = useState<string>(templates[0]?.id || "");
   const [audience, setAudience] = useState<"opted_in" | "portal" | "all">("opted_in");
@@ -481,7 +486,7 @@ function NewBroadcast({ templates, contacts, onClose, onSaved }: any) {
     setSaving(true);
     const { data: u } = await supabase.auth.getUser();
     const { error } = await supabase.from("whatsapp_broadcasts").insert({
-      name, template_id: templateId, status: "draft" as any,
+      name, template_id: templateId, status: "draft",
       audience_filter: { type: audience },
       total_recipients: audienceCount, created_by: u.user?.id,
     });
@@ -508,7 +513,7 @@ function NewBroadcast({ templates, contacts, onClose, onSaved }: any) {
           </label>
           <label className="block">
             <span className="text-xs text-white/50 block mb-1">Audience</span>
-            <select value={audience} onChange={e => setAudience(e.target.value as any)} className="w-full h-10 rounded-lg px-3 bg-black/30 border border-white/10 outline-none">
+            <select value={audience} onChange={e => { const value = e.target.value; if (value === "opted_in" || value === "portal" || value === "all") setAudience(value); }} className="w-full h-10 rounded-lg px-3 bg-black/30 border border-white/10 outline-none">
               <option value="opted_in">Opted-in only (safest)</option>
               <option value="portal">All portal clients (not opted-out)</option>
               <option value="all">All contacts (not opted-out)</option>
@@ -546,7 +551,7 @@ function NewBroadcast({ templates, contacts, onClose, onSaved }: any) {
 
 /* ---------------- Reminders ---------------- */
 
-function RemindersView({ companies, contacts }: any) {
+function RemindersView({ companies, contacts }: { companies: Company[]; contacts: Contact[] }) {
   const contactByUser = useMemo(() => {
     const m: Record<string, Contact> = {};
     for (const c of contacts as Contact[]) if (c.user_id && !m[c.user_id]) m[c.user_id] = c;
@@ -606,7 +611,7 @@ function RemindersView({ companies, contacts }: any) {
 
 /* ---------------- Audit ---------------- */
 
-function AuditView({ contacts, broadcasts }: any) {
+function AuditView({ contacts, broadcasts }: { contacts: Contact[]; broadcasts: Broadcast[] }) {
   const sources = useMemo(() => {
     const m: Record<string, number> = {};
     for (const c of contacts as Contact[]) m[c.source || "manual"] = (m[c.source || "manual"] || 0) + 1;

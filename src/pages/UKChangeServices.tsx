@@ -284,7 +284,7 @@ const UKChangeServices = () => {
             >
               <div>
                 <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 mb-2">Package</div>
-                <h3 className="text-3xl font-bold mb-2">{c.title}</h3>
+                <h2 className="text-3xl font-bold mb-2">{c.title}</h2>
                 <div className="text-4xl font-bold text-gradient mb-4">{c.price}</div>
                 <p className="opacity-90 mb-6">{c.description}</p>
                 <Button

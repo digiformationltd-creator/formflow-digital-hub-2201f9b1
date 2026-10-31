@@ -121,7 +121,7 @@ export async function resolveCompanyForAddress(name: string): Promise<{ userId: 
 export type AddressFieldStatus = "unchanged" | "new" | "changed";
 
 export function addressFieldStatus(
-  live: any,
+  live: unknown,
   proposed: AddressDraftProposal | undefined,
 ): AddressFieldStatus {
   if (!proposed || proposed.value == null) return "unchanged";

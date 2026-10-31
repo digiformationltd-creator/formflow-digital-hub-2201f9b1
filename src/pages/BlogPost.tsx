@@ -4,6 +4,7 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { blogPosts, findBlogPost } from "@/data/blog";
 import { useSeo } from "@/lib/seo";
+import { blogTopicFor } from "@/data/blogTopics";
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -27,7 +28,7 @@ const BlogPost = () => {
       headline: post.title,
       description: post.metaDescription,
       datePublished: post.date,
-      dateModified: post.date,
+      dateModified: post.dateModified ?? post.date,
       author: { "@id": "https://www.digiformation.co.uk/#organization" },
       publisher: { "@id": "https://www.digiformation.co.uk/#organization" },
       image: "https://www.digiformation.co.uk/favicon-512.png",
@@ -53,9 +54,8 @@ const BlogPost = () => {
     );
   }
 
-  const sameCategory = blogPosts.filter((p) => p.slug !== post.slug && p.category === post.category);
-  const otherPosts = blogPosts.filter((p) => p.slug !== post.slug && p.category !== post.category);
-  const related = [...sameCategory, ...otherPosts].slice(0, 3);
+  const topic = blogTopicFor(post);
+  const related = blogPosts.filter((p) => p.slug !== post.slug && blogTopicFor(p).id === topic.id).slice(0, 3);
 
   return (
     <Layout>
@@ -73,12 +73,19 @@ const BlogPost = () => {
               {post.title}
             </h1>
             <p className="mt-6 text-lg md:text-xl leading-relaxed opacity-90">{post.excerpt}</p>
+            <p className="mt-4 text-sm opacity-80">
+              Published by <Link to="/about" className="underline underline-offset-4">Digiformation Ltd</Link>
+              {post.dateModified && post.dateModified !== post.date && <> · Updated <time dateTime={post.dateModified}>{post.dateModified}</time></>}
+            </p>
           </div>
         </div>
       </section>
 
       <article className="py-14">
         <div className="container mx-auto px-4 max-w-3xl space-y-8">
+          <p className="text-sm opacity-80">
+            General information; individual legal, tax and provider requirements need review for your circumstances. <Link to="/contact" className="underline underline-offset-4">Report an issue or ask about this article</Link>.
+          </p>
           {post.content && post.content.length > 0 ? (
             post.content.map((s) => (
               <section key={s.h}>
@@ -102,16 +109,11 @@ const BlogPost = () => {
             </div>
           )}
 
-          <section className="glass glass-tint-pink rounded-2xl p-8 mt-6">
-            <h3 className="font-display text-xl font-semibold mb-4">Helpful Digiformation services</h3>
+          <section aria-labelledby="topic-services-heading" className="glass glass-tint-pink rounded-2xl p-8 mt-6">
+            <h2 id="topic-services-heading" className="font-display text-xl font-semibold mb-4">Explore {topic.title.toLowerCase()}</h2>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/uk-services/uk-ltd-formation" className="text-primary hover:underline">→ UK LTD Formation</Link></li>
-              <li><Link to="/usa-services/us-llc-formation" className="text-primary hover:underline">→ US LLC Formation</Link></li>
-              <li><Link to="/software-development" className="text-primary hover:underline">→ Software Development &amp; AI Agents (from £10)</Link></li>
-              <li><Link to="/web-development" className="text-primary hover:underline">→ Web Development &amp; E-Commerce (from £30)</Link></li>
-              <li><Link to="/web-development" className="text-primary hover:underline">→ 3D &amp; Interactive Web Development (£180)</Link></li>
-              <li><Link to="/banks-payment-solutions" className="text-primary hover:underline">→ Banks &amp; Payment Solutions</Link></li>
-              <li><Link to="/contact" className="text-primary hover:underline">→ Free WhatsApp Consultation</Link></li>
+              {topic.links.map((link) => <li key={link.path}><Link to={link.path} className="text-primary hover:underline">→ {link.label}</Link></li>)}
+              <li><Link to="/contact" className="text-primary hover:underline">Discuss this guide with DigiFormation</Link></li>
             </ul>
           </section>
         </div>

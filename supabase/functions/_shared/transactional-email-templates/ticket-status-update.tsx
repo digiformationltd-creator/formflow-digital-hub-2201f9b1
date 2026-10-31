@@ -46,7 +46,7 @@ const TicketStatusUpdateEmail = ({ customerName, ticketRef, subject, status, not
 
 export const template = {
   component: TicketStatusUpdateEmail,
-  subject: (d: Record<string, any>) =>
+  subject: (d: Props) =>
     `Ticket ${d.ticketRef || ''} — ${d.status || 'updated'}`.trim(),
   displayName: 'Ticket status update',
   previewData: {

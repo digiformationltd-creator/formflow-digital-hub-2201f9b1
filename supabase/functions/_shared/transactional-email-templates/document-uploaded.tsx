@@ -29,7 +29,7 @@ const DocumentUploadedEmail = ({ customerName, documentName, docDate, loginUrl }
 
 export const template = {
   component: DocumentUploadedEmail,
-  subject: (d: Record<string, any>) => `New Document — ${d.documentName || 'Available'}`,
+  subject: (d: Props) => `New Document — ${d.documentName || 'Available'}`,
   displayName: 'Document uploaded',
   previewData: { customerName: 'Jane', documentName: 'Certificate of Incorporation.pdf', docDate: '2026-05-03' },
 } satisfies TemplateEntry

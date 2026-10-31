@@ -3,6 +3,8 @@ import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
+import { decodeEmailTemplateData, type EmailTemplateData } from '../_shared/email-template-data.ts'
+import { isRecord, readBoundedJson } from '../_shared/request-security.ts'
 
 // Configuration baked in at scaffold time — do NOT change these manually.
 // To update, re-run the email domain setup flow.
@@ -79,22 +81,25 @@ Deno.serve(async (req) => {
   let recipientEmail: string
   let idempotencyKey: string
   let messageId: string
-  let templateData: Record<string, any> = {}
+  let templateData: EmailTemplateData = { heading: '' }
   let orderId: string | null = null
   let invoiceId: string | null = null
   let ticketId: string | null = null
   let clientUserId: string | null = null
   let triggerSource: string | null = null
   try {
-    const body = await req.json()
-    templateName = body.templateName || body.template_name
-    recipientEmail = body.recipientEmail || body.recipient_email
+    const body = await readBoundedJson(req, 131072)
+    if (!isRecord(body)) throw new TypeError('Object required')
+    const name = body.templateName || body.template_name
+    const recipient = body.recipientEmail || body.recipient_email
+    if (typeof name !== 'string' || (recipient !== undefined && typeof recipient !== 'string')) throw new TypeError('Invalid template or recipient')
+    templateName = name
+    recipientEmail = recipient || ''
     const suppliedIdempotencyKey = body.idempotencyKey || body.idempotency_key
+    if (suppliedIdempotencyKey !== undefined && typeof suppliedIdempotencyKey !== 'string') throw new TypeError('Invalid idempotency key')
     messageId = suppliedIdempotencyKey || crypto.randomUUID()
     idempotencyKey = suppliedIdempotencyKey || messageId
-    if (body.templateData && typeof body.templateData === 'object') {
-      templateData = body.templateData
-    }
+    templateData = decodeEmailTemplateData(body.templateData ?? {})
     const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
     const pickUuid = (v: unknown) => (typeof v === 'string' && uuidRe.test(v) ? v : null)
     orderId      = pickUuid(body.orderId || body.order_id)
@@ -211,7 +216,7 @@ Deno.serve(async (req) => {
       'www.digiformation.co.uk',
       'formflow-digital-hub.lovable.app',
     ])
-    const URL_FIELDS = ['loginUrl', 'invoiceUrl', 'liveSelfieLink', 'invoice_url', 'login_url']
+    const URL_FIELDS = ['loginUrl', 'invoiceUrl', 'liveSelfieLink', 'invoice_url', 'login_url'] as const
     const isSafeUrl = (raw: unknown): boolean => {
       if (raw == null || raw === '') return true
       if (typeof raw !== 'string') return false
@@ -600,7 +605,7 @@ Deno.serve(async (req) => {
     })
     await client.close()
   } catch (sendErr) {
-    const msg = String((sendErr as any)?.message || sendErr).slice(0, 300)
+    const msg = (sendErr instanceof Error ? sendErr.message : String(sendErr)).slice(0, 300)
     console.error('SMTP send failed', { error: msg, templateName, effectiveRecipient })
     await supabase.from('email_send_log')
       .update({ status: 'failed', error_message: msg })

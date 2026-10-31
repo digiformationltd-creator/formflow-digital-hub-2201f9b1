@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { errorMessage } from "@/businessos/lib/dataContracts";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Mail, AlertTriangle, CheckCircle2, Clock, Ban, RefreshCw } from "lucide-react";
@@ -11,7 +12,7 @@ type LogRow = {
   status: string;
   error_message: string | null;
   created_at: string;
-  metadata: any;
+  metadata: import("@/integrations/supabase/types").Json;
 };
 
 type Suppressed = { id: string; email: string; reason: string; created_at: string };
@@ -47,7 +48,7 @@ export default function OsEmailOps() {
   const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number; skipped: number; failed: number } | null>(null);
 
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const hours = RANGES.find(r => r.id === range)?.hours || 168;
     const since = new Date(Date.now() - hours * 3600 * 1000).toISOString();
@@ -67,9 +68,9 @@ export default function OsEmailOps() {
     setLogs((logRes.data || []) as LogRow[]);
     setSuppressed((supRes.data || []) as Suppressed[]);
     setLoading(false);
-  };
+  }, [range]);
 
-  useEffect(() => { load(); }, [range]);
+  useEffect(() => { load(); }, [load]);
 
   // Realtime
   useEffect(() => {
@@ -79,8 +80,7 @@ export default function OsEmailOps() {
       .on("postgres_changes", { event: "*", schema: "public", table: "suppressed_emails" }, () => load())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [range]);
+  }, [load]);
 
   // Deduplicate by message_id — latest row per email
   const deduped = useMemo(() => {
@@ -139,7 +139,7 @@ export default function OsEmailOps() {
       toast.message("Skipped — already delivered");
       return { ok: true, skipped: true };
     }
-    const meta = row.metadata || {};
+    const meta = row.metadata && typeof row.metadata === "object" && !Array.isArray(row.metadata) ? row.metadata : {};
     const { error } = await supabase.functions.invoke("send-transactional-email", {
       body: {
         template: row.template_name,
@@ -160,8 +160,8 @@ export default function OsEmailOps() {
       const r = await retryOne(row);
       if (!r.skipped) toast.success("Re-queued");
       load();
-    } catch (e: any) {
-      toast.error(e.message || "Retry failed");
+    } catch (e: unknown) {
+      toast.error(errorMessage(e, "") || "Retry failed");
     } finally {
       setRetrying(null);
     }

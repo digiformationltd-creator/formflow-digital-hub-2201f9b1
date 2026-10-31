@@ -6,6 +6,7 @@ import {
   ArrowRight, Database, Cpu, RefreshCw, BarChart3, UserCheck, MessageCircle,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import type { RpcResult } from "@/businessos/lib/dataContracts";
 
 const MODULES = [
   { label: "AI Command Center",    to: "/admin/automation/command-center",  icon: Sparkles, desc: "Talk to Business OS. Approve actions.", tint: "bg-purple-500/10 text-purple-300", featured: true },
@@ -20,7 +21,7 @@ const MODULES = [
 
 export default function OsAutomation() {
   const [kpi, setKpi] = useState({ reminders: 0, overdue: 0, jobs: 0, failures: 0, recent: 0 });
-  const [activity, setActivity] = useState<any[]>([]);
+  const [activity, setActivity] = useState<RpcResult<"automation_runs_recent">>([]);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
@@ -30,9 +31,9 @@ export default function OsAutomation() {
       supabase.rpc("scheduled_jobs_status"),
       supabase.rpc("automation_runs_recent", { _limit: 12 }),
     ]);
-    const rems = (r1.data ?? []) as any[];
-    const jobs = (r2.data ?? []) as any[];
-    const runs = (r3.data ?? []) as any[];
+    const rems = r1.data ?? [];
+    const jobs = r2.data ?? [];
+    const runs = r3.data ?? [];
     setKpi({
       reminders: rems.length,
       overdue: rems.filter(r => r.severity === "overdue").length,
@@ -145,7 +146,7 @@ export default function OsAutomation() {
           <div className="text-sm text-white/50">No recorded runs yet. Scheduled jobs and Command Center executions appear here.</div>
         )}
         <ul className="space-y-2 text-sm">
-          {activity.map((e: any) => (
+          {activity.map((e) => (
             <li key={e.id} className="flex items-center gap-3">
               <span className={`w-2 h-2 rounded-full ${e.status==="success"?"bg-green-400":e.status==="failed"?"bg-red-400":"bg-cyan-400"}`} />
               <span className="flex-1 truncate text-white/80">{e.job_name}</span>
@@ -170,7 +171,7 @@ export default function OsAutomation() {
   );
 }
 
-function Row({ icon: Icon, label, status, ok }: any) {
+function Row({ icon: Icon, label, status, ok }: { icon: import("lucide-react").LucideIcon; label: string; status: string; ok: boolean }) {
   return (
     <div className="flex items-center justify-between text-sm rounded-lg bg-white/[0.02] border border-white/5 p-2.5">
       <span className="flex items-center gap-2"><Icon className="w-3.5 h-3.5 text-white/50" /><span className="text-white/80">{label}</span></span>

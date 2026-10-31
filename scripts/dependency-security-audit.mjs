@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import { spawnSync } from 'node:child_process';
+const out = new URL('../reports/final-production-readiness-2026-10-18/', import.meta.url);
+const command = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const result = spawnSync(command, ['audit', '--omit=dev', '--json'], { shell: process.platform === 'win32', encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 });
+if (!result.stdout?.trim()) throw new Error(result.stderr || result.error?.message || 'npm audit produced no JSON');
+const report = JSON.parse(result.stdout);
+if (!report.metadata) throw new Error('npm audit did not return an advisory inventory');
+fs.writeFileSync(new URL('npm-production-audit.json', out), JSON.stringify(report, null, 2));
+const rows = Object.values(report.vulnerabilities || {}).map(v => ({ package: v.name, severity: v.severity, direct: v.isDirect, fix: v.fixAvailable, nodes: v.nodes, reachability: v.name === 'xlsx' ? 'Admin spreadsheet import/export; untrusted spreadsheet parsing requires remediation' : v.name === 'dompurify' ? 'PDF HTML rendering dependency; review attacker-controlled HTML paths' : /tailwind|postcss|glob|braces|chokidar|yaml|micromatch|source-map|nanoid/.test(v.name) ? 'Build/tooling graph; no browser execution established by audit alone' : 'Requires reachability review' }));
+fs.writeFileSync(new URL('dependency-findings.json', out), JSON.stringify(rows, null, 2));
+console.log(JSON.stringify(report.metadata.vulnerabilities));

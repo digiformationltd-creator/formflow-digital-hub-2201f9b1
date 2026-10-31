@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import type { DbRow } from "@/businessos/lib/dataContracts";
 import { toast } from "sonner";
 import { ArrowLeft, Save, Trash2, Loader2, CalendarClock, AlertTriangle, Sparkles } from "lucide-react";
 import { analyzePending, commandCenterUrl } from "@/businessos/lib/pendingCompany";
@@ -10,10 +11,10 @@ type Status = "available" | "reserved" | "sold_out" | "unavailable";
 export default function OsManagedCompanyDetail() {
   const { id } = useParams();
   const nav = useNavigate();
-  const [row, setRow] = useState<any>(null);
+  const [row, setRow] = useState<DbRow<"managed_companies"> | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [reminders, setReminders] = useState<any[]>([]);
+  const [reminders, setReminders] = useState<DbRow<"email_reminder_log">[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -145,7 +146,7 @@ export default function OsManagedCompanyDetail() {
   );
 }
 
-function Field({ label, value, onChange, type = "text", multiline = false }: any) {
+function Field({ label, value, onChange, type = "text", multiline = false }: { label: string; value: string | null; onChange: (value: string) => void; type?: string; multiline?: boolean }) {
   return (
     <div>
       <label className="text-xs uppercase tracking-wider text-zinc-500">{label}</label>
@@ -164,7 +165,7 @@ function Field({ label, value, onChange, type = "text", multiline = false }: any
 // missing / overdue items. Each row offers a one-click AI Quick Action that
 // opens the AI Command Center with the correct command pre-filled. Nothing
 // executes automatically — the existing approval flow is unchanged.
-function PendingPanel({ row }: { row: any }) {
+function PendingPanel({ row }: { row: DbRow<"managed_companies"> }) {
   const items = useMemo(() => analyzePending(row), [row]);
   if (items.length === 0) {
     return (

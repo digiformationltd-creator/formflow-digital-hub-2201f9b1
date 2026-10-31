@@ -84,7 +84,7 @@ export default function OsSupport() {
         .select("user_id, full_name, email, company_name")
         .in("user_id", ids);
       const map: Record<string, ProfileLite> = {};
-      (profs || []).forEach((p: any) => { map[p.user_id] = p; });
+      (profs || []).forEach((p) => { map[p.user_id] = p; });
       setProfiles(map);
     }
     setLoading(false);

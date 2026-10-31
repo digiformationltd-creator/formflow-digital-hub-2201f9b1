@@ -82,7 +82,7 @@ const OrderConfirmationEmail = ({
 
 export const template = {
   component: OrderConfirmationEmail,
-  subject: (d: Record<string, any>) =>
+  subject: (d: Props) =>
     `Order Received${d.orderRef ? ` — ${d.orderRef}` : ''} | ${SITE_NAME}`,
   displayName: 'Order confirmation (customer)',
   previewData: {

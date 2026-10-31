@@ -1,5 +1,6 @@
 import { useSeo } from "@/lib/seo";
-import { useEffect, useState } from "react";
+import type { ClientOrder, ClientSubscription, ClientWalletTransaction, ClientTicket, ManagedClientRow, ManagedClientInsert, ClientDocument, ClientInvoice } from '@/lib/client-models';
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { recoverSession } from "@/lib/auth/session";
@@ -28,7 +29,7 @@ type SectionId =
   | "overview" | "company" | "addresses" | "orders" | "myClients" | "invoices" | "wallet" | "documents"
   | "editAccount" | "newServices" | "tickets" | "openTicket";
 
-const menu: { id: SectionId; label: string; icon: any }[] = [
+const menu: { id: SectionId; label: string; icon: import("lucide-react").LucideIcon }[] = [
   { id: "overview", label: "Dashboard", icon: LayoutDashboard },
   { id: "company", label: "My Company", icon: Building2 },
   { id: "addresses", label: "Address Subscription", icon: MapPin },
@@ -87,7 +88,7 @@ const services = [
 // Keep this list short (5–6 items) — it's a quick launcher, not the full
 // catalogue. Each entry links straight to the public service page where the
 // client can see packages and start the checkout flow.
-const QUICK_ORDER_SERVICES: { name: string; blurb: string; link: string; icon: any }[] = [
+const QUICK_ORDER_SERVICES: { name: string; blurb: string; link: string; icon: import("lucide-react").LucideIcon }[] = [
   { name: "Companies House ID Verification", blurb: "Verify your identity for Companies House", icon: ShieldCheck, link: "/uk-services/ltd-id-verification" },
   { name: "UK Limited Company Registration", blurb: "Form a new UK Ltd company — pick a package", icon: Building2, link: "/uk-services/uk-ltd-formation" },
   { name: "Registered Office Address", blurb: "Use our London address for your company", icon: MapPin, link: "/uk-services/registered-office-address" },
@@ -106,7 +107,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   return <Badge variant={variant}>{status}</Badge>;
 };
 
-const EmptyState = ({ icon: Icon, title, description, action }: { icon: any; title: string; description: string; action?: React.ReactNode }) => (
+const EmptyState = ({ icon: Icon, title, description, action }: { icon: import("lucide-react").LucideIcon; title: string; description: string; action?: React.ReactNode }) => (
   <div className="glass rounded-2xl p-10 text-center">
     <div className="inline-flex w-14 h-14 items-center justify-center rounded-full bg-primary/10 mb-3">
       <Icon className="w-7 h-7 opacity-70" />
@@ -123,11 +124,11 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [companies, setCompanies] = useState<CompanyDetails[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [subscriptions, setSubscriptions] = useState<any[]>([]);
-  const [walletRows, setWalletRows] = useState<any[]>([]);
-  const [tickets, setTickets] = useState<any[]>([]);
-  const [managedClients, setManagedClients] = useState<any[]>([]);
+  const [orders, setOrders] = useState<ClientOrder[]>([]);
+  const [subscriptions, setSubscriptions] = useState<ClientSubscription[]>([]);
+  const [walletRows, setWalletRows] = useState<ClientWalletTransaction[]>([]);
+  const [tickets, setTickets] = useState<ClientTicket[]>([]);
+  const [managedClients, setManagedClients] = useState<ManagedClientRow[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [active, setActive] = useState<SectionId>("overview");
@@ -191,7 +192,7 @@ const Dashboard = () => {
 
   const reloadManagedClients = async () => {
     if (!user) return;
-    const { data } = await (supabase as any).from("managed_clients").select("*").eq("portal_owner_user_id", user.id).order("created_at", { ascending: false });
+    const { data } = await supabase.from("managed_clients").select("*").eq("portal_owner_user_id", user.id).order("created_at", { ascending: false });
     setManagedClients(data || []);
   };
   const reloadOrders = async () => {
@@ -240,14 +241,14 @@ const Dashboard = () => {
         supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status")
           .or(`user_id.eq.${user.id},placed_by_user_id.eq.${user.id}`),
         supabase.from("invoices").select("id,order_id,invoice_number,pdf_url,total_gbp,status").is("user_id", null).is("placed_by_user_id", null).ilike("bill_to_email", emailLower),
-        (supabase as any).from("managed_clients").select("*").eq("portal_owner_user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("managed_clients").select("*").eq("portal_owner_user_id", user.id).order("created_at", { ascending: false }),
       ]);
 
       if (cancelled) return;
       // De-dupe & merge orders (owned + email-matched orphans) so repeat
       // purchases of the same service ALL appear as separate rows.
       const seen = new Set<string>();
-      const combinedOrders: any[] = [];
+      const combinedOrders: ClientOrder[] = [];
       for (const row of [...(orderRows || []), ...(guestOrderRows || [])]) {
         if (row?.id && !seen.has(row.id)) {
           seen.add(row.id);
@@ -258,7 +259,7 @@ const Dashboard = () => {
 
       // Attach invoice metadata (invoice number + PDF storage path) to each
       // order so the client can download deliverables from the modal.
-      const invMap = new Map<string, any>();
+      const invMap = new Map<string, Pick<ClientInvoice, "id" | "order_id" | "invoice_number" | "pdf_url" | "total_gbp" | "status">>();
       for (const inv of [...(invRowsOwn || []), ...(invRowsOrphan || [])]) {
         if (inv?.order_id) invMap.set(inv.order_id, inv);
       }
@@ -277,7 +278,7 @@ const Dashboard = () => {
       setSubscriptions(subRows || []);
       setWalletRows(walletData || []);
       setTickets(ticketRows || []);
-      setManagedClients((managedRows as any[]) || []);
+      setManagedClients(managedRows || []);
 
       const uEmail = user.email?.toLowerCase();
       setIsAdmin(uEmail === "info@digiformation.co.uk" || uEmail === "info@digiformation.uk" || !!role);
@@ -331,7 +332,7 @@ const Dashboard = () => {
   // Split orders into portal-owner's own direct orders vs B2B orders placed
   // for end customers. B2B = customer_email differs from the owner's email.
   const ownerEmailLc = (user.email || "").toLowerCase().trim();
-  const isB2BRow = (o: any) => {
+  const isB2BRow = (o: ClientOrder) => {
     const ce = (o.customer_email || "").toLowerCase().trim();
     return !!ce && !!ownerEmailLc && ce !== ownerEmailLc;
   };
@@ -690,7 +691,7 @@ const Dashboard = () => {
                       <div className="flex items-center justify-between mt-4">
                         <span className="font-semibold text-sm">{s.price}</span>
                         <Button asChild size="sm" variant="hero" className="rounded-full">
-                          <Link to={(s as any).link || "/packages"}>Order <ArrowUpRight className="w-3.5 h-3.5" /></Link>
+                          <Link to={s.link || "/packages"}>Order <ArrowUpRight className="w-3.5 h-3.5" /></Link>
                         </Button>
                       </div>
                     </div>
@@ -795,9 +796,8 @@ const MyCompaniesSection = ({ userId, companies, onChange, editable = false }: {
 
   const saveCompany = async (c: CompanyDetails) => {
     setSavingId(c.id);
-    const { id, ...rest } = c as any;
-    const cleaned: any = { ...rest };
-    delete cleaned.created_at; delete cleaned.updated_at; delete cleaned.user_id;
+    const { id, ...rest } = c;
+    const cleaned: Partial<CompanyDetails> = { ...rest };
     ["incorporation_date", "address_expire", "address_start", "confirmation_due", "accounts_filing_due"].forEach(k => {
       if (cleaned[k] === "") cleaned[k] = null;
     });
@@ -915,7 +915,7 @@ const CompanyCard = ({
                   <Input
                     type={f.type || "text"}
                     value={(c[f.key] as string) || ""}
-                    onChange={(e) => onChange({ [f.key]: e.target.value } as any)}
+                    onChange={(e) => onChange({ [f.key]: e.target.value })}
                     className="mt-1.5 text-white"
                     readOnly={!editable}
                     disabled={!editable}
@@ -932,7 +932,7 @@ const CompanyCard = ({
                     <p className="text-[11px] text-white/60">11-character code per director. Add one per line for multiple directors.</p>
                     <Textarea
                       value={(c.companies_house_personal_code as string) || ""}
-                      onChange={(e) => onChange({ companies_house_personal_code: e.target.value } as any)}
+                      onChange={(e) => onChange({ companies_house_personal_code: e.target.value })}
                       className="mt-1.5 text-white"
                       rows={4}
                       placeholder={"Director 1: XXXXXXXXXXX\nDirector 2: XXXXXXXXXXX"}
@@ -952,7 +952,7 @@ const CompanyCard = ({
                   <Label className="text-[11px] uppercase tracking-wider text-white/60">{f.label}</Label>
                   <Textarea
                     value={(c[f.key] as string) || ""}
-                    onChange={(e) => onChange({ [f.key]: e.target.value } as any)}
+                    onChange={(e) => onChange({ [f.key]: e.target.value })}
                     className="mt-1.5 text-white"
                     rows={2}
                     readOnly={!editable}
@@ -967,7 +967,7 @@ const CompanyCard = ({
                     <Input
                       type="date"
                       value={(c[f.key] as string) || ""}
-                      onChange={(e) => onChange({ [f.key]: e.target.value } as any)}
+                      onChange={(e) => onChange({ [f.key]: e.target.value })}
                       className="mt-1.5 text-white"
                       readOnly={!editable}
                       disabled={!editable}
@@ -1006,18 +1006,18 @@ const MyAddressesSection = ({ userId, editable = false }: { userId: string; edit
   const [rows, setRows] = useState<AddressRow[] | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     const { data } = await supabase
       .from("client_addresses")
       .select("*")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
     setRows((data as AddressRow[]) || []);
-  };
+  }, [userId]);
 
   useEffect(() => {
     load();
-  }, [userId]);
+  }, [load]);
 
   const updateField = (id: string, patch: Partial<AddressRow>) => {
     setRows(prev => (prev || []).map(a => a.id === id ? { ...a, ...patch } : a));
@@ -1025,7 +1025,7 @@ const MyAddressesSection = ({ userId, editable = false }: { userId: string; edit
 
   const saveAddress = async (a: AddressRow) => {
     setSavingId(a.id);
-    const { id, ...rest } = a as any;
+    const { id, ...rest } = a;
     const cleaned = { ...rest };
     ["start_date", "expire_date"].forEach(k => { if (cleaned[k] === "") cleaned[k] = null; });
     const { error } = await supabase.from("client_addresses").update(cleaned).eq("id", id);
@@ -1156,7 +1156,7 @@ const AddressCard = ({
   );
 };
 
-const AddressField = ({ label, value, onChange, type = "text" }: { label: string; value: any; onChange: (v: string) => void; type?: string }) => (
+const AddressField = ({ label, value, onChange, type = "text" }: { label: string; value: string | number | null | undefined; onChange: (v: string) => void; type?: string }) => (
   <div>
     <Label className="text-[11px] uppercase tracking-wider opacity-60">{label}</Label>
     <Input type={type} value={value || ""} onChange={(e) => onChange(e.target.value)} className="mt-1.5" />
@@ -1191,16 +1191,16 @@ interface ManagedClient {
   company: string | null;
   notes: string | null;
   country: string | null;
-  orders: any[];
+  orders: ClientOrder[];
   totalGbp: number;
   lastDate: string;
   statuses: { pending: number; inProgress: number; completed: number };
 }
 
 const buildManagedClients = (
-  rows: any[],
+  rows: ClientOrder[],
   ownerEmail: string,
-  managedClients: any[] = [],
+  managedClients: ManagedClientRow[] = [],
 ): ManagedClient[] => {
   const byId = new Map<string, ManagedClient>();
   const byEmail = new Map<string, ManagedClient>();
@@ -1279,10 +1279,10 @@ type ClientSort = "recent" | "orders" | "spend" | "name";
 type ClientStatusFilter = "all" | "pending" | "inProgress" | "completed";
 
 interface MyClientsSectionProps {
-  rows: any[];
+  rows: ClientOrder[];
   ownerEmail: string;
   ownerUserId: string;
-  managedClients: any[];
+  managedClients: ManagedClientRow[];
   focusedEmail?: string | null;
   onFocusHandled?: () => void;
   onReload: () => Promise<void>;
@@ -1318,9 +1318,9 @@ const MyClientsSection = ({ rows, ownerEmail, ownerUserId, managedClients, focus
 
   const doMerge = async (targetId: string) => {
     if (!mergeSourceId || !targetId || mergeSourceId === targetId) return;
-    const { data, error } = await (supabase as any).rpc("merge_managed_clients", { _target: targetId, _source: mergeSourceId });
+    const { data, error } = await supabase.rpc("merge_managed_clients", { _target: targetId, _source: mergeSourceId });
     if (error) { toast.error(error.message || "Merge failed"); return; }
-    toast.success(`Merged — ${data?.moved_orders ?? 0} order(s) moved.`);
+    toast.success(`Merged — ${(data && typeof data === "object" && !Array.isArray(data) && typeof data.moved_orders === "number" ? data.moved_orders : 0)} order(s) moved.`);
     setMergeOpen(false); setMergeSourceId(null); setSelectedKey(null);
     await onReload();
   };
@@ -1651,7 +1651,7 @@ const ManagedClientEditor = ({
       return;
     }
     setSaving(true);
-    const payload: any = {
+    const payload: ManagedClientInsert = {
       portal_owner_user_id: ownerUserId,
       name: name.trim() || null,
       email: trimmedEmail || null,
@@ -1660,8 +1660,8 @@ const ManagedClientEditor = ({
       notes: notes.trim() || null,
     };
     const query = isEdit
-      ? (supabase as any).from("managed_clients").update(payload).eq("id", client!.id)
-      : (supabase as any).from("managed_clients").insert(payload);
+      ? supabase.from("managed_clients").update(payload).eq("id", client!.id)
+      : supabase.from("managed_clients").insert(payload);
     const { error } = await query;
     setSaving(false);
     if (error) {
@@ -1679,7 +1679,7 @@ const ManagedClientEditor = ({
     if (!client?.id) return;
     if (!confirm("Delete this client? Their orders will remain in your account but will lose the client link.")) return;
     setDeleting(true);
-    const { error } = await (supabase as any).from("managed_clients").delete().eq("id", client.id);
+    const { error } = await supabase.from("managed_clients").delete().eq("id", client.id);
     setDeleting(false);
     if (error) { toast.error(error.message || "Delete failed"); return; }
     toast.success("Client removed.");
@@ -1781,9 +1781,9 @@ const MergeClientDialog = ({
 };
 
 
-const ClientOrdersSection = ({ rows, onBrowse, ownerEmail, onOpenClient }: { rows: any[]; onBrowse: () => void; ownerEmail?: string; onOpenClient?: (email: string) => void }) => {
+const ClientOrdersSection = ({ rows, onBrowse, ownerEmail, onOpenClient }: { rows: ClientOrder[]; onBrowse: () => void; ownerEmail?: string; onOpenClient?: (email: string) => void }) => {
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
-  const [selected, setSelected] = useState<any | null>(null);
+  const [selected, setSelected] = useState<ClientOrder | null>(null);
   if (rows.length === 0) return <EmptyState icon={ShoppingBag} title="No orders yet" description="Your service orders will appear here automatically once placed." action={<Button variant="hero" className="rounded-full" onClick={onBrowse}>Place First Order</Button>} />;
   return (
     <div className="space-y-3">
@@ -1837,7 +1837,6 @@ const ClientOrdersSection = ({ rows, onBrowse, ownerEmail, onOpenClient }: { row
                 <div className="space-y-4">
                   <div>
                     <div className="text-sm font-semibold">{selected.service}</div>
-                    {selected.package_name && <div className="text-xs opacity-70">{selected.package_name}</div>}
                     <div className="text-xs opacity-60 mt-1">{selected.order_date} • {fmt(Number(selected.amount_gbp))}</div>
                   </div>
                   <div className="space-y-2">
@@ -1897,7 +1896,7 @@ const ClientOrdersSection = ({ rows, onBrowse, ownerEmail, onOpenClient }: { row
   );
 };
 
-const ClientSubscriptionsSection = ({ rows, onBrowse }: { rows: any[]; onBrowse: () => void }) => {
+const ClientSubscriptionsSection = ({ rows, onBrowse }: { rows: ClientSubscription[]; onBrowse: () => void }) => {
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
   const fmtDate = (d: string | null) => d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
   if (rows.length === 0) return <EmptyState icon={CalendarDays} title="No active subscriptions" description="Recurring services like address renewals will appear here automatically." action={<Button variant="hero" className="rounded-full" onClick={onBrowse}>Browse Services</Button>} />;
@@ -1968,18 +1967,18 @@ const ClientSubscriptionsSection = ({ rows, onBrowse }: { rows: any[]; onBrowse:
   );
 };
 
-const ClientWalletSection = ({ rows, balance }: { rows: any[]; balance: number }) => {
+const ClientWalletSection = ({ rows, balance }: { rows: ClientWalletTransaction[]; balance: number }) => {
   const fmt = (n: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n || 0);
   return <div className="space-y-5"><div className="glass rounded-2xl p-6"><div className="text-xs opacity-70">Current Balance</div><div className="text-3xl font-semibold mt-1">{fmt(balance)}</div></div>{rows.length === 0 ? <EmptyState icon={Wallet} title="No transactions yet" description="Wallet top-ups, payments and refunds will be tracked here automatically." /> : <div className="space-y-3">{rows.map((w) => <div key={w.id} className="glass rounded-xl p-4 flex items-center justify-between gap-3"><div><div className="font-medium">{w.description}</div><div className="text-xs opacity-60">{w.txn_ref} • {w.txn_date} • {w.txn_type}</div></div><div className="font-semibold">{fmt(Number(w.amount_gbp))}</div></div>)}</div>}</div>;
 };
 
-const ClientTicketsSection = ({ rows, onOpen }: { rows: any[]; onOpen: () => void }) => {
+const ClientTicketsSection = ({ rows, onOpen }: { rows: ClientTicket[]; onOpen: () => void }) => {
   if (rows.length === 0) return <EmptyState icon={Ticket} title="No support tickets" description="Any support requests you raise will be tracked here with replies from our team." action={<Button variant="hero" className="rounded-full" onClick={onOpen}>Open a Ticket</Button>} />;
   return <div className="space-y-3"><div className="flex justify-end"><Button variant="hero" size="sm" className="rounded-full" onClick={onOpen}>Open Ticket</Button></div>{rows.map((t) => <div key={t.id} className="glass rounded-xl p-4"><div className="flex items-center justify-between gap-3 flex-wrap"><div><div className="font-mono text-xs text-primary">{t.ticket_ref}</div><div className="font-semibold">{t.subject}</div></div><StatusBadge status={t.status} /></div><p className="text-sm opacity-75 mt-2 line-clamp-2">{t.message}</p><div className="text-xs opacity-60 mt-2">{new Date(t.created_at).toLocaleString()}</div></div>)}</div>;
 };
 
 const ClientDocumentsSection = ({ userId }: { userId: string }) => {
-  const [rows, setRows] = useState<any[] | null>(null);
+  const [rows, setRows] = useState<ClientDocument[] | null>(null);
   useEffect(() => {
     (async () => {
       const { data } = await supabase
@@ -2024,7 +2023,7 @@ const ClientDocumentsSection = ({ userId }: { userId: string }) => {
 };
 
 const ClientInvoicesSection = ({ userId }: { userId: string }) => {
-  const [rows, setRows] = useState<any[] | null>(null);
+  const [rows, setRows] = useState<ClientInvoice[] | null>(null);
   useEffect(() => {
     (async () => {
       const { data } = await supabase

@@ -7,7 +7,7 @@ import {
 export type NavItem = {
   label: string;
   to: string;
-  icon: any;
+  icon: import("lucide-react").LucideIcon;
   glow: "blue"|"purple"|"green"|"amber"|"red"|"cyan"|"pink"|"lime";
   children?: { label: string; to: string }[];
 };

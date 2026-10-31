@@ -363,7 +363,7 @@ export default function OsClients() {
   );
 }
 
-function StatCard({ label, value, icon: Icon, glow }: { label: string; value: number; icon: any; glow: string }) {
+function StatCard({ label, value, icon: Icon, glow }: { label: string; value: number; icon: import("lucide-react").LucideIcon; glow: string }) {
   return (
     <div className={`os-glass os-glow-${glow} p-4`}>
       <div className="flex items-center justify-between mb-2">

@@ -5,13 +5,14 @@ import { ArrowRight, CheckCircle2, FileText, KeyRound, Power, AlertCircle } from
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/card-hero-tax.webp";
+import { checkoutLinkForSlug } from "@/data/serviceCatalog";
 
 const rotatingCtas = [
-  "Get Your UTR Today",
-  "Recover Your Missing UTR",
-  "Register Your UTR Now",
-  "Fix Your HMRC Tax Status",
-  "Start UK Tax Compliance",
+  "Get Help Finding Your UTR",
+  "Discuss a Missing Tax Reference",
+  "Understand Your Company Codes",
+  "Ask About HMRC Online Access",
+  "Request Code Support",
 ];
 
 type Card = {
@@ -24,6 +25,7 @@ type Card = {
   why?: string[];
   did?: string[];
   ctas: string[];
+  source: { label: string; url: string };
 };
 
 const cards: Card[] = [
@@ -34,57 +36,53 @@ const cards: Card[] = [
     title: "What is UTR?",
     intro: "A UTR (Unique Taxpayer Reference) is a 10-digit number issued by HMRC.",
     what: [
-      "File Corporation Tax",
-      "Submit Self Assessment",
-      "Open UK business bank accounts",
-      "Register for VAT",
-      "Prove your business is tax-registered",
+      "Identify the company for Corporation Tax correspondence",
+      "Add Corporation Tax services to the business tax account",
+      "Use the company reference on the relevant tax return",
+      "Keep the company UTR separate from a director's personal UTR",
     ],
     did: [
-      "They used a virtual or third-party address",
-      "Their mail is delayed or lost",
-      "Director lives outside the UK",
-      "They registered themselves and made errors",
-      "HMRC could not verify their identity",
-      "The letter was returned or rejected",
+      "Check existing HMRC correspondence for the reference",
+      "Check that the company's registered address is correct",
+      "Use HMRC's official company UTR request route if needed",
     ],
-    ctas: ["Get Your UTR Today", "Recover Your Missing UTR", "Register Your UTR Now"],
+    ctas: ["Ask About Finding Your UTR", "Discuss a Missing UTR"],
+    source: { label: "HMRC: find your UTR", url: "https://www.gov.uk/find-utr-number" },
   },
   {
     id: "auth-code",
     icon: KeyRound,
     eyebrow: "Card 02",
-    title: "HMRC Authentication Code",
-    intro: "An HMRC Authentication Code is a security code used to access HMRC's online services.",
+    title: "Companies House Authentication Code",
+    intro: "Companies House issues this six-character company code for authorised online filings. It is separate from HMRC sign-in details and an individual's Companies House personal code.",
     what: [
-      "Activate your HMRC online account",
-      "Link your company to HMRC services",
-      "File Corporation Tax & VAT online",
-      "Access your tax dashboard",
-      "Authorise your accountant",
+      "Authorise company information filed online at Companies House",
+      "Use with supported Companies House filing software",
+      "Treat it with the care of a company officer's signature",
+      "Request or replace it through the official Companies House process",
     ],
-    ctas: ["Get Your HMRC Code Now", "Activate Your Tax Account", "Fix Your HMRC Access"],
+    ctas: ["Ask About Company Filing Access", "Discuss a Missing Company Code"],
+    source: { label: "Companies House: authentication codes", url: "https://www.gov.uk/guidance/company-authentication-codes-for-online-filing" },
   },
   {
     id: "activation-code",
     icon: Power,
     eyebrow: "Card 03",
-    title: "Company Activation Code",
-    intro: "A Company Activation Code is required to fully activate your company on HMRC systems.",
+    title: "HMRC Corporation Tax Activation Code",
+    intro: "HMRC may send an activation code when you enrol for Corporation Tax online services. This activates that tax service, rather than the company's legal existence.",
     what: [
-      "Activate your HMRC Corporation Tax account",
-      "Submit CT600 returns",
-      "Register for PAYE or VAT",
-      "Fully activate your company on HMRC systems",
+      "Complete enrolment in the Corporation Tax online service where required",
+      "Follow the instructions HMRC sends with the code",
+      "Request a replacement through HMRC if it is missing or expired",
+      "Keep other tax-service enrolments separate where applicable",
     ],
     why: [
-      "You never activated your company after registration",
-      "Code letter expired",
-      "Address or director mismatch",
-      "Online account setup errors",
-      "Company registered by third party",
+      "Check whether Corporation Tax services are already linked to the account",
+      "Check the registered address used for HMRC correspondence",
+      "Follow HMRC's missing or expired activation-code process",
     ],
-    ctas: ["Get Your Activation Code", "Fix HMRC Mismatch", "Activate Your Company"],
+    ctas: ["Ask About Corporation Tax Access", "Discuss an Activation Code"],
+    source: { label: "HMRC: add Corporation Tax services", url: "https://www.gov.uk/limited-company-formation/add-corporation-tax-services-to-business-tax-account" },
   },
 ];
 
@@ -96,7 +94,7 @@ const RotatingCta = () => {
   }, []);
   return (
     <Button asChild variant="hero" size="lg" className="rounded-full">
-      <Link to="/checkout?service=utr-number">
+      <Link to={checkoutLinkForSlug("utr-number")}>
         <span key={i} className="inline-block animate-fade-in">{rotatingCtas[i]}</span>
         <ArrowRight className="w-4 h-4" />
       </Link>
@@ -106,9 +104,8 @@ const RotatingCta = () => {
 
 const UtrCodes = () => {
   useSeo({
-    title: "UTR, HMRC Auth & Company Activation Codes | Digiformation",
-    description: "Get or recover your UTR, HMRC Authentication Code, and Company Activation Code. Stay fully compliant with HMRC and Companies House for your UK Limited Company.",
-    keywords: "UTR registration, HMRC authentication code, company activation code, HMRC corporation tax, UK tax compliance 2026, UTR for non resident UK company",
+    title: "UTR & Company Authentication Code Help | DigiFormation",
+    description: "Understand your company UTR, Companies House authentication code and HMRC Corporation Tax activation code. Explore official request routes and support options.",
     type: "website",
     breadcrumbs: [
       { name: "Home", path: "/" },
@@ -121,7 +118,7 @@ const UtrCodes = () => {
       name: "UTR, HMRC & Companies House Code Services",
       provider: { "@type": "Organization", name: "Digiformation Ltd" },
       areaServed: "United Kingdom",
-      description: "Apply for or recover your UTR, HMRC Authentication Code, and Companies House Activation Code.",
+      description: "Guidance and support with company UTR requests, Companies House authentication codes and HMRC Corporation Tax online access.",
     },
   });
 
@@ -141,7 +138,7 @@ const UtrCodes = () => {
                 UTR, Auth Code & <em className="not-italic text-gradient">Activation Code</em>
               </h1>
               <p className="mt-8 text-lg md:text-xl leading-relaxed max-w-2xl opacity-90">
-                Get or recover the three essential codes every UK Limited Company needs to file taxes, access HMRC, and stay compliant.
+                These references have different purposes. Find the right official request process and discuss support for your company's circumstances; receiving a code does not establish full tax or filing compliance.
               </p>
               <div className="mt-10"><RotatingCta /></div>
             </div>
@@ -169,10 +166,10 @@ const UtrCodes = () => {
                     </div>
                     <span className="text-[10px] uppercase tracking-[0.18em] opacity-70">{c.eyebrow}</span>
                   </div>
-                  <h3 className="text-2xl font-bold mb-3">{c.title}</h3>
+                  <h2 className="text-2xl font-bold mb-3">{c.title}</h2>
                   <p className="text-sm opacity-90 mb-5">{c.intro}</p>
 
-                  <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 mb-3">It is required to</div>
+                  <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 mb-3">Purpose and next steps</div>
                   <ul className="space-y-2 mb-6">
                     {c.what.map((w) => (
                       <li key={w} className="flex gap-3 text-sm">
@@ -184,7 +181,7 @@ const UtrCodes = () => {
 
                   {c.did && (
                     <>
-                      <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 mb-3">Why clients never receive it</div>
+                      <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 mb-3">If you cannot find it</div>
                       <ul className="space-y-2 mb-6">
                         {c.did.map((d) => (
                           <li key={d} className="flex gap-3 text-sm">
@@ -198,7 +195,7 @@ const UtrCodes = () => {
 
                   {c.why && (
                     <>
-                      <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 mb-3">Why this happens</div>
+                      <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 mb-3">Checks before requesting help</div>
                       <ul className="space-y-2 mb-6">
                         {c.why.map((d) => (
                           <li key={d} className="flex gap-3 text-sm">
@@ -210,10 +207,11 @@ const UtrCodes = () => {
                     </>
                   )}
 
+                  <a href={c.source.url} className="text-sm underline underline-offset-4 mb-6" target="_blank" rel="noopener noreferrer">{c.source.label}</a>
                   <div className="mt-auto space-y-2">
                     {c.ctas.map((cta) => (
                       <Button key={cta} asChild variant="ghostGlow" className="rounded-full w-full">
-                        <Link to={`/checkout?service=${encodeURIComponent(c.id)}`}>{cta} <ArrowRight className="w-4 h-4" /></Link>
+                        <Link to={checkoutLinkForSlug(c.id === "utr" ? "utr-number" : c.id)}>{cta} <ArrowRight className="w-4 h-4" /></Link>
                       </Button>
                     ))}
                   </div>
@@ -231,16 +229,16 @@ const UtrCodes = () => {
             <span className="text-xs uppercase tracking-[0.18em] font-semibold">What We Do For You</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-8">
-            We <em className="not-italic text-gradient">recover, request and activate</em> on your behalf
+            Understand the process and <em className="not-italic text-gradient">request appropriate support</em>
           </h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {[
-              "Request a new activation code",
-              "Verify HMRC records",
-              "Fix account mismatches",
-              "Recover missing UTRs",
-              "Re-issue authentication letters",
-              "Full HMRC online setup",
+              "Identify the reference or filing access you need",
+              "Find the relevant official request route",
+              "Check existing company correspondence",
+              "Discuss assistance with a missing reference",
+              "Review authorisation before acting for your company",
+              "Understand which next steps remain your responsibility",
             ].map((s) => (
               <div key={s} className="flex items-start gap-3 glass glass-tint-mustard rounded-xl p-4">
                 <CheckCircle2 className="w-5 h-5 mt-0.5 text-primary" />
@@ -248,6 +246,7 @@ const UtrCodes = () => {
               </div>
             ))}
           </div>
+          <p className="mt-6 text-sm opacity-85">Keep personal passwords and sign-in one-time codes private. Share a company authentication code only with someone authorised to file for your company. Official guidance checked 25 October 2026; delivery and service access depend on the relevant authority.</p>
           <div className="mt-10"><RotatingCta /></div>
         </div>
       </section>

@@ -1,3 +1,5 @@
+import type { Json, TablesInsert } from "@/integrations/supabase/types";
+import { errorMessage } from "@/businessos/lib/dataContracts";
 // Email Marketing AI Agent — Phase 1
 // Prospect management UI: CSV import, manual add, classify, assign campaign.
 // No sending logic here — sequencing/sending is Phase 2.
@@ -14,6 +16,10 @@ import { ProspectDashboardWidgets, ProspectTimelineDrawer, ProspectInsightsPanel
 type Campaign =
   | "idv_acsp" | "uk_formation" | "banking"
   | "compliance" | "ai_dashboard" | "website_dev";
+
+function parseCampaign(value: string | null): Campaign | null { return CAMPAIGNS.find(item => item.id === value)?.id ?? null; }
+function parseSize(value: string): Size { return value === "micro" || value === "small" || value === "medium" || value === "established" ? value : "unknown"; }
+function parseStatus(value: string): Status { return value === "qualified" || value === "rejected" || value === "enrolled" || value === "replied" || value === "completed" ? value : "new"; }
 
 type Status = "new" | "qualified" | "rejected" | "enrolled" | "replied" | "completed";
 type Size = "micro" | "small" | "medium" | "established" | "unknown";
@@ -77,7 +83,7 @@ export default function ProspectsPanel() {
   const [timelineFor, setTimelineFor] = useState<Prospect | null>(null);
   const [requalifying, setRequalifying] = useState<string | null>(null);
 
-  const callControl = async (prospect_id: string, action: string, extra: any = {}) => {
+  const callControl = async (prospect_id: string, action: string, extra: Record<string, Json> = {}) => {
     const { data: sess } = await supabase.auth.getSession();
     const token = sess.session?.access_token;
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -97,7 +103,7 @@ export default function ProspectsPanel() {
     setRequalifying(null);
     if (r) {
       toast({ title: "Re-queued for AI qualification", description: "Runs on the next cron tick (≤10m)." });
-      setRows((rs) => rs.map((x) => x.id === id ? { ...x, qualification_status: "pending" } as any : x));
+      setRows((rs) => rs.map((x) => x.id === id ? { ...x, qualification_status: "pending" } as Prospect : x));
     }
   };
 
@@ -129,7 +135,7 @@ export default function ProspectsPanel() {
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) toast({ title: "Failed to load prospects", description: error.message, variant: "destructive" });
-    setRows((data as any) ?? []);
+    setRows((data ?? []).map(row => ({ ...row, tags: row.tags ?? [], size_category: parseSize(row.size_category), assigned_campaign: parseCampaign(row.assigned_campaign), status: parseStatus(row.status), qualification_status: row.qualification_status === "qualified" || row.qualification_status === "rejected" || row.qualification_status === "needs_review" || row.qualification_status === "skipped" ? row.qualification_status : "pending" })));
     setLoading(false);
   };
 
@@ -151,7 +157,7 @@ export default function ProspectsPanel() {
 
   const counts = useMemo(() => {
     const c = { total: rows.length, new: 0, qualified: 0, enrolled: 0, replied: 0, rejected: 0 };
-    for (const r of rows) (c as any)[r.status]++;
+    for (const r of rows) { if (r.status !== "completed") c[r.status]++; }
     return c;
   }, [rows]);
 
@@ -196,7 +202,7 @@ export default function ProspectsPanel() {
             className="w-full bg-white/5 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-white/20"
           />
         </div>
-        <select value={statusF} onChange={(e) => setStatusF(e.target.value as any)}
+        <select value={statusF} onChange={(e) => setStatusF(e.target.value === "all" ? "all" : parseStatus(e.target.value))}
           className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm">
           <option value="all">All statuses</option>
           <option value="new">New</option>
@@ -206,7 +212,7 @@ export default function ProspectsPanel() {
           <option value="rejected">Rejected</option>
           <option value="completed">Completed</option>
         </select>
-        <select value={campF} onChange={(e) => setCampF(e.target.value as any)}
+        <select value={campF} onChange={(e) => setCampF(e.target.value === "all" || e.target.value === "none" ? e.target.value : parseCampaign(e.target.value) ?? "none")}
           className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm">
           <option value="all">All campaigns</option>
           <option value="none">— Unassigned —</option>
@@ -299,7 +305,7 @@ export default function ProspectsPanel() {
                     <td className="px-4 py-3">
                       <select
                         value={r.assigned_campaign ?? ""}
-                        onChange={(e) => updateProspect(r.id, { assigned_campaign: (e.target.value || null) as any })}
+                        onChange={(e) => updateProspect(r.id, { assigned_campaign: parseCampaign(e.target.value) })}
                         className="bg-white/5 border border-white/10 rounded px-2 py-1 text-xs max-w-[180px]">
                         <option value="">— None —</option>
                         {CAMPAIGNS.map((c) => (
@@ -430,7 +436,7 @@ function AddModal({ onClose, onDone }: { onClose: () => void; onDone: () => void
   const I = (k: keyof typeof form, label: string, type = "text") => (
     <div>
       <div className="text-[11px] uppercase tracking-wider text-white/40 mb-1">{label}</div>
-      <input type={type} value={form[k] as any}
+      <input type={type} value={String(form[k])}
         onChange={(e) => setForm({ ...form, [k]: e.target.value })}
         className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm outline-none focus:border-white/20" />
     </div>
@@ -458,7 +464,7 @@ function AddModal({ onClose, onDone }: { onClose: () => void; onDone: () => void
         <div>
           <div className="text-[11px] uppercase tracking-wider text-white/40 mb-1">Campaign</div>
           <select value={form.assigned_campaign}
-            onChange={(e) => setForm({ ...form, assigned_campaign: e.target.value as any })}
+            onChange={(e) => setForm({ ...form, assigned_campaign: parseCampaign(e.target.value) ?? "" })}
             className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm">
             <option value="">— None —</option>
             {CAMPAIGNS.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
@@ -548,7 +554,7 @@ function ImportModal({ onClose, onDone }: { onClose: () => void; onDone: () => v
         const slice = records.slice(i, i + CHUNK);
         const { data, error } = await supabase
           .from("email_prospects")
-          .upsert(slice as any, { onConflict: "contact_email", ignoreDuplicates: true })
+          .upsert(slice, { onConflict: "contact_email", ignoreDuplicates: true })
           .select("id");
         if (error) { console.warn("chunk error", error); continue; }
         inserted += data?.length ?? 0;
@@ -564,8 +570,8 @@ function ImportModal({ onClose, onDone }: { onClose: () => void; onDone: () => v
       setResult({ inserted, skipped });
       toast({ title: "Import complete", description: `Inserted ${inserted}, skipped ${skipped}.` });
       onDone();
-    } catch (e: any) {
-      toast({ title: "Import failed", description: e?.message ?? "Unknown error", variant: "destructive" });
+    } catch (e: unknown) {
+      toast({ title: "Import failed", description: errorMessage(e, "") ?? "Unknown error", variant: "destructive" });
     } finally {
       setBusy(false);
     }

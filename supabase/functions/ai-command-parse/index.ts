@@ -16,6 +16,8 @@
 // Intents emitted MUST match those supported by os-command-execute.
 // If unsure, return intent="clarify" with a helpful message — no fabrication.
 
+import { isRecord, readBoundedJson } from '../_shared/request-security.ts';
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -183,17 +185,17 @@ async function callGemini(prompt: string, userPayload: unknown) {
   catch { throw new Error("AI returned non-JSON: " + String(content).slice(0, 200)); }
 }
 
-function sanitizeIntent(out: any) {
-  if (!out || typeof out !== "object") return null;
-  const intent = SUPPORTED_INTENTS.includes(out.intent) ? out.intent : "clarify";
-  const payload = (out.payload && typeof out.payload === "object") ? out.payload : {};
-  const plan = (out.plan && typeof out.plan === "object") ? {
+function sanitizeIntent(out: unknown) {
+  if (!isRecord(out)) return null;
+  const intent = typeof out.intent === 'string' && SUPPORTED_INTENTS.includes(out.intent) ? out.intent : "clarify";
+  const payload = isRecord(out.payload) ? out.payload : {};
+  const plan = isRecord(out.plan) ? {
     goal:     String(out.plan.goal ?? ""),
     required: Array.isArray(out.plan.required) ? out.plan.required.map(String) : [],
     missing:  Array.isArray(out.plan.missing)  ? out.plan.missing.map(String)  : [],
     steps:    Array.isArray(out.plan.steps)    ? out.plan.steps.map(String)    : [],
     modules:  Array.isArray(out.plan.modules)  ? out.plan.modules.map(String)  : [],
-    risk:     ["safe","sensitive","destructive"].includes(out.plan.risk) ? out.plan.risk : "safe",
+    risk:     typeof out.plan.risk === 'string' && ["safe","sensitive","destructive"].includes(out.plan.risk) ? out.plan.risk : "safe",
   } : { goal:"", required:[], missing:[], steps:[], modules:[], risk:"safe" };
   const message = typeof out.message === "string" ? out.message : "";
   return { intent, payload, plan, message };
@@ -206,11 +208,12 @@ Deno.serve(async (req) => {
       status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-  let body: any;
-  try { body = await req.json(); }
-  catch { return new Response(JSON.stringify({ error: "Bad JSON" }), {
-    status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+  let body: unknown;
+  try { body = await readBoundedJson(req); }
+  catch (error) { return new Response(JSON.stringify({ error: "Invalid or oversized JSON" }), {
+    status: error instanceof RangeError ? 413 : 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
   }); }
+  if (!isRecord(body)) return new Response(JSON.stringify({ error: 'JSON object required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   try {
     const mode = body?.mode ?? "parse_intent";

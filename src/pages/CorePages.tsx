@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { applySeo, useSeo } from '@/lib/seo';
+import { applySeo, serializeJsonLd, useSeo } from '@/lib/seo';
 import { supabase } from "@/integrations/supabase/client";
 import { buildOrderRef } from "@/lib/orderRef";
 import { notifyDigibizCrm } from "@/lib/crmBridge";
@@ -71,7 +71,7 @@ const injectJsonLd = (id: string, data: object) => {
     el.type = "application/ld+json";
     document.head.appendChild(el);
   }
-  el.textContent = JSON.stringify(data);
+  el.textContent = serializeJsonLd(data);
   return () => {
     el?.remove();
   };
@@ -82,7 +82,7 @@ export const About = () => (
   <SimplePage
     eyebrow="About Us"
     title="Building global businesses, one formation at a time"
-    description="Digiformation Ltd is the trusted one-stop platform for UK & US company formation, banking, payment gateways, compliance and web development. We've helped 500+ entrepreneurs in 60+ countries launch and scale."
+    description="Digiformation Ltd offers UK and US company formation support, compliance assistance, banking and payment application guidance, and website development."
   />
 );
 
@@ -1332,23 +1332,26 @@ export const FAQ = () => {
             {visibleFaqs.map((f) => {
               const isOpen = open === f.q;
               return (
-                <button
+                <details
                   key={f.q}
-                  type="button"
-                  onClick={() => setOpen(isOpen ? null : f.q)}
-                  className="w-full text-left glass rounded-2xl p-6 transition-all hover:shadow-elegant"
+                  open={isOpen}
+                  onToggle={(event) => {
+                    const expanded = event.currentTarget.open;
+                    setOpen((current) => expanded ? f.q : current === f.q ? null : current);
+                  }}
+                  className="group w-full text-left glass rounded-2xl p-6 transition-all hover:shadow-elegant"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="text-[10px] uppercase tracking-[0.18em] opacity-60 mb-2">{f.category}</div>
-                      <h3 className="font-display text-lg md:text-xl font-semibold leading-snug">
-                        {f.q}
-                      </h3>
-                    </div>
-                    <ChevronDown className={`w-5 h-5 mt-1 flex-shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`} />
-                  </div>
-                  {isOpen && <p className="mt-4 opacity-85 leading-relaxed whitespace-pre-line">{f.a}</p>}
-                </button>
+                  <summary aria-label={f.q} className="cursor-pointer list-none rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary [&::-webkit-details-marker]:hidden">
+                    <h2 aria-label={f.q} className="flex items-start justify-between gap-4">
+                      <span>
+                        <span className="block text-[10px] font-sans uppercase tracking-[0.18em] opacity-60 mb-2">{f.category}</span>
+                        <span className="block font-display text-lg md:text-xl font-semibold leading-snug">{f.q}</span>
+                      </span>
+                      <ChevronDown aria-hidden="true" className="w-5 h-5 mt-1 flex-shrink-0 transition-transform group-open:rotate-180" />
+                    </h2>
+                  </summary>
+                  <p className="mt-4 opacity-85 leading-relaxed whitespace-pre-line">{f.a}</p>
+                </details>
               );
             })}
           </div>

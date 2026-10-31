@@ -13,9 +13,11 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
+import { isRecord, isUuid, readBoundedJson } from '../_shared/request-security.ts'
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
+  if (req.method !== 'POST') return new Response(null, { status: 405, headers: { ...corsHeaders, Allow: 'POST, OPTIONS' } })
 
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
   const SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -38,18 +40,22 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ error: 'admin role required' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' }})
   }
 
-  let body: any
-  try { body = await req.json() } catch { return new Response(JSON.stringify({ error: 'invalid json' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}) }
+  let body: unknown
+  try { body = await readBoundedJson(req) } catch (error) { return new Response(JSON.stringify({ error: 'invalid or oversized json' }), { status: error instanceof RangeError ? 413 : 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}) }
+  if (!isRecord(body)) return new Response(JSON.stringify({ error: 'object required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   const { prospect_id, action, reason, detail } = body
-  if (!prospect_id || !action) {
+  if (!isUuid(prospect_id) || typeof action !== 'string' || !['stop', 'replied', 'restart', 'enroll', 'meeting', 'order', 'requalify'].includes(action)
+    || (reason !== undefined && (typeof reason !== 'string' || reason.length > 2000))
+    || (detail !== undefined && (typeof detail !== 'string' || detail.length > 12000))
+    || (body.payload !== undefined && !isRecord(body.payload))) {
     return new Response(JSON.stringify({ error: 'prospect_id and action required' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }})
   }
 
   const now = new Date().toISOString()
-  const json = (b: any, status = 200) =>
+  const json = (b: unknown, status = 200) =>
     new Response(JSON.stringify(b), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' }})
 
-  const addTimeline = async (event_type: string, title: string, dtl?: string, payload: any = {}) => {
+  const addTimeline = async (event_type: string, title: string, dtl?: string | null, payload: Record<string, unknown> = {}) => {
     await admin.from('prospect_timeline').insert({ prospect_id, event_type, title, detail: dtl ?? null, payload })
   }
 
@@ -144,7 +150,7 @@ Deno.serve(async (req) => {
   }
 
   if (action === 'order') {
-    await addTimeline('order', 'Order created', detail || reason || null, body.payload || {})
+    await addTimeline('order', 'Order created', detail || reason || null, isRecord(body.payload) ? body.payload : {})
     return json({ ok: true })
   }
 

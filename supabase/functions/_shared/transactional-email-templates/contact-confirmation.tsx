@@ -39,7 +39,7 @@ const ContactConfirmationEmail = ({ customerName, ticketRef, subject, message }:
 
 export const template = {
   component: ContactConfirmationEmail,
-  subject: (d: Record<string, any>) =>
+  subject: (d: Props) =>
     `We've received your message${d.ticketRef ? ` — ${d.ticketRef}` : ''}`,
   displayName: 'Contact form acknowledgement',
   previewData: {

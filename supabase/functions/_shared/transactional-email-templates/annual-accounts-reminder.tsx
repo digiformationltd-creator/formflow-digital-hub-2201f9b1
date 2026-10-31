@@ -50,7 +50,7 @@ const AnnualAccountsReminderEmail = ({ customerName, companyName, companyNumber,
 
 export const template = {
   component: AnnualAccountsReminderEmail,
-  subject: (d: Record<string, any>) => `${subjectPrefix(urgencyFor(d.daysRemaining))}Annual Accounts Filing Due`,
+  subject: (d: Props) => `${subjectPrefix(urgencyFor(d.daysRemaining))}Annual Accounts Filing Due`,
   displayName: 'Annual accounts reminder',
   previewData: {
     customerName: 'Sanaullah Malik',

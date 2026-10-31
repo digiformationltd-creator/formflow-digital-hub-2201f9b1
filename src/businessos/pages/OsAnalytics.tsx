@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { isRecord } from "@/businessos/lib/dataContracts";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -384,6 +385,13 @@ function AiUsage({ insights, loading, perf }: { insights: Insights | null; loadi
 // Audit Explorer
 // ─────────────────────────────────────────────────────────────
 
+
+function isAuditRow(value: unknown): value is AuditRow {
+  if (!isRecord(value)) return false;
+  return ['id', 'created_at', 'intent', 'status'].every(key => typeof value[key] === 'string')
+    && ['executed_at', 'state', 'risk_tier', 'target_type', 'target_id', 'prompt', 'error', 'rolled_back_at', 'admin_id', 'admin_name'].every(key => value[key] === null || typeof value[key] === 'string');
+}
+
 const PAGE = 50;
 
 function AuditExplorer() {
@@ -399,7 +407,7 @@ function AuditExplorer() {
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const run = async (newOffset = 0) => {
+  const run = useCallback(async (newOffset = 0) => {
     setLoading(true);
     setOffset(newOffset);
     const { data, error } = await supabase.rpc("audit_search", {
@@ -415,23 +423,24 @@ function AuditExplorer() {
       _offset: newOffset,
     });
     if (!error && data) {
-      setRows((data as any).rows ?? []);
-      setTotal((data as any).total ?? 0);
+      if (isRecord(data) && Array.isArray(data.rows) && data.rows.every(isAuditRow) && typeof data.total === "number") {
+        setRows(data.rows); setTotal(data.total);
+      } else { setRows([]); setTotal(0); console.error("Invalid audit response contract"); }
     }
     setLoading(false);
-  };
-  useEffect(() => { run(0); /* initial */ /* eslint-disable-next-line */ }, []);
+  }, [from, to, intent, risk, status, moduleF, q]);
+  useEffect(() => { void run(0); }, [run]);
 
   const exportCsv = () => {
     if (rows.length === 0) return;
-    const headers = ["created_at","admin_name","intent","status","risk_tier","target_type","target_id","executed_at","rolled_back_at","error","prompt"];
-    const escape = (v: any) => {
+    const headers: (keyof AuditRow)[] = ["created_at","admin_name","intent","status","risk_tier","target_type","target_id","executed_at","rolled_back_at","error","prompt"];
+    const escape = (v) => {
       if (v === null || v === undefined) return "";
       const s = String(v).replace(/"/g, '""');
       return /[",\n]/.test(s) ? `"${s}"` : s;
     };
     const csv = [headers.join(",")].concat(
-      rows.map((r) => headers.map((h) => escape((r as any)[h])).join(","))
+      rows.map((r) => headers.map((h) => escape(r[h])).join(","))
     ).join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);

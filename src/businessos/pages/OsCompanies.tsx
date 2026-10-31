@@ -139,7 +139,7 @@ export default function OsCompanies() {
         .select("user_id, full_name, email, company_name")
         .in("user_id", ids);
       const map: Record<string, ProfileLite> = {};
-      (profs || []).forEach((p: any) => { map[p.user_id] = p; });
+      (profs || []).forEach((p) => { map[p.user_id] = p; });
       setProfiles(map);
     }
     setLoading(false);
@@ -238,7 +238,7 @@ export default function OsCompanies() {
         ].map(t => (
           <button
             key={t.k}
-            onClick={() => setTab(t.k as any)}
+            onClick={() => { if (t.k === "companies" || t.k === "addresses") setTab(t.k); }}
             className={`px-4 py-2 rounded-lg text-sm font-medium inline-flex items-center gap-2 transition ${tab === t.k ? "bg-white/15 text-white" : "text-white/60 hover:bg-white/5"}`}
           >
             <t.icon className="w-4 h-4" /> {t.label}

@@ -58,7 +58,7 @@ function previousWindow(since: Date, until: Date): { since: Date; until: Date } 
   return { since: new Date(since.getTime() - span), until: new Date(since.getTime()) };
 }
 
-const CATEGORY_META: Record<string, { label: string; icon: any; tone: string; q: string }> = {
+const CATEGORY_META: Record<string, { label: string; icon: import("lucide-react").LucideIcon; tone: string; q: string }> = {
   ai:       { label: "AI Referrals",     icon: Sparkles,   tone: "purple", q: "How much business is AI driving?" },
   search:   { label: "Search Referrals", icon: Search,     tone: "blue",   q: "Is SEO bringing customers?" },
   social:   { label: "Social Media",     icon: Share2,     tone: "pink",   q: "Are social channels paying off?" },
@@ -201,7 +201,7 @@ export default function OsGrowthIntelligence() {
       setLoading(false);
     });
     return () => { cancelled = true; };
-  }, [since.getTime(), until.getTime(), prevWin.since.getTime(), prevWin.until.getTime()]);
+  }, [since, until, prevWin]);
 
   const ov = data;
   const health = useMemo(() => computeHealth(data, prevData), [data, prevData]);
@@ -443,7 +443,7 @@ export default function OsGrowthIntelligence() {
 
 /* ------------------------------ Quick action ------------------------------ */
 function QuickAction({ icon: Icon, label, onClick, disabled }:
-  { icon: any; label: string; onClick: () => void; disabled?: boolean }) {
+  { icon: import("lucide-react").LucideIcon; label: string; onClick: () => void; disabled?: boolean }) {
   return (
     <button
       onClick={onClick}
@@ -457,7 +457,7 @@ function QuickAction({ icon: Icon, label, onClick, disabled }:
 
 /* ------------------------------ KPI card ------------------------------ */
 function Kpi({ label, value, sub, icon: Icon, tone, loading, curr, prev, suffix }:
-  { label: string; value: string; sub?: string; icon: any; tone: string; loading?: boolean;
+  { label: string; value: string; sub?: string; icon: import("lucide-react").LucideIcon; tone: string; loading?: boolean;
     curr?: number; prev?: number; suffix?: string; }) {
   let delta: { text: string; up: boolean | null } | null = null;
   if (typeof curr === "number" && typeof prev === "number") {
@@ -540,7 +540,7 @@ function DrillDrawer({
       setLoading(false);
     });
     return () => { cancelled = true; };
-  }, [kind, keyId, since.getTime(), until.getTime()]);
+  }, [kind, keyId, since, until]);
 
   return (
     <div className="fixed inset-0 z-50 flex">

@@ -15,7 +15,7 @@ export type AgentPlan = {
   risk: "safe" | "sensitive" | "destructive";
 };
 
-const RISK_TINT: Record<AgentPlan["risk"], { wrap: string; pill: string; icon: any; label: string }> = {
+const RISK_TINT: Record<AgentPlan["risk"], { wrap: string; pill: string; icon: import("lucide-react").LucideIcon; label: string }> = {
   safe:        { wrap: "border-emerald-500/20", pill: "bg-emerald-500/15 text-emerald-200", icon: ShieldCheck, label: "Safe" },
   sensitive:   { wrap: "border-amber-500/30",   pill: "bg-amber-500/15 text-amber-200",     icon: Shield,      label: "Sensitive — review" },
   destructive: { wrap: "border-red-500/30",     pill: "bg-red-500/15 text-red-200",         icon: ShieldAlert, label: "Destructive — confirm" },

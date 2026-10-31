@@ -5,7 +5,7 @@ import { useSeo } from "@/lib/seo";
 import { bankingProviders, BANKING_CATEGORIES, type BankingCategory } from "@/data/banking";
 import { ArrowRight, Sparkles, Building2, Globe2, CreditCard } from "lucide-react";
 
-const CATEGORY_ICON: Record<BankingCategory, any> = {
+const CATEGORY_ICON: Record<BankingCategory, import("lucide-react").LucideIcon> = {
   "Payment Gateways": CreditCard,
   "Business Accounts": Building2,
   "International Transfers": Globe2,

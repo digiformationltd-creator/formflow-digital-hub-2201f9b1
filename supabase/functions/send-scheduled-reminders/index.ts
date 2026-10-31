@@ -3,6 +3,7 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2.45.0'
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
+import { isServiceRequest, secretMatches } from '../_shared/request-security.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -37,12 +38,12 @@ function stageForDays(days: number): { stage: number; days: number } | null {
   return matches.reduce((a, b) => (a.days < b.days ? a : b))
 }
 
-function fmtAddress(a: any): string {
+function fmtAddress(a: { address_line1?: string | null; address_line2?: string | null; city?: string | null; county?: string | null; postcode?: string | null; country?: string | null }): string {
   return [a.address_line1, a.address_line2, a.city, a.county, a.postcode, a.country]
     .filter(Boolean).join(', ')
 }
 
-async function alreadySent(supabase: any, target_id: string, reminder_type: ReminderType, stage: number, due_date: string): Promise<boolean> {
+async function alreadySent(supabase: ReturnType<typeof createClient>, target_id: string, reminder_type: ReminderType, stage: number, due_date: string): Promise<boolean> {
   const { data } = await supabase
     .from('email_reminder_log')
     .select('id')
@@ -54,17 +55,17 @@ async function alreadySent(supabase: any, target_id: string, reminder_type: Remi
   return !!data
 }
 
-async function logSent(supabase: any, row: any) {
+async function logSent(supabase: ReturnType<typeof createClient>, row: { user_id: string | null; target_type: string; target_id: string; reminder_type: ReminderType; stage: number; due_date: string; recipient_email: string }) {
   await supabase.from('email_reminder_log').insert(row)
 }
 
 const ADMIN_EMAIL = 'info@digiformation.co.uk'
 
 async function sendReminder(
-  supabase: any,
+  supabase: ReturnType<typeof createClient>,
   templateName: string,
   recipientEmail: string,
-  templateData: Record<string, any>,
+  templateData: Record<string, unknown>,
   idempotencyKey: string,
   links: { clientUserId?: string | null; orderId?: string | null; invoiceId?: string | null } = {},
 ) {
@@ -101,27 +102,12 @@ async function sendReminder(
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
-  // AUTH: only allow service-role JWT (cron) or a matching CRON_SECRET header.
-  // This prevents anonymous callers from triggering early reminder sends and
-  // burning the per-stage idempotency slot in email_reminder_log.
-  const authHeader = req.headers.get('Authorization') || ''
-  const cronSecretHeader = req.headers.get('x-cron-secret') || ''
+  if (req.method !== 'POST') return new Response(null, { status: 405, headers: { Allow: 'POST' } })
+  // Cron may use the exact service credential or the configured cron secret.
+  // Decoding a JWT's role does not verify its signature.
   const expectedCronSecret = Deno.env.get('CRON_SECRET') || ''
-  let allowed = false
-  if (authHeader.startsWith('Bearer ')) {
-    const token = authHeader.replace('Bearer ', '')
-    if (token === SERVICE_KEY) {
-      allowed = true
-    } else {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1] || ''))
-        if (payload?.role === 'service_role') allowed = true
-      } catch { /* ignore */ }
-    }
-  }
-  if (!allowed && expectedCronSecret && cronSecretHeader === expectedCronSecret) {
-    allowed = true
-  }
+  const allowed = isServiceRequest(req, SERVICE_KEY) ||
+    secretMatches(req.headers.get('x-cron-secret') || '', expectedCronSecret)
   if (!allowed) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -272,7 +258,7 @@ Deno.serve(async (req) => {
       .select('id, company_name, company_number, registered_address, status, confirmation_due, accounts_filing_due, address_expire')
       .in('status', ['available', 'reserved'])
 
-    const managedChecks: Array<{ field: keyof typeof managed[number]; type: ReminderType }> = [
+    const managedChecks: Array<{ field: 'confirmation_due' | 'accounts_filing_due' | 'address_expire'; type: ReminderType }> = [
       { field: 'confirmation_due',    type: 'confirmation_statement' },
       { field: 'accounts_filing_due', type: 'annual_accounts' },
       { field: 'address_expire',      type: 'address_expiry' },
@@ -280,8 +266,8 @@ Deno.serve(async (req) => {
 
     for (const mc of managed || []) {
       for (const check of managedChecks) {
-        const dateStr = (mc as any)[check.field] as string | null
-        if (!dateStr) continue
+        const dateStr: unknown = mc[check.field]
+        if (typeof dateStr !== 'string' || !dateStr) continue
         const due = new Date(dateStr + 'T00:00:00Z')
         const days = daysBetween(today, due)
         const stage = stageForDays(days)
@@ -334,7 +320,7 @@ Deno.serve(async (req) => {
     })
   } catch (e) {
     console.error('scheduler error', e)
-    return new Response(JSON.stringify({ ok: false, error: String(e), summary }), {
+    return new Response(JSON.stringify({ ok: false, error: 'Reminder processing unavailable', summary }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })

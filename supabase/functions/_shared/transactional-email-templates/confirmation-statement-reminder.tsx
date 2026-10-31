@@ -50,7 +50,7 @@ const ConfirmationStatementReminderEmail = ({ customerName, companyName, company
 
 export const template = {
   component: ConfirmationStatementReminderEmail,
-  subject: (d: Record<string, any>) => `${subjectPrefix(urgencyFor(d.daysRemaining))}Confirmation Statement Filing Due`,
+  subject: (d: Props) => `${subjectPrefix(urgencyFor(d.daysRemaining))}Confirmation Statement Filing Due`,
   displayName: 'Confirmation statement reminder',
   previewData: {
     customerName: 'Sanaullah Malik',

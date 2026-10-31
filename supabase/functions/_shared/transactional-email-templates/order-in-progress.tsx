@@ -23,7 +23,7 @@ const OrderInProgressEmail = ({ customerName, orderRef, service }: Props) => (
 
 export const template = {
   component: OrderInProgressEmail,
-  subject: (d: Record<string, any>) => `Order In Progress${d.orderRef ? ` — ${d.orderRef}` : ''}`,
+  subject: (d: Props) => `Order In Progress${d.orderRef ? ` — ${d.orderRef}` : ''}`,
   displayName: 'Order in progress',
   previewData: { customerName: 'Sanaullah Malik', orderRef: 'GB102512APR26', service: 'UK LTD Formation' },
 } satisfies TemplateEntry

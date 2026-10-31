@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.audit-artifacts/
 dist
 dist-ssr
 *.local
@@ -27,3 +28,4 @@ reports/
 *.sln
 *.sw?
 supabase/.temp
+.firecrawl/

@@ -1,3 +1,4 @@
+import { errorMessage } from "@/businessos/lib/dataContracts";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -237,8 +238,8 @@ export default function OsOrders() {
         toast.info(`Invoice ${invoice.invoice_number} already exists`);
       }
       await load();
-    } catch (e: any) {
-      toast.error(e?.message || "Invoice action failed");
+    } catch (e: unknown) {
+      toast.error(errorMessage(e, "") || "Invoice action failed");
     } finally {
       setPendingId(null);
     }
@@ -259,7 +260,7 @@ export default function OsOrders() {
       toast.error(error.message || "Unable to load orders");
       return;
     }
-    const ids = (ordersData || []).map((o: any) => o.id);
+    const ids = (ordersData || []).map((o) => o.id);
     const invMap = new Map<string, { invoice_number: string; status: string }>();
     if (ids.length) {
       const { data: invs } = await supabase
@@ -274,7 +275,7 @@ export default function OsOrders() {
         }
       }
     }
-    const merged: OrderRow[] = (ordersData || []).map((o: any) => ({
+    const merged: OrderRow[] = (ordersData || []).map((o) => ({
       ...o,
       invoice_number: invMap.get(o.id)?.invoice_number ?? null,
       invoice_status: invMap.get(o.id)?.status ?? null,
@@ -858,7 +859,7 @@ export default function OsOrders() {
   );
 }
 
-function StatCard({ label, value, icon: Icon, glow }: { label: string; value: string; icon: any; glow: string }) {
+function StatCard({ label, value, icon: Icon, glow }: { label: string; value: string; icon: import("lucide-react").LucideIcon; glow: string }) {
   return (
     <div className={`os-glass os-glow-${glow} p-4`}>
       <div className="flex items-center justify-between mb-2">

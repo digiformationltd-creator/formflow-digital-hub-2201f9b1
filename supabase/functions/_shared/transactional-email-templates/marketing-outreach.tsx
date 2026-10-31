@@ -33,7 +33,7 @@ const MarketingOutreachEmail = ({ greeting, heading, preview, paragraphs, body_t
 
 export const template = {
   component: MarketingOutreachEmail,
-  subject: (d: Record<string, any>) => d.subject || 'A quick note from Digiformation',
+  subject: (d: { subject?: string }) => d.subject || 'A quick note from Digiformation',
   displayName: 'Marketing Outreach (AI-personalised)',
   previewData: {
     greeting: 'Sarah',

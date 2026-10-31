@@ -2,6 +2,7 @@
 // Safe by design: only touches ephemeral data. Invoices, client documents,
 // successful email history, customer records, compliance data are NEVER deleted.
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import { isServiceRequest } from '../_shared/request-security.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,17 +10,6 @@ const corsHeaders = {
 }
 
 const RETENTION_DAYS = 30
-
-function parseJwtClaims(token: string): Record<string, unknown> | null {
-  const parts = token.split('.')
-  if (parts.length < 2) return null
-  try {
-    const payload = parts[1]
-      .replaceAll('-', '+').replaceAll('_', '/')
-      .padEnd(Math.ceil(parts[1].length / 4) * 4, '=')
-    return JSON.parse(atob(payload)) as Record<string, unknown>
-  } catch { return null }
-}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
@@ -32,15 +22,10 @@ Deno.serve(async (req) => {
   }
 
   // Defense in depth: only service-role callers (cron) may trigger cleanup.
-  const auth = req.headers.get('Authorization')
-  if (!auth?.startsWith('Bearer ')) {
+  if (req.method !== 'POST') return new Response(null, { status: 405, headers: { Allow: 'POST' } })
+  if (!isServiceRequest(req, serviceKey)) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }),
       { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
-  }
-  const claims = parseJwtClaims(auth.slice(7).trim())
-  if (claims?.role !== 'service_role') {
-    return new Response(JSON.stringify({ error: 'Forbidden' }),
-      { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 
   const supabase = createClient(supabaseUrl, serviceKey)

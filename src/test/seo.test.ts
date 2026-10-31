@@ -1,7 +1,32 @@
 import { describe, expect, it, beforeEach } from "vitest";
-import { applySeo } from "@/lib/seo";
+import { applySeo, resetRouteSeo, serializeJsonLd } from "@/lib/seo";
 
 describe("route SEO contract", () => {
+  it('serializes embedded HTML safely without changing JSON content', () => {
+    const value = { '@type': 'Article', headline: '</script><script>globalThis.pwned=true</script>&\u2028\u2029' };
+    const encoded = serializeJsonLd(value);
+    expect(encoded).not.toContain('<');
+    expect(JSON.parse(encoded)).toEqual(value);
+    document.head.innerHTML = `<script type="application/ld+json">${encoded}</script>`;
+    expect(document.head.querySelectorAll('script')).toHaveLength(1);
+  });
+  it('removes outgoing route graphs while preserving the explicitly owned global graph', () => {
+    document.head.innerHTML = '<script id="ldjson-global" type="application/ld+json">{"@graph":[]}</script><script id="outgoing-graph" type="application/ld+json">{"@graph":[{"@type":"Article"}]}</script>';
+    resetRouteSeo('/contact');
+    expect(document.getElementById('ldjson-global')).not.toBeNull();
+    expect(document.getElementById('outgoing-graph')).toBeNull();
+  });
+  it('clears article schema and moves canonical/hreflang through SPA routes', () => {
+    for (const path of ['/blog/first', '/insights/report', '/contact', '/checkout', '/uk-services']) {
+      resetRouteSeo(path);
+      expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(`https://www.digiformation.co.uk${path}`);
+      for (const language of ['en', 'x-default']) expect(document.querySelector(`link[hreflang="${language}"]`)?.getAttribute('href')).toBe(`https://www.digiformation.co.uk${path}`);
+      expect(document.querySelectorAll('#ldjson-page')).toHaveLength(1);
+      expect(document.getElementById('ldjson-page')?.textContent).not.toContain('BlogPosting');
+      expect(document.querySelector('meta[name="googlebot"]')?.getAttribute('content')).toBe(path === '/checkout' ? 'noindex, nofollow' : 'index, follow');
+      applySeo({ title: 'Article', description: 'Article', path, jsonLd: { '@context': 'https://schema.org', '@type': 'BlogPosting', url: `https://www.digiformation.co.uk${path}` } });
+    }
+  });
   beforeEach(() => {
     document.head.innerHTML = `
       <title>Shell</title>
