@@ -6,6 +6,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { startStaticServer, launchChromium, publicPaths, blockExternalTraffic, readSeo, seoFailures } from './seo-runtime.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -141,7 +142,7 @@ function removeDynamicHead(html) {
 function buildHtml(template, pathname, metadata) {
   const canonical = `${SITE}${pathname === "/" ? "/" : pathname}`;
   const robots = metadata.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large";
-  const entityGraph = fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/i)?.[1];
+  const entityGraph = fs.readFileSync(path.join(ROOT, "index.html"), "utf8").match(/<script\b[^>]*\bid="ldjson-global"[^>]*>([\s\S]*?)<\/script>/i)?.[1];
   const schema = [
     {
       "@context": "https://schema.org",
@@ -199,14 +200,39 @@ function writeRoute(pathname, html) {
   fs.writeFileSync(output, html);
 }
 
-function main() {
+async function main() {
   if (!fs.existsSync(path.join(DIST, "index.html"))) throw new Error("dist/index.html missing; run vite build first");
   const template = fs.readFileSync(path.join(DIST, "index.html"), "utf8");
+  // Keep an unrendered application entry for private and conversion routes.
+  fs.writeFileSync(path.join(DIST, 'app-shell.html'), template);
   const blogs = parseBlogMetadata();
   const insights = parseInsightMetadata();
   const paths = [...new Set([...sitemapPaths(), ...PRIVATE_PREFIXES])];
   for (const pathname of paths) writeRoute(pathname, buildHtml(template, pathname, getMetadata(pathname, blogs, insights)));
-  console.log(`✓ prerendered ${paths.length} route shells (${blogs.size} blog metadata records, ${insights.size} insight records)`);
+  writeRoute('/404', buildHtml(template, '/404', { title:'Page not found — DigiFormation', description:'The requested page could not be found.', h1:'Page not found', noindex:true }));
+  // Metadata shells are a bootstrap only. Export the actual React page content
+  // for every public route and fail the build if rendering is incomplete.
+  const server = await startStaticServer(), browser = await launchChromium();
+  let count = 0;
+  try {
+    for (const pathname of publicPaths()) {
+      const context = await browser.newContext({ reducedMotion: 'reduce' });
+      const page = await context.newPage(); const errors = [];
+      page.on('pageerror', error => errors.push(error.message));
+      await blockExternalTraffic(page, server.base);
+      try {
+        await page.goto(server.base + pathname, { waitUntil: 'domcontentloaded' });
+        await page.waitForFunction(expected => document.documentElement.dataset.routeReady === expected, pathname, {timeout:20000});
+        const data = await readSeo(page);
+        const failures = [...seoFailures(data, pathname), ...errors];
+        if (failures.length) throw new Error(`${pathname}: ${failures.join('; ')}`);
+        // Preferences are browser-specific. Do not export the transient banner.
+        await page.locator('[aria-label="Analytics cookie choices"]').evaluateAll(nodes => nodes.forEach(node => node.remove()));
+        writeRoute(pathname, await page.content()); count++;
+      } finally { await context.close(); }
+    }
+  } finally { await browser.close(); await server.close(); }
+  console.log(`Verified full-content export: ${count} public routes (${blogs.size} blog records).`);
 }
 
-main();
+await main();

@@ -2,6 +2,7 @@
 // source detection, UTM persistence. All writes are best-effort, never block UI.
 
 import { supabase } from "@/integrations/supabase/client";
+import { analyticsAllowed, safeAnalyticsPath } from './analytics-consent';
 
 const COOKIE_NAME = "df_visitor_id";
 const LS_FIRST = "df_attribution_first";
@@ -141,6 +142,7 @@ const detectBrowser = (): string => {
 
 // ---------- visitor id ----------
 export const getVisitorId = (): string => {
+  if (!analyticsAllowed()) return '';
   let id = getCookie(COOKIE_NAME);
   if (!id) {
     id = uuid();
@@ -154,7 +156,7 @@ export const getVisitorId = (): string => {
 let trackedThisLoad = false;
 
 export const trackPageView = async () => {
-  if (typeof window === "undefined" || trackedThisLoad) return;
+  if (typeof window === "undefined" || !analyticsAllowed() || trackedThisLoad || safeAnalyticsPath(window.location.href) === '/private') return;
   trackedThisLoad = true;
 
   try {
@@ -167,8 +169,8 @@ export const trackPageView = async () => {
       utm_content: url.searchParams.get("utm_content") || undefined,
       utm_term: url.searchParams.get("utm_term") || undefined,
     };
-    const referrer = document.referrer || "";
-    const detected = detectFromReferrer(referrer);
+    const detected = detectFromReferrer(document.referrer || '');
+    const referrer = document.referrer ? new URL(document.referrer).origin : '';
 
     // UTM beats referrer for source attribution
     let source: string | undefined;
@@ -192,7 +194,7 @@ export const trackPageView = async () => {
 
     const device = detectDevice();
     const browser = detectBrowser();
-    const landing = window.location.pathname + window.location.search;
+    const landing = safeAnalyticsPath(window.location.href);
 
     const visit = {
       source, category, campaign: utm.utm_campaign,
@@ -255,6 +257,7 @@ export const trackPageView = async () => {
 
 // ---------- snapshot for form submission ----------
 export const getAttributionSnapshot = (): AttributionSnapshot => {
+  if (!analyticsAllowed()) return { visitor_id: '' };
   const visitor_id = getVisitorId();
   const first = readStoredTouch(LS_FIRST) ?? {};
   const last = readStoredTouch(LS_LAST) ?? {};
@@ -289,6 +292,7 @@ export const recordLeadAttribution = async (params: {
   userId?: string | null;
   declared?: DeclaredSource | null;
 }) => {
+  if (!analyticsAllowed()) return null;
   try {
     const snap = getAttributionSnapshot();
     const payload = {

@@ -1,6 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { trackPageView } from "@/lib/analytics";
+import { CONSENT_EVENT, initializeAnalytics } from '@/lib/analytics-consent';
 
 /**
  * Automatically captures client-side route transitions in React Router
@@ -8,23 +9,12 @@ import { trackPageView } from "@/lib/analytics";
  */
 const GoogleAnalyticsTracker = () => {
   const location = useLocation();
-  const isFirstRender = useRef(true);
-
   useEffect(() => {
-    // Skip the very first render if gtag config already fires initial page_view,
-    // or trigger on subsequent SPA route navigations.
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      const fullPath = location.pathname + location.search + location.hash;
-      trackPageView(fullPath, document.title);
-    }, 120);
-
-    return () => clearTimeout(timer);
-  }, [location.pathname, location.search, location.hash]);
+    const send = () => { initializeAnalytics(); trackPageView(location.pathname); };
+    const timer = setTimeout(send, 120);
+    window.addEventListener(CONSENT_EVENT, send);
+    return () => { clearTimeout(timer); window.removeEventListener(CONSENT_EVENT, send); };
+  }, [location.pathname, location.key]);
 
   return null;
 };

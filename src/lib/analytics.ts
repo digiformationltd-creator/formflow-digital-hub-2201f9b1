@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { analyticsAllowed, GA_ID, safeAnalyticsPath } from './analytics-consent';
 
 declare global {
   interface Window {
@@ -7,14 +8,16 @@ declare global {
   }
 }
 
-export const GA_MEASUREMENT_ID = "G-E063R532V0";
+export const GA_MEASUREMENT_ID = GA_ID;
+let lastPagePath: string | undefined;
+const emittedTransactions = new Set<string>();
 
 /**
  * Universal safe call for gtag that queues into dataLayer even if
  * Google Analytics script is still loading asynchronously.
  */
 export const gtag = (...args: unknown[]) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !analyticsAllowed()) return;
   if (typeof window.gtag === "function") {
     window.gtag(...args);
   } else {
@@ -27,11 +30,15 @@ export const gtag = (...args: unknown[]) => {
  * Tracks SPA Page Views across React Router navigations.
  */
 export const trackPageView = (url: string, title?: string) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !analyticsAllowed()) return;
+  const pathname = safeAnalyticsPath(url);
+  if (pathname === '/private' || pathname === lastPagePath) return;
+  lastPagePath = pathname;
   gtag("event", "page_view", {
-    page_path: url,
+    page_path: pathname,
     page_title: title || document.title,
-    page_location: window.location.href,
+    page_location: window.location.origin + pathname,
+    page_referrer: document.referrer ? new URL(document.referrer).origin : '',
     send_to: GA_MEASUREMENT_ID,
   });
 };
@@ -40,17 +47,22 @@ export const trackPageView = (url: string, title?: string) => {
  * Generic custom event tracker for Google Analytics 4.
  */
 export const trackEvent = (eventName: string, params: Record<string, unknown> = {}) => {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !analyticsAllowed() || safeAnalyticsPath(window.location.href) === '/private') return false;
+  // No free-text, identity fields, arbitrary URLs or form payloads in analytics.
+  const allowed = new Set(['method','source','page_path','currency','value','items','transaction_id','lead_type','content_type','item_id','destination','country','jurisdiction','message_length']);
+  const safe = Object.fromEntries(Object.entries(params).filter(([key]) => allowed.has(key)).map(([key,value]) => [key, key === 'destination' || key === 'page_path' ? safeAnalyticsPath(String(value)) : value]));
   gtag("event", eventName, {
-    ...params,
+    ...safe,
     send_to: GA_MEASUREMENT_ID,
   });
+  return true;
 };
 
 /**
  * Tracks WhatsApp click interactions both to Supabase analytics table and GA4.
  */
 export const trackWhatsAppClick = async (source: string) => {
+  if (!analyticsAllowed()) return;
   // Fire Google Analytics event immediately
   trackEvent("contact_whatsapp", {
     method: "WhatsApp",
@@ -58,18 +70,12 @@ export const trackWhatsAppClick = async (source: string) => {
     page_path: typeof window !== "undefined" ? window.location.pathname : "",
   });
 
-  // Recommended standard GA4 contact / lead event
-  trackEvent("generate_lead", {
-    lead_type: "whatsapp_contact",
-    source: source.slice(0, 100),
-  });
-
   // Record to Supabase DB (best-effort, non-blocking)
   try {
     await supabase.from("whatsapp_clicks").insert({
       source: source.slice(0, 100),
       page_path: typeof window !== "undefined" ? window.location.pathname.slice(0, 500) : null,
-      referrer: typeof document !== "undefined" ? document.referrer.slice(0, 1000) : null,
+      referrer: typeof document !== "undefined" && document.referrer ? new URL(document.referrer).origin : null,
       user_agent: typeof navigator !== "undefined" ? navigator.userAgent.slice(0, 500) : null,
     });
   } catch {
@@ -110,8 +116,12 @@ export const trackPurchase = (params: {
   packageName?: string;
   amount: number;
   currency: string;
+  paymentConfirmed?: boolean;
 }) => {
-  if (!params.invoiceNumber?.trim() || !params.orderRef.trim() || !Number.isFinite(params.amount) || params.amount < 0) return false;
+  // Never call this from invoice creation. Only a trusted payment-confirmation
+  // integration may supply this signal; no such integration is enabled here.
+  if (!analyticsAllowed() || params.paymentConfirmed !== true || !params.invoiceNumber?.trim() || !params.orderRef.trim() || !Number.isFinite(params.amount) || params.amount < 0) return false;
+  if (emittedTransactions.has(params.orderRef)) return false;
   // A successful invoice/order may be returned again after a refresh or retry.
   // Keep GA4 transaction IDs idempotent per browser session.
   if (typeof window !== "undefined") {
@@ -137,6 +147,7 @@ export const trackPurchase = (params: {
       },
     ],
   });
+  emittedTransactions.add(params.orderRef);
   return true;
 };
 
@@ -148,13 +159,20 @@ export const trackLeadSubmission = (params: {
   service?: string;
   source?: string;
   country?: string;
+  confirmedId?: string;
 }) => {
+  if (!params.confirmedId) return;
   trackEvent("generate_lead", {
     lead_type: params.leadType,
-    service: params.service || "General Inquiry",
-    source: params.source || "Website Form",
-    country: params.country || "Unknown",
   });
+};
+
+export const trackOrderSubmitted = (orderRef: string) => {
+  if (!orderRef || !analyticsAllowed()) return;
+  const key = `order:${orderRef}`;
+  if (emittedTransactions.has(key)) return;
+  emittedTransactions.add(key);
+  trackEvent('order_submitted', { content_type: 'invoice_request' });
 };
 
 /**

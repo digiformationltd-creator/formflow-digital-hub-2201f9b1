@@ -14,6 +14,7 @@ import {
   Building2, 
   HelpCircle, 
   Check, 
+  ChevronDown,
   FileText, 
   Scale,
   Award
@@ -131,7 +132,7 @@ const IdVerificationPage = () => {
     description: "Official UK Companies House Identity Verification service under ECCTA 2023. Fast digital verification for UK & non-resident directors, PSCs, and officers for £20.",
     keywords: "Companies House ID verification, UK LTD ID verification, director verification UK, PSC identity check, ECCTA 2023 identity verification, non resident director ID check, authorised corporate service provider ACSP, Companies House identity check online",
     type: "website",
-    canonical: "https://www.digiformation.co.uk/id-verification",
+    path: "/id-verification",
     breadcrumbs: [
       { name: "Home", path: "/" },
       { name: "ID Verification", path: "/id-verification" },

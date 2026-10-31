@@ -15,6 +15,7 @@ beforeEach(() => {
   };
   vi.stubGlobal('localStorage', storage);
   Object.defineProperty(window, 'localStorage', { configurable: true, value: storage });
+  storage.setItem('df_analytics_consent_v1', 'granted');
   vi.clearAllMocks();
   mocks.insert.mockResolvedValue({ error: null });
   mocks.rpc.mockResolvedValue({ error: null });

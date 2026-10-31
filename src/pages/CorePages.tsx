@@ -190,6 +190,9 @@ export const Contact = () => {
       .single();
     if (dbError) {
       console.error("Failed to save submission:", dbError);
+      setSubmitting(false);
+      toast.error("We could not save your message. Please try again or contact us by email.");
+      return;
     }
 
     // Link attribution to this inquiry — surfaces it inside Growth Intelligence.
@@ -203,6 +206,7 @@ export const Contact = () => {
 
     // Google Analytics 4 lead generation event
     trackLeadSubmission({
+      confirmedId: inserted?.id,
       leadType: "contact_form",
       service: form.service,
       source: declaredSource?.label,

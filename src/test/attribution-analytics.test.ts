@@ -8,6 +8,7 @@ describe("attribution and purchase telemetry contracts", () => {
     window.sessionStorage.clear();
     window.dataLayer = [];
     window.gtag = undefined;
+    window.localStorage.setItem('df_analytics_consent_v1', 'granted');
   });
 
   it("classifies Bing search and country Google hosts as organic search", () => {
@@ -24,7 +25,7 @@ describe("attribution and purchase telemetry contracts", () => {
   });
 
   it("emits one purchase event per order reference in a browser session", () => {
-    expect(trackPurchase({ orderRef: "INV-TEST-1", invoiceNumber: 'INV-1', serviceTitle: "UK LTD", amount: 100, currency: "GBP" })).toBe(true);
+    expect(trackPurchase({ orderRef: "INV-TEST-1", invoiceNumber: 'INV-1', serviceTitle: "UK LTD", amount: 100, currency: "GBP", paymentConfirmed: true })).toBe(true);
     expect(trackPurchase({ orderRef: "INV-TEST-1", invoiceNumber: 'INV-1', serviceTitle: "UK LTD", amount: 100, currency: "GBP" })).toBe(false);
     expect(window.dataLayer?.filter((entry: unknown) => Array.isArray(entry) && entry[1] === "purchase")).toHaveLength(1);
   });
@@ -34,7 +35,8 @@ describe("attribution and purchase telemetry contracts", () => {
     expect(trackPurchase(order)).toBe(false);
     expect(trackPurchase({ ...order, invoiceNumber: '' })).toBe(false);
     expect(window.dataLayer).toHaveLength(0);
-    expect(trackPurchase({ ...order, invoiceNumber: 'INV-RETRY' })).toBe(true);
+    expect(trackPurchase({ ...order, invoiceNumber: 'INV-RETRY' })).toBe(false);
+    expect(trackPurchase({ ...order, invoiceNumber: 'INV-RETRY', paymentConfirmed: true })).toBe(true);
     expect(trackPurchase({ ...order, invoiceNumber: 'INV-RETRY' })).toBe(false);
     expect(window.dataLayer).toHaveLength(1);
   });

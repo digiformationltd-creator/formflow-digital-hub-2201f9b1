@@ -10,6 +10,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import RecoveryRedirect from "./components/RecoveryRedirect";
 import AttributionTracker from "./components/AttributionTracker";
 import GoogleAnalyticsTracker from "./components/GoogleAnalyticsTracker";
+import AnalyticsConsent from './components/AnalyticsConsent';
 import RouteSeoBoundary from './components/RouteSeoBoundary';
 
 // Lazy-loaded routes for performance & minimal initial bundle
@@ -68,6 +69,7 @@ const App = () => (
         <RecoveryRedirect />
         <AttributionTracker />
         <GoogleAnalyticsTracker />
+        <AnalyticsConsent />
         <Suspense fallback={<div className="min-h-screen bg-background" />}>
           <Routes>
           <Route path="/" element={<Index />} />

@@ -203,7 +203,7 @@ describe('DigiFormation Ask AI — Proactive Business Consultant & Smart Follow-
     expect(profile.preferred_jurisdiction).toBe('uk_ltd');
 
     // Turn 2: Pivot completely to dropshipping in USA!
-    const turn2 = [
+    const turn2: { role: 'user' | 'assistant'; content: string }[] = [
       ...turn1,
       { role: 'user', content: 'Actually forget freelancing. I have decided to start a US dropshipping store instead.' },
     ];

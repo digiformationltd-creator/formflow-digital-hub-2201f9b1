@@ -28,7 +28,7 @@ import { notifyDigibizCrm } from "@/lib/crmBridge";
 import { COUNTRIES } from "@/lib/countries";
 import { normalizePhoneToE164 } from "@/lib/phone";
 import { recordLeadAttribution, type DeclaredSource } from "@/lib/attribution";
-import { trackBeginCheckout, trackPurchase } from "@/lib/analytics";
+import { trackBeginCheckout, trackOrderSubmitted } from "@/lib/analytics";
 import SourceHeardSelect from "@/components/attribution/SourceHeardSelect";
 import { isPlaceholderCompanyName, PLACEHOLDER_COMPANY_ERROR } from "@/lib/companyNameValidator";
 import { SearchableCountrySelect } from "./SearchableCountrySelect";
@@ -771,18 +771,9 @@ const CheckoutFlow = ({
       notes: invoiceNumber ? `Invoice ${invoiceNumber}` : "",
     });
 
-    // A purchase means the business-defined success condition was met: the
-    // invoice/order endpoint returned an invoice number. Failed invoice
-    // generation must never be reported as a completed purchase.
+    // An invoice request is an order submission, not a paid purchase.
     if (orderSucceeded) {
-      trackPurchase({
-        orderRef: finalOrderRef,
-        invoiceNumber,
-        serviceTitle,
-        packageName,
-        amount: total,
-        currency,
-      });
+      trackOrderSubmitted(finalOrderRef);
     } else {
       console.warn("[analytics] purchase skipped because invoice generation did not succeed", { orderRef: finalOrderRef });
     }
