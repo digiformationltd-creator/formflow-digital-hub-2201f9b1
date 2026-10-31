@@ -91,6 +91,9 @@ function syncSitemap() {
   // Replace any old domain occurrences
   xml = xml.replace(/https:\/\/(www\.)?digiformation\.uk/g, 'https://www.digiformation.co.uk');
   xml = removeExcludedUrls(xml);
+  // Imported cornerstone articles were also appended outside the managed
+  // block. Rebuild all blog entries once, preserving every non-blog entry.
+  xml = xml.replace(/<url\b[^>]*>[\s\S]*?<\/url>/g, entry => /<loc>https:\/\/www\.digiformation\.co\.uk\/blog\//.test(entry) ? '' : entry);
 
   const posts = getBlogPosts();
   const block = buildBlock(posts);
@@ -108,6 +111,9 @@ function syncSitemap() {
     const url = `https://www.digiformation.co.uk${pathname}`;
     if (!xml.includes(`<loc>${url}</loc>`)) xml = xml.replace('</urlset>', `  <url><loc>${url}</loc></url>\n</urlset>`);
   }
+  const locs=[...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m=>m[1]);
+  if(new Set(locs).size!==locs.length)throw new Error('Duplicate sitemap URLs');
+  xml=xml.replace(/\n(?:[ \t]*\n)+/g,'\n');
   fs.writeFileSync(SITEMAP, xml);
   console.log(`✓ sitemap.xml synced (${posts.length} blog posts, explicit source dateModified used; no build-date fabrication)`);
 }

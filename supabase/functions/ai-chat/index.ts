@@ -139,8 +139,8 @@ Behavior: When user asks anything, FIRST try to match the question to an FAQ bel
 23. What is Activation Code (HMRC)? → Code to activate online tax filing — separate from Companies House Auth Code.
 
 — UK COMPLIANCE —
-24. AD01 process? → Change of registered office address — filed online with Companies House, takes 24h. We file it for you.
-25. AD01 common issues? → Wrong jurisdiction, no proof of new address, or director not authorised. We handle all of it.
+24. AD01 process & price? → Statutory form to change UK registered office address. Online filing via WebFiling is £10 if you have the authentication code. If you lost your Authentication Code or old mail access, our fully managed paper postal filing service to Companies House Cardiff is £50 under /uk-compliance/ad01-form-post.
+25. AD01 lost auth code recovery? → If your authentication code is lost and old address inaccessible, paper Form AD01 is the only legal recovery route to update your address first without being locked out. We draft, verify, and post it by tracked priority mail for £50.
 26. Annual Accounts filing? → Due 9 months after year-end. We prepare + file.
 27. Confirmation Statement? → Yearly £34 Companies House fee + our service. Due once a year.
 28. Name change service? → Special resolution + NM01 filing. We handle it.

@@ -27,6 +27,10 @@ export type CompliancePage = {
   /** Structured form fields that the checkout will render so we collect
    *  the exact data this filing needs (e.g. Director's Personal Code). */
   formFields?: ComplianceFormField[];
+  badge?: string;
+  whenNeeded?: Array<{ title: string; desc: string }>;
+  howItWorks?: Array<{ step: string; title: string; desc: string }>;
+  faqs?: Array<{ q: string; a: string }>;
 };
 
 // Shared base — every Companies House filing needs CRN + Auth code
@@ -240,30 +244,105 @@ export const compliancePages: CompliancePage[] = [
   },
   {
     slug: "ad01-form-post",
-    title: "AD01 Form Post Service",
-    hero: "Secure AD01 Address Filing Service",
-    price: "£100",
-    eyebrow: "UK Compliance",
+    title: "AD01 Form Filing Service — Change Registered Office Address",
+    hero: "Official Companies House AD01 Form Filing Service",
+    price: "£50",
+    eyebrow: "UK Compliance · Companies House Registered Office Change",
+    badge: "Official Postal Filing · No Auth Code Required",
     overview: [
-      "Official AD01 filing",
-      "Registered office address update",
-      "Postal handling support",
-      "Companies House submission",
+      "Official statutory Form AD01 paper preparation formatted to Companies House specifications",
+      "Essential lifeline if you lost your Authentication Code or old mail access",
+      "Tracked physical postal delivery to Companies House Cardiff, Edinburgh, or Belfast",
+      "Companies House public register update & new authentication code re-issuance assistance",
+      "Director identity verification alignment under the Economic Crime and Corporate Transparency Act (ECCTA 2023)",
+      "Dedicated corporate compliance support until officially accepted on the UK register",
     ],
     requirements: [
-      "Company Number (CRN)",
-      "Company Name",
-      "Director's Full Name",
-      "New Registered Office Address (optional — we can provide one if you don't have your own)",
+      "Company Registration Number (CRN) & Registered Company Name",
+      "Director's Full Legal Name (as registered with Companies House)",
+      "New UK Registered Office Address (we can also supply a London Registered Office address if required)",
+      "Reason for postal filing (e.g. Lost Authentication Code, Old Address Abandoned, Routine Change)",
     ],
-    description: "Official AD01 filing service to update your UK registered office address with full postal and Companies House handling.",
-    metaTitle: "AD01 Form Filing Service | Registered Office Update | Digiformation LTD",
-    metaDescription: "Official AD01 filing service from Digiformation LTD. Update your UK registered office address with full postal handling.",
-    keywords: "AD01 form, AD01 filing, UK registered office change, Companies House address",
+    whenNeeded: [
+      {
+        title: "Lost Companies House Authentication Code",
+        desc: "Online WebFiling is blocked if you lost your 6-character code. Because Companies House posts replacement codes only to the current (abandoned) address, paper Form AD01 is the only legal recovery route to update your address first.",
+      },
+      {
+        title: "Old Address Abandoned or Inaccessible",
+        desc: "If your previous formation agent stopped mail forwarding, the landlord terminated tenancy, or you moved premises, statutory notices and court letters could be missed, resulting in involuntary company strike-off.",
+      },
+      {
+        title: "Non-Resident Director Lockout",
+        desc: "International founders residing outside the UK who lack UK Government Gateway accounts or digital ID verification can have their paper filing professionally executed and dispatched directly from within the UK.",
+      },
+      {
+        title: "Preventing Compulsory Strike-Off & Fines",
+        desc: "Companies House rejects Confirmation Statements and annual filings if registered office queries remain unresolved. An expedited AD01 restores compliance and active standing.",
+      },
+    ],
+    howItWorks: [
+      {
+        step: "01",
+        title: "Submit Details & Choose Address",
+        desc: "Provide your company number, director name, and your new UK address (or select DigiFormation's London Registered Office service).",
+      },
+      {
+        step: "02",
+        title: "Statutory Drafting & Jurisdictional Check",
+        desc: "We draft the formal paper Form AD01, verify jurisdictional rules (England & Wales, Scotland, or Northern Ireland), and prepare director declarations.",
+      },
+      {
+        step: "03",
+        title: "Tracked Priority Postal Dispatch",
+        desc: "We print and dispatch the physical document via tracked postal delivery directly to the appropriate Companies House registrar.",
+      },
+      {
+        step: "04",
+        title: "Register Update & Code Recovery",
+        desc: "Companies House updates the public register within 5–10 working days. We notify you immediately and assist in ordering your new authentication code.",
+      },
+    ],
+    faqs: [
+      {
+        q: "What is Form AD01 and why do I need to file it?",
+        a: "Form AD01 is the statutory Companies House form used under the Companies Act 2006 to change a company's registered office address. All official legal notices, HMRC tax mail, and statutory reminders are legally served to this address. You must notify Companies House within 14 days of changing address.",
+      },
+      {
+        q: "Can I file an AD01 form if I lost my Companies House Authentication Code?",
+        a: "Yes! That is the single most common reason founders use our postal filing service. Online filing on WebFiling requires an active authentication code. If you lost your code and cannot receive a replacement at your old address, paper submission of Form AD01 by post is the only official way to update your registered office.",
+      },
+      {
+        q: "Why is your service £50 when Companies House does not charge a filing fee?",
+        a: "While Companies House charges £0 statutory fee for Form AD01, our £50 fee covers complete professional drafting, address validation, jurisdictional review, physical printing, packaging, tracked priority postal dispatch to Companies House Cardiff, registry tracking, and post-filing support to help you re-issue your authentication code.",
+      },
+      {
+        q: "How long does Companies House take to process a paper AD01 form?",
+        a: "Companies House typically processes and registers paper postal submissions within 5 to 10 working days of receipt at their Cardiff, Edinburgh, or Belfast offices.",
+      },
+      {
+        q: "Does filing Form AD01 also change my director's service address?",
+        a: "No. Form AD01 updates only the company's official registered office address. If you also need to update your director correspondence/service address, that is done using Form CH01. If you need both, DigiFormation can handle both simultaneously.",
+      },
+      {
+        q: "Can non-UK resident directors use this service?",
+        a: "Yes, 100%. DigiFormation assists international founders and non-resident directors in over 180 countries. We handle all UK-side physical printing, postal submission, and tracking so you don't have to post physical letters from abroad.",
+      },
+      {
+        q: "What if I don't have a new UK address to switch to?",
+        a: "DigiFormation can provide a prestigious London Registered Office Address service starting at £40/year with same-day digital mail scanning. You can add this during checkout.",
+      },
+    ],
+    description: "Official paper AD01 filing service to change your UK registered office address with Companies House. The essential lifeline for UK and foreign directors who lost their Authentication Code or access to their old address. Fully managed for £50.",
+    metaTitle: "File AD01 Form Online — Companies House Address Change Service (£50)",
+    metaDescription: "Official AD01 postal filing service for UK LTDs (£50). Change your registered office address even without an authentication code or mail access. Fast 2026 postal filing.",
+    keywords: "file AD01 form, AD01 form filing service, change registered office address companies house, AD01 postal filing service, file AD01 without auth code, companies house paper AD01, change UK company address form AD01, companies house registered office change service, AD01 paper submission cardiff, lost authentication code address change, change company address non resident UK, AD01 form fee, companies house address update",
     formFields: [
       { key: "company_number", label: "Company Number (CRN)", placeholder: "e.g. 12345678", required: true },
       { key: "current_company_name", label: "Company Name", placeholder: "Registered company name", required: true },
-      { key: "director_full_name", label: "Director's Full Name", placeholder: "As shown on passport", required: true },
+      { key: "director_full_name", label: "Director's Full Legal Name", placeholder: "As shown on passport / register", required: true },
+      { key: "new_registered_address", label: "New Registered Office Address", placeholder: "Full UK address or type 'Need DigiFormation Address'", type: "textarea", required: true },
+      { key: "has_auth_code", label: "Do you have the Authentication Code?", placeholder: "No - Lost Code / Yes / Inaccessible Address", required: true },
     ],
   },
 ];

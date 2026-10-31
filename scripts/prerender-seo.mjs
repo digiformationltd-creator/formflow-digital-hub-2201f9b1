@@ -36,6 +36,7 @@ const CORE = {
   "/web-development": ["Web Development & 3D Experiences — DigiFormation", "Fast, accessible websites and interactive 3D experiences designed for trust, conversion and measurable growth."],
   "/uk-services": ["UK Company Formation & Compliance Services", "Form and maintain a UK company remotely with registered office, identity verification, UTR and annual compliance support."],
   "/uk-compliance": ["UK Company Compliance Services — DigiFormation", "Stay on top of Companies House and HMRC obligations with practical UK company compliance support."],
+  "/uk-compliance/ad01-form-post": ["File AD01 Form Online — Companies House Address Change Service (£50)", "Official AD01 postal filing service for UK LTDs (£50). Change your registered office address even without an authentication code or mail access. Fast 2026 postal filing."],
   "/usa-services": ["U.S. Company Formation & Compliance Services", "Launch and maintain a U.S. company remotely with LLC formation, EIN, ITIN, banking guidance and conditional BOI review."],
   "/banks-payment-solutions": ["Business Banking & Payment Solutions — DigiFormation", "Compare legitimate banking and payment-provider routes for international companies; approvals remain subject to each provider's checks."],
 };

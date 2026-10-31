@@ -10,8 +10,8 @@ import { Download, Database, FileJson, FileArchive, Loader2 } from "lucide-react
 
 const exportPayloadSchema = z.object({
   generated_at: z.string(), table_count: z.number(), total_rows: z.number(),
-  counts: z.record(z.number()), errors: z.record(z.string()).optional(),
-  tables: z.record(z.array(z.record(z.unknown()))),
+  counts: z.record(z.string(), z.number()), errors: z.record(z.string(), z.string()).optional(),
+  tables: z.record(z.string(), z.array(z.record(z.string(), z.unknown()))),
 });
 type ExportPayload = z.infer<typeof exportPayloadSchema>;
 

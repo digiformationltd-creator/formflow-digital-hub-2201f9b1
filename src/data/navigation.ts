@@ -22,7 +22,7 @@ export const ukCompliance: NavItem[] = [
   { name: "Appoint or Remove Shareholder", path: "/uk-compliance/shareholder-appoint-remove" },
   { name: "Appoint or Remove PSC & Secretary", path: "/uk-compliance/psc-secretary-appoint-remove" },
   { name: "Change Company Residence Status", path: "/uk-compliance/company-residence-change" },
-  { name: "AD01 Postal Filing Service", path: "/uk-compliance/ad01-form-post" },
+  { name: "File AD01 Form (Paper / Post)", path: "/uk-compliance/ad01-form-post", price: "£50" },
 ];
 
 export const usaServices: NavItem[] = [

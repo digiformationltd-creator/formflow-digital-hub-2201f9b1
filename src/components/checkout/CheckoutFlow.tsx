@@ -267,7 +267,7 @@ const CheckoutFlow = ({
   const DRAFT_TTL_MS = 10 * 60 * 1000;
   const draftKey = `checkout-draft:${serviceTitle}`;
   const draftSchema = z.object({
-    savedAt: z.number(), form: z.record(z.string()).optional(), extra: z.record(z.string()).optional(),
+    savedAt: z.number(), form: z.record(z.string(), z.string()).optional(), extra: z.record(z.string(), z.string()).optional(),
     selected: z.array(z.string()).max(100).optional(), stepIdx: z.number().int().min(0).max(2).optional(),
     serviceMode: z.enum(["ltd-only", "both"]).optional(),
     declaredSource: z.object({ id: z.string(), label: z.string(), category: z.enum(["ai", "search", "social", "direct", "referral"]) }).nullable().optional(),

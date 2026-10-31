@@ -1,4 +1,4 @@
-// Advertised prices rechecked at https://www.digibizos.co.uk/pricing on 2026-10-26.
+// Advertised prices rechecked at https://www.digibizos.co.uk/pricing on 2026-10-31.
 // This verifies published tiers, not payment, fulfilment or software capabilities.
 // Keep this source of truth isolated from company formation and banking pricing.
 export const DIGI_BIZ_OS_URL = "https://www.digibizos.co.uk/";
