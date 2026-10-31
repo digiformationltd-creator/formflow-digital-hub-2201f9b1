@@ -4,6 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import ts from 'typescript';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -51,31 +52,28 @@ function removeExcludedUrls(xml) {
 const TODAY = new Date().toISOString().split("T")[0];
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-export function getBlogPosts() {
-  const files = [BLOG_FILE, CORNERSTONE_FILE];
-  const posts = [];
-  for (const f of files) {
-    if (!fs.existsSync(f)) continue;
-    const txt = fs.readFileSync(f, 'utf8');
-    const slugRegex = /["']?slug["']?\s*:\s*["']([^"']+)["']/g;
-    let match;
-    while ((match = slugRegex.exec(txt)) !== null) {
-      const slug = match[1];
-      const snippet = txt.slice(match.index, match.index + 800);
-      const dateMatch = snippet.match(/["']?date["']?\s*:\s*["'](\d{4}-\d{2}-\d{2})["']/);
-      const modMatch = snippet.match(/["']?dateModified["']?\s*:\s*["'](\d{4}-\d{2}-\d{2})["']/);
-      const date = dateMatch ? dateMatch[1] : '2026-10-30';
-      const modified = modMatch ? modMatch[1] : date;
-      posts.push({ slug, date, modified });
+export function getBlogPosts(input) {
+  const sources = input === undefined ? [BLOG_FILE,CORNERSTONE_FILE].map(file=>fs.readFileSync(file,'utf8')) : [input];
+  const posts=[];
+  for(const text of sources){
+    const source=ts.createSourceFile('content.ts',text,ts.ScriptTarget.Latest,true);
+    for(const statement of source.statements)if(ts.isVariableStatement(statement))for(const decl of statement.declarationList.declarations){
+      if(!['blogPosts','cornerstoneArticles'].includes(decl.name.getText(source))||!decl.initializer||!ts.isArrayLiteralExpression(decl.initializer))continue;
+      for(const item of decl.initializer.elements){
+        if(ts.isSpreadElement(item)&&item.expression.getText(source)==='cornerstoneArticles'&&input===undefined)continue;
+        if(!ts.isObjectLiteralExpression(item))throw new Error('Unsupported blog record/spread');
+        const field=name=>{const p=item.properties.find(p=>ts.isPropertyAssignment(p)&&(ts.isIdentifier(p.name)||ts.isStringLiteral(p.name))&&p.name.text===name);if(!p)return undefined;if(!ts.isStringLiteralLike(p.initializer))throw new Error('Nonliteral blog '+name);return p.initializer.text;};
+        const slug=field('slug'),date=field('date'),modified=field('dateModified');
+        if(!slug||!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug))throw new Error('Invalid blog slug');
+        for(const value of [date,modified].filter(Boolean)){if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||new Date(value).toISOString().slice(0,10)!==value)throw new Error('Invalid blog date');if(value>TODAY)throw new Error('Blog future date');}
+        if(!date)throw new Error('Missing publication date');
+        if(modified&&modified<date)throw new Error('Invalid modification before publication');
+        posts.push({slug,date,modified});
+      }
     }
   }
-
-  const seen = new Set();
-  return posts.filter(p => {
-    if (seen.has(p.slug)) return false;
-    seen.add(p.slug);
-    return true;
-  });
+  const seen=new Set();for(const post of posts){if(seen.has(post.slug))throw new Error('duplicate blog slug: '+post.slug);seen.add(post.slug);}
+  return posts;
 }
 
 function buildBlock(posts) {

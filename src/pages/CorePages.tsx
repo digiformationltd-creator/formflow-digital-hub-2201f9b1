@@ -1959,7 +1959,7 @@ export const Privacy = () => {
           </LegalSection>
 
           <LegalSection num="6" title="Cookies & Analytics">
-            <p>Our website utilizes necessary functional cookies and privacy-preserving performance telemetry to enhance user navigation and remember preferences. You can adjust cookie preferences in your browser settings at any time.</p>
+            <p>We use storage needed for sign-in, service requests and your cookie choice. Optional Google Analytics and first-party visit attribution run only after you accept analytics. Use “Cookie settings” on this website to reject or withdraw analytics consent. Analytics page URLs exclude query strings and fragments.</p>
           </LegalSection>
 
           <LegalSection num="7" title="Your Statutory Rights">

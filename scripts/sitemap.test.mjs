@@ -16,8 +16,9 @@ test('rejects a future or chronologically invalid modification date', () => {
   assert.throws(() => getBlogPosts(`const blogPosts = [{slug:'test',date:'2026-01-01',dateModified:'2099-01-01'}];`), /future/);
   assert.throws(() => getBlogPosts(`const blogPosts = [{slug:'test',date:'2026-01-02',dateModified:'2026-01-01'}];`), /modification/);
 });
-test('current source has 51 distinct literal blog records including the four quoted records', () => {
+test('current source includes original and imported cornerstone records without duplicates', () => {
   const posts = getBlogPosts();
-  assert.equal(posts.length, 51); assert.equal(new Set(posts.map(post => post.slug)).size, posts.length);
+  assert.equal(posts.length, 62); assert.equal(new Set(posts.map(post => post.slug)).size, posts.length);
+  assert.ok(posts.some(post=>post.slug==='complete-guide-non-resident-us-llc-formation-2026-wyoming-delaware-new-mexico-florida'));
   assert.ok(posts.some(post => post.slug === 'free-open-source-office-suite-microsoft-365-copilot-alternative-2026'));
 });
