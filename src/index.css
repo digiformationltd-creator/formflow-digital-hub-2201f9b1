@@ -341,13 +341,15 @@ body p, body span, body li, body label, body small, body div {
 .animate-partner-slide { animation: partner-slide 24s linear infinite; }
 .animate-headline-slide { animation: headline-slide 4s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-/* Lightweight logo strip */
+/* =========================================================
+   Unified Partner & Banking Logo Strip (Optical Normalization)
+   ========================================================= */
 .trust-strip {
   width: 100%;
-  height: 120px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-  border-top: 1px solid rgba(255,255,255,0.06);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  height: 100px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.015), rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -357,7 +359,8 @@ body p, body span, body li, body label, body small, body div {
 .trust-strip::after {
   content: "";
   position: absolute;
-  top: 0; bottom: 0;
+  top: 0;
+  bottom: 0;
   width: 120px;
   z-index: 2;
   pointer-events: none;
@@ -370,74 +373,170 @@ body p, body span, body li, body label, body small, body div {
   right: 0;
   background: linear-gradient(270deg, hsl(var(--background)) 0%, transparent 100%);
 }
+
 .trust-track {
   display: flex;
   align-items: center;
-  gap: 56px;
+  gap: 48px;
   width: max-content;
-  animation: partner-slide 28s linear infinite;
+  animation: partner-slide 32s linear infinite;
   will-change: transform;
 }
+.trust-track:hover {
+  animation-play-state: paused;
+}
+
+/* Identical uniform container system */
 .trust-slot {
   flex-shrink: 0;
-  height: 90px;
+  width: 150px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
-/* All logos zoom to fill the strip uniformly */
-.trust-slot-md { width: 150px; }
-.trust-slot-lg { width: 170px; }
-.trust-slot-xl { width: 200px; }
 
+/* Base image styling: centered, contained, natural aspect ratio preserved */
 .trust-slot img {
-  height: 90px;
+  max-width: 130px;
+  max-height: 40px;
   width: auto;
-  max-width: 100%;
+  height: auto;
   object-fit: contain;
-  opacity: 0.95;
-  transition: opacity .25s ease, transform .25s ease;
+  opacity: 0.88;
+  filter: contrast(1.05);
+  transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+  transform: scale(1);
+  transform-origin: center center;
+  display: block;
 }
-/* Logos with extra whitespace — scale up so visual size matches others */
-.trust-slot[data-logo="paypal"] img,
-.trust-slot[data-logo="airwallex"] img {
-  transform: scale(1.45);
-}
-.trust-slot[data-logo="worldfirst"] img,
-.trust-slot[data-logo="sunrate"] img,
-.trust-slot[data-logo="companies-house"] img {
-  transform: scale(1.6);
-}
-.trust-slot[data-logo="irs"] img,
-.trust-slot[data-logo="stripe"] img {
-  transform: scale(0.78);
-}
-.trust-slot img:hover {
+
+.trust-slot:hover img {
   opacity: 1;
+  filter: contrast(1.15);
   transform: scale(1.06);
 }
-.trust-slot[data-logo="paypal"] img:hover,
-.trust-slot[data-logo="airwallex"] img:hover {
-  transform: scale(1.52);
+
+/* Optical balance adjustments tailored to individual logo artwork proportions */
+/* Wide wordmarks & banners */
+.trust-slot[data-logo="airwallex"] img {
+  max-width: 138px;
+  max-height: 25px;
 }
-.trust-slot[data-logo="worldfirst"] img:hover,
-.trust-slot[data-logo="sunrate"] img:hover,
-.trust-slot[data-logo="companies-house"] img:hover {
-  transform: scale(1.68);
+.trust-slot[data-logo="worldfirst"] img {
+  max-width: 134px;
+  max-height: 27px;
+}
+.trust-slot[data-logo="sunrate"] img {
+  max-width: 134px;
+  max-height: 26px;
+}
+.trust-slot[data-logo="wise"] img {
+  max-width: 126px;
+  max-height: 28px;
+}
+
+/* Medium horizontal logos */
+.trust-slot[data-logo="paypal"] img {
+  max-width: 125px;
+  max-height: 32px;
+}
+.trust-slot[data-logo="hmrc"] img {
+  max-width: 125px;
+  max-height: 32px;
+}
+
+/* Standard height logos */
+.trust-slot[data-logo="companies-house"] img {
+  max-width: 120px;
+  max-height: 36px;
+}
+.trust-slot[data-logo="irs"] img {
+  max-width: 110px;
+  max-height: 35px;
+}
+.trust-slot[data-logo="stripe"] img {
+  max-width: 95px;
+  max-height: 34px;
+}
+.trust-slot[data-logo="tide"] img {
+  max-width: 95px;
+  max-height: 34px;
+}
+.trust-slot[data-logo="ebay"] img {
+  max-width: 95px;
+  max-height: 34px;
+}
+
+/* Square / compact logo */
+.trust-slot[data-logo="shopify"] img {
+  max-width: 52px;
+  max-height: 38px;
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1024px) {
+  .trust-strip { height: 90px; }
+  .trust-track { gap: 36px; }
+  .trust-slot {
+    width: 135px;
+    height: 52px;
+    padding: 0 8px;
+  }
+  .trust-slot img {
+    max-width: 115px;
+    max-height: 34px;
+  }
+  .trust-slot[data-logo="airwallex"] img { max-width: 120px; max-height: 22px; }
+  .trust-slot[data-logo="worldfirst"] img { max-width: 118px; max-height: 23px; }
+  .trust-slot[data-logo="sunrate"] img { max-width: 118px; max-height: 22px; }
+  .trust-slot[data-logo="shopify"] img { max-width: 44px; max-height: 34px; }
 }
 
 @media (max-width: 768px) {
-  .trust-strip { height: 90px; }
+  .trust-strip { height: 80px; }
+  .trust-strip::before, .trust-strip::after { width: 60px; }
   .trust-track {
-    gap: 36px;
+    gap: 24px;
+    animation-duration: 24s;
+  }
+  .trust-slot {
+    width: 115px;
+    height: 44px;
+    padding: 0 6px;
+  }
+  .trust-slot img {
+    max-width: 100px;
+    max-height: 28px;
+  }
+  .trust-slot[data-logo="airwallex"] img { max-width: 105px; max-height: 18px; }
+  .trust-slot[data-logo="worldfirst"] img { max-width: 102px; max-height: 19px; }
+  .trust-slot[data-logo="sunrate"] img { max-width: 102px; max-height: 18px; }
+  .trust-slot[data-logo="shopify"] img { max-width: 36px; max-height: 28px; }
+}
+
+@media (max-width: 480px) {
+  .trust-strip { height: 74px; }
+  .trust-strip::before, .trust-strip::after { width: 40px; }
+  .trust-track {
+    gap: 20px;
     animation-duration: 20s;
   }
-  .trust-slot { height: 70px; }
-  .trust-slot-md { width: 110px; }
-  .trust-slot-lg { width: 125px; }
-  .trust-slot-xl { width: 145px; }
-  .trust-slot img { height: 70px; }
-  .trust-strip::before, .trust-strip::after { width: 50px; }
+  .trust-slot {
+    width: 100px;
+    height: 40px;
+    padding: 0 4px;
+  }
+  .trust-slot img {
+    max-width: 88px;
+    max-height: 24px;
+  }
+  .trust-slot[data-logo="airwallex"] img { max-width: 92px; max-height: 16px; }
+  .trust-slot[data-logo="worldfirst"] img { max-width: 90px; max-height: 17px; }
+  .trust-slot[data-logo="sunrate"] img { max-width: 90px; max-height: 16px; }
+  .trust-slot[data-logo="shopify"] img { max-width: 32px; max-height: 24px; }
 }
 
 /* =========================================================
