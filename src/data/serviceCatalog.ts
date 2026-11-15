@@ -195,17 +195,9 @@ const UK_SERVICE_ENTRIES: CatalogEntry[] = [
 
 const WEB_DEV_ENTRIES: CatalogEntry[] = [
   {
-    slug: "web-ecommerce-shopify",
-    name: "E-commerce Store (Shopify)",
-    description: "Full Shopify storefront setup with theme, products and payments.",
-    price: 30,
-    currency: "GBP",
-    category: "Web Development",
-  },
-  {
     slug: "web-react-basic",
     name: "React Basic 3D Website",
-    description: "4-page React 3D website with 2 animated WebGL scenes, logo and SEO.",
+    description: "4-page React 3D website with 2 animated 3D visual scenes (Three.js & WebGL), logo and SEO.",
     price: 20,
     currency: "GBP",
     category: "Web Development",
@@ -213,7 +205,7 @@ const WEB_DEV_ENTRIES: CatalogEntry[] = [
   {
     slug: "web-react-standard",
     name: "React Standard 3D Website",
-    description: "6-page React 3D website with 4 animated WebGL scenes, animations and SEO.",
+    description: "6-page React 3D website with 4 animated 3D visual scenes (Three.js & WebGL), smooth 3D scroll animations and SEO.",
     price: 30,
     currency: "GBP",
     category: "Web Development",
@@ -221,7 +213,7 @@ const WEB_DEV_ENTRIES: CatalogEntry[] = [
   {
     slug: "web-react-premium",
     name: "React Premium 3D Website",
-    description: "10-page React 3D website with 6 animated WebGL scenes, CMS, blog and integrations.",
+    description: "10-page React 3D website with 6 animated 3D visual scenes, custom WebGL shaders, CMS, blog and integrations.",
     price: 50,
     currency: "GBP",
     category: "Web Development",
@@ -229,16 +221,8 @@ const WEB_DEV_ENTRIES: CatalogEntry[] = [
   {
     slug: "web-react-ecommerce-basic",
     name: "Basic E-Commerce React 3D",
-    description: "React 3D storefront with 3D product showcase, catalog and search.",
+    description: "React 3D storefront with interactive 3D product showcase, WebGL scenes, product catalog and search.",
     price: 90,
-    currency: "GBP",
-    category: "Web Development",
-  },
-  {
-    slug: "web-3d-animated",
-    name: "3D & Animated Website",
-    description: "Interactive 3D WebGL / Three.js website with scroll-driven animations and high conversion architecture.",
-    price: 50,
     currency: "GBP",
     category: "Web Development",
   },

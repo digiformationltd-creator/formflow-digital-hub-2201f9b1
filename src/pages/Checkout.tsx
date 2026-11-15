@@ -53,7 +53,7 @@ const CATALOG_GROUPS: CatalogGroup[] = [
     categoryLabel: "Companies House ID Verification",
     description: "Identity verification for directors, PSCs and shareholders.",
     items: [
-      { id: "idv", name: "LTD ID Verification", description: "Companies House identity verification (IDV) for directors / PSCs.", price: 40 },
+      { id: "idv", name: "LTD ID Verification", description: "Companies House identity verification (IDV) for directors / PSCs.", price: 17.99 },
     ],
   },
 ];

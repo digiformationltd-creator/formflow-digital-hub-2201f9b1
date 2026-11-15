@@ -1597,10 +1597,10 @@ export const ClientArea = () => {
 
 /* ---------- Web Development ---------- */
 const webServices = [
-  { icon: Code2, title: "Custom Website Design & Development", desc: "Bespoke, conversion-focused websites built to reflect your brand and drive measurable results." },
-  { icon: ShoppingBag, title: "E-commerce (Shopify)", desc: "Beautiful, high-performance Shopify stores with conversion-optimised product pages and checkout." },
-  { icon: LayoutIcon, title: "Landing Page Design & Development", desc: "Standalone landing pages for product launches, lead capture and service-specific offers." },
-  { icon: RefreshCw, title: "Website Redesign & Migration", desc: "Modernise an outdated site or migrate to a faster, safer stack with zero SEO loss." },
+  { icon: Code2, title: "Custom 3D Website Design & Development", desc: "Bespoke, conversion-focused 3D React websites built with Three.js and WebGL to reflect your brand." },
+  { icon: ShoppingBag, title: "Interactive 3D E-commerce", desc: "High-performance React 3D storefronts with interactive product showcase, WebGL scenes, and instant checkout." },
+  { icon: LayoutIcon, title: "3D Spatial Landing Pages", desc: "Standalone 3D landing pages for product launches, lead capture and immersive interactive showcases." },
+  { icon: RefreshCw, title: "Website Redesign & 3D Migration", desc: "Modernise an outdated site into a fluid 60+ FPS 3D React experience with zero SEO loss." },
   { icon: LifeBuoy, title: "Ongoing Maintenance & Support", desc: "Updates, security patches, performance tuning and content edits — all handled for you." },
 ];
 
@@ -1681,7 +1681,7 @@ export const WebDevelopment = () => {
                 Websites that <em className="not-italic text-gradient">convert</em>
               </h1>
               <p className="mt-4 text-base md:text-lg opacity-90">
-                Fast, modern websites & Shopify stores. Fixed prices, no hidden fees.
+                Fast, modern 3D React websites & interactive e-commerce with WebGL scenes. Fixed prices, no hidden fees.
               </p>
               <Button asChild variant="hero" size="lg" className="rounded-full mt-6">
                 <Link to="/contact">Request a Free Quote <ArrowRight className="w-4 h-4" /></Link>
