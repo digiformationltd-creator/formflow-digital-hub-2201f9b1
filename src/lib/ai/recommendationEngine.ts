@@ -432,7 +432,7 @@ export function generateBusinessFollowUps(params: FollowUpGenerationParams): Bus
     candidates.push(
       {
         label: "Show UK LTD packages (Starter vs Silver)",
-        prompt: "Show the full breakdown of UK LTD packages from Starter £140 to Silver £170 and what each includes.",
+        prompt: "Show the full breakdown of UK LTD packages from Starter £130 to Silver £160 and what each includes.",
         category: "pricing",
       },
       {
@@ -457,8 +457,8 @@ export function generateBusinessFollowUps(params: FollowUpGenerationParams): Bus
   else if (/\b(uk\s*ltd|uk\s*company|companies\s*house|england|wales|scotland)\b/.test(text) || profile.preferred_jurisdiction === 'uk_ltd') {
     candidates.push(
       {
-        label: "Compare Starter (£140) vs Silver (£170)",
-        prompt: "What is the difference between the UK LTD Starter (£140) and Silver (£170) packages, and why is Silver recommended?",
+        label: "Compare Starter (£130) vs Silver (£160)",
+        prompt: "What is the difference between the UK LTD Starter (£130) and Silver (£160) packages, and why is Silver recommended?",
         category: "pricing",
       },
       {

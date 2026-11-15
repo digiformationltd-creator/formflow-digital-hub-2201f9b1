@@ -487,7 +487,7 @@ type PricingSection = {
 const ukLtdPackages: DetailPkg[] = [
   {
     name: "Starter",
-    price: "£140",
+    price: "£130",
     note: "3–5 Business Days",
     tone: "from-emerald-500/20 to-emerald-500/5",
     ring: "ring-emerald-500/40",
@@ -505,7 +505,7 @@ const ukLtdPackages: DetailPkg[] = [
   },
   {
     name: "Silver",
-    price: "£170",
+    price: "£160",
     badge: "Most Popular",
     tone: "from-sky-500/25 to-sky-500/5",
     ring: "ring-sky-400/60",
@@ -524,7 +524,7 @@ const ukLtdPackages: DetailPkg[] = [
   },
   {
     name: "Gold",
-    price: "£180",
+    price: "£170",
     tone: "from-amber-400/25 to-amber-400/5",
     ring: "ring-amber-400/50",
     link: "/uk-services/uk-ltd-formation/choose-jurisdiction?package=Gold",
@@ -543,7 +543,7 @@ const ukLtdPackages: DetailPkg[] = [
   },
   {
     name: "Platinum",
-    price: "£200",
+    price: "£190",
     tone: "from-rose-500/25 to-rose-500/5",
     ring: "ring-rose-400/50",
     link: "/uk-services/uk-ltd-formation/choose-jurisdiction?package=Platinum",

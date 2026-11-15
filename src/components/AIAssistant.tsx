@@ -54,7 +54,7 @@ const QUICK_QUESTIONS_POOL = [
   "Can foreigners open a UK LTD?",
   "Do I need a UK address for my company?",
   "What is ID Verification (Companies House)?",
-  "What's in Silver £170 vs Starter £140?",
+  "What's in Silver £160 vs Starter £130?",
   "How do I get a UTR number?",
   "What is the Companies House Auth Code?",
   "What is HMRC Activation Code?",

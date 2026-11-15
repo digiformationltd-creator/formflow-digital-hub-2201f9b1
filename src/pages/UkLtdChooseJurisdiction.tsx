@@ -48,7 +48,7 @@ type Pkg = {
 const packages: Pkg[] = [
   {
     name: "Starter",
-    price: "£140",
+    price: "£130",
     tone: "from-emerald-500/20 to-emerald-500/5",
     ring: "ring-emerald-500/40",
     processing: "3–5 Business Days",
@@ -65,7 +65,7 @@ const packages: Pkg[] = [
   },
   {
     name: "Silver",
-    price: "£170",
+    price: "£160",
     tone: "from-sky-500/25 to-sky-500/5",
     ring: "ring-sky-400/60",
     badge: "Most Popular",
@@ -83,7 +83,7 @@ const packages: Pkg[] = [
   },
   {
     name: "Gold",
-    price: "£180",
+    price: "£170",
     tone: "from-amber-400/25 to-amber-400/5",
     ring: "ring-amber-400/50",
     features: [
@@ -101,7 +101,7 @@ const packages: Pkg[] = [
   },
   {
     name: "Platinum",
-    price: "£200",
+    price: "£190",
     tone: "from-rose-500/25 to-rose-500/5",
     ring: "ring-rose-400/50",
     features: [

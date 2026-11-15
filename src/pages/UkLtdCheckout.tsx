@@ -14,10 +14,10 @@ const PACKAGES = ["Starter", "Silver", "Gold", "Platinum"] as const;
 type PackageName = (typeof PACKAGES)[number];
 
 const PACKAGE_PRICES: Record<PackageName, number> = {
-  Starter: 140,
-  Silver: 170,
-  Gold: 180,
-  Platinum: 200,
+  Starter: 130,
+  Silver: 160,
+  Gold: 170,
+  Platinum: 190,
 };
 
 const PACKAGE_DESCRIPTIONS: Record<PackageName, string> = {
