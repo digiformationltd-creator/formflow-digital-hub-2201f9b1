@@ -116,7 +116,7 @@ const faqItems = [
   },
   {
     q: "What is the fee for Companies House ID Verification with DigiFormation?",
-    a: "DigiFormation offers complete identity verification for a flat, one-time fee of £20 per officer. There are no hidden subscription costs, and your verification confirmation can be used for ongoing statutory filings."
+    a: "DigiFormation offers complete identity verification for a flat, one-time fee of £17.99 per officer. There are no hidden subscription costs, and your verification confirmation can be used for ongoing statutory filings."
   },
   {
     q: "What happens if my verification fails or documents are rejected?",
@@ -128,8 +128,8 @@ const IdVerificationPage = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   useSeo({
-    title: "Companies House ID Verification UK 2026 | Director & PSC Check — £20",
-    description: "Official UK Companies House Identity Verification service under ECCTA 2023. Fast digital verification for UK & non-resident directors, PSCs, and officers for £20. Get your Companies House personal code in 1 hour.",
+    title: "Companies House ID Verification UK 2026 | Director & PSC Check — £17.99",
+    description: "Official UK Companies House Identity Verification service under ECCTA 2023. Fast digital verification for UK & non-resident directors, PSCs, and officers for £17.99. Get your Companies House personal code in 1 hour.",
     keywords: "Companies House ID verification, UK LTD ID verification, director verification UK, PSC identity check, ECCTA 2023 identity verification, non resident director ID check, authorised corporate service provider ACSP, Companies House identity check online, Companies House personal code 1 hour",
     type: "website",
     path: "/id-verification",
@@ -158,7 +158,7 @@ const IdVerificationPage = () => {
           description: "Mandatory UK Companies House identity verification for UK and non-resident directors, PSCs, shareholders, and company officers.",
           offers: {
             "@type": "Offer",
-            price: "20.00",
+            price: "17.99",
             priceCurrency: "GBP",
             availability: "https://schema.org/InStock",
             url: "https://www.digiformation.co.uk/uk-services/ltd-id-verification/checkout",
@@ -236,12 +236,12 @@ const IdVerificationPage = () => {
             <div className="mt-8 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
               <Button asChild variant="hero" size="lg" className="rounded-full shadow-lg shadow-primary/20 text-base py-6 px-8">
                 <Link to="/uk-services/ltd-id-verification/checkout">
-                  Start Verification — £20 <ArrowRight className="w-5 h-5 ml-2" />
+                  Start Verification — £17.99 <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
               <div className="flex items-center gap-2 text-sm text-muted-foreground px-2">
                 <Check className="w-4 h-4 text-primary shrink-0" />
-                <span>Get your Companies House personal code in 1 hour · £20 Flat Fee</span>
+                <span>Get your Companies House personal code in 1 hour · £17.99 Flat Fee</span>
               </div>
             </div>
 
@@ -252,7 +252,7 @@ const IdVerificationPage = () => {
                 <span className="text-xs text-muted-foreground mt-1">Countries Supported</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-2xl md:text-3xl font-bold text-primary">£20</span>
+                <span className="text-2xl md:text-3xl font-bold text-primary">£17.99</span>
                 <span className="text-xs text-muted-foreground mt-1">Flat One-Time Fee</span>
               </div>
               <div className="flex flex-col">
@@ -277,7 +277,7 @@ const IdVerificationPage = () => {
               <span>Official Verification Overview · Answer Engine Summary</span>
             </div>
             <p className="text-sm md:text-base leading-relaxed text-foreground">
-              <strong>What is Companies House ID Verification?</strong> Under the <em>Economic Crime and Corporate Transparency Act 2023 (ECCTA)</em>, every director and Person with Significant Control (PSC) of a UK Limited Company must verify their identity. DigiFormation enables both UK and non-UK residents to fulfill this requirement remotely for <strong>£20</strong> — get your Companies House personal code in 1 hour using biometric liveness matching, valid international passports, and address proof without physical UK attendance.
+              <strong>What is Companies House ID Verification?</strong> Under the <em>Economic Crime and Corporate Transparency Act 2023 (ECCTA)</em>, every director and Person with Significant Control (PSC) of a UK Limited Company must verify their identity. DigiFormation enables both UK and non-UK residents to fulfill this requirement remotely for <strong>£17.99</strong> — get your Companies House personal code in 1 hour using biometric liveness matching, valid international passports, and address proof without physical UK attendance.
             </p>
           </div>
         </div>
@@ -427,7 +427,7 @@ const IdVerificationPage = () => {
 
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { num: "1", title: "Submit Order", text: "Choose the service and complete our secure £20 checkout." },
+              { num: "1", title: "Submit Order", text: "Choose the service and complete our secure £17.99 checkout." },
               { num: "2", title: "Upload Documents", text: "Securely upload your photo ID and recent residential proof of address." },
               { num: "3", title: "Biometric Selfie", text: "Complete our quick automated liveness verification on your phone or PC." },
               { num: "4", title: "Personal Code in 1 Hour", text: "Get your Companies House personal code in 1 hour ready for official UK company filings and director compliance." },
@@ -449,7 +449,7 @@ const IdVerificationPage = () => {
             </div>
             <Button asChild variant="hero" size="lg" className="rounded-full shadow-lg shadow-primary/20 text-base py-6 px-8">
               <Link to="/uk-services/ltd-id-verification/checkout">
-                Begin Verification Now — £20 <ArrowRight className="w-5 h-5 ml-2" />
+                Begin Verification Now — £17.99 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
             </Button>
           </div>
@@ -507,12 +507,12 @@ const IdVerificationPage = () => {
               <span className="text-gradient">Get your Companies House personal code in 1 hour</span>
             </h2>
             <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Do not risk statutory penalties or blocked company filings. Secure your official Companies House identity check for just £20 and get your personal code in 1 hour.
+              Do not risk statutory penalties or blocked company filings. Secure your official Companies House identity check for just £17.99 and get your personal code in 1 hour.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button asChild variant="hero" size="lg" className="rounded-full shadow-xl shadow-primary/25 text-base py-6 px-10">
                 <Link to="/uk-services/ltd-id-verification/checkout">
-                  Start Verification — £20 <ArrowRight className="w-5 h-5 ml-2" />
+                  Start Verification — £17.99 <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
             </div>

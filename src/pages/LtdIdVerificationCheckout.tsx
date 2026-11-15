@@ -14,7 +14,7 @@ const LtdIdVerificationCheckout = () => {
       id: "ltd-id-verification",
       name: "LTD ID Verification",
       description: "Companies House identity verification for directors, PSCs, secretaries and shareholders. Get your Companies House personal code in 1 hour.",
-      price: 20,
+      price: 17.99,
       fixed: true,
     },
   ];

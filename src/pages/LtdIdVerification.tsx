@@ -75,9 +75,9 @@ const LtdIdVerification = () => {
             </p>
             <div className="mt-10 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
               <Button asChild variant="hero" size="lg" className="rounded-full">
-                <Link to="/uk-services/ltd-id-verification/checkout">Get Started — £20 <ArrowRight className="w-4 h-4" /></Link>
+                <Link to="/uk-services/ltd-id-verification/checkout">Get Started — £17.99 <ArrowRight className="w-4 h-4" /></Link>
               </Button>
-              <span className="text-sm opacity-80 font-medium">⚡ Get your Companies House personal code in 1 hour · £20 Flat</span>
+              <span className="text-sm opacity-80 font-medium">⚡ Get your Companies House personal code in 1 hour · £17.99 Flat</span>
             </div>
           </div>
         </div>
@@ -171,7 +171,7 @@ const LtdIdVerification = () => {
             </h3>
             <p className="mt-4 opacity-90">Stay compliant with UK regulations — get your Companies House personal code in 1 hour. Secure, fast, and accepted by Companies House.</p>
             <Button asChild variant="hero" size="lg" className="rounded-full mt-8">
-              <Link to="/uk-services/ltd-id-verification/checkout">Start Verification — £20 <ArrowRight className="w-4 h-4" /></Link>
+              <Link to="/uk-services/ltd-id-verification/checkout">Start Verification — £17.99 <ArrowRight className="w-4 h-4" /></Link>
             </Button>
           </div>
         </div>
