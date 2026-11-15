@@ -118,4 +118,4 @@ function syncSitemap() {
   console.log(`✓ sitemap.xml synced (${posts.length} blog posts, explicit source dateModified used; no build-date fabrication)`);
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) syncSitemap();
+if (process.argv[1] && fs.realpathSync(path.resolve(process.argv[1])) === fs.realpathSync(fileURLToPath(import.meta.url))) syncSitemap();

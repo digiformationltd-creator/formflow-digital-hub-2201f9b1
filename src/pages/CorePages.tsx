@@ -694,7 +694,7 @@ const usaExtraPackages: DetailPkg[] = [
   },
   {
     name: "ITIN Number Service",
-    price: "$199",
+    price: "$99",
     tone: "from-sky-500/25 to-sky-500/5",
     ring: "ring-sky-400/60",
     features: [

@@ -90,7 +90,7 @@ export const usaServicePages: UsaService[] = [
       "IRS Acceptance Agent submission",
       "Receive your ITIN letter from the IRS by post & email",
     ],
-    price: 200,
+    price: 99,
     currency: "USD",
     turnaround: "6–10 weeks (IRS processing)",
     metaTitle: "ITIN Number Service for Non-U.S. Residents | Digiformation Ltd",
