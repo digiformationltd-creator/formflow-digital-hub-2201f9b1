@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135 28" fill="none">
+  <!-- PhotonPay Emblem -->
+  <defs>
+    <linearGradient id="ppGrad" x1="2" y1="2" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4F46E5" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(2, 2)">
+    <rect x="1" y="1" width="22" height="22" rx="6" fill="url(#ppGrad)" />
+    <!-- Dynamic Photon diamond / P flash -->
+    <path d="M12 5L17 12L12 19L7 12Z" fill="#FFFFFF" fill-opacity="0.9" />
+    <circle cx="12" cy="12" r="2.2" fill="#4F46E5" />
+  </g>
+  <!-- PhotonPay Wordmark -->
+  <text x="32" y="19" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" letter-spacing="-0.3px" fill="#0F172A">Photon<tspan font-weight="800" fill="#4F46E5">Pay</tspan></text>
+</svg>

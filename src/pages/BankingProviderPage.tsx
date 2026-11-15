@@ -10,7 +10,7 @@ import ServiceFAQ from "@/components/seo/ServiceFAQ";
 import RecommendedGuides from "@/components/seo/RecommendedGuides";
 
 // Pure-banking accounts vs. payment gateways — drives the hero image.
-const BANKING_SLUGS = new Set(["tide", "wise", "payoneer", "worldfirst", "airwallex", "sunrate", "zionpe", "wallester"]);
+const BANKING_SLUGS = new Set(["tide", "wise", "payoneer", "worldfirst", "airwallex", "sunrate", "zionpe", "wallester", "wirex", "photonpay"]);
 
 const BankingProviderPage = () => {
   const { slug } = useParams();

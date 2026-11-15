@@ -50,6 +50,8 @@ export const banking: NavItem[] = [
   { name: "Grey", path: "/banks-payment-solutions/grey", price: "£50" },
   { name: "TapTap Send", path: "/banks-payment-solutions/taptap", price: "£50" },
   { name: "Nsave Business", path: "/banks-payment-solutions/nsave-business", price: "£50" },
+  { name: "Wirex", path: "/banks-payment-solutions/wirex", price: "£50" },
+  { name: "PhotonPay", path: "/banks-payment-solutions/photonpay", price: "£50" },
 ];
 
 export const navGroups: NavGroup[] = [

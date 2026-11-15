@@ -14,6 +14,8 @@ import zylaLogo from "@/assets/partners/zyla.svg";
 import airwallexLogo from "@/assets/partners/airwallex.png";
 import mollieLogo from "@/assets/partners/mollie.svg";
 import wallesterLogo from "@/assets/partners/wallester.svg";
+import wirexLogo from "@/assets/partners/wirex.svg";
+import photonpayLogo from "@/assets/partners/photonpay.svg";
 
 export type BankingCategory = "Payment Gateways" | "Business Accounts" | "International Transfers";
 
@@ -254,6 +256,30 @@ export const bankingProviders: BankingProvider[] = [
     metaDescription: "Issue virtual and physical Visa cards instantly with Wallester. API-driven card issuing and payment solutions for businesses.",
     keywords: "Wallester, Visa card issuing, virtual cards, business payments, card API",
   },
+  {
+    slug: "wirex",
+    name: "Wirex",
+    tagline: "Next-gen Web3 & borderless business accounts with multi-currency IBANs.",
+    description: "Seamlessly bridge traditional fiat banking and digital assets. Open multi-currency business accounts in GBP, EUR, and USD, issue corporate crypto-friendly Visa cards, and execute instant global payouts with competitive FX rates.",
+    features: [],
+    requirements: REQ_BOTH,
+    setupPrice: "£50",
+    metaTitle: "Wirex Business Account Setup | Digiformation Ltd",
+    metaDescription: "Open a Wirex multi-currency business account with Digiformation. Web3 corporate accounts, GBP/EUR IBANs, and corporate Visa cards.",
+    keywords: "Wirex business account, Web3 corporate banking, multi-currency IBAN, crypto friendly corporate card, Wirex UK",
+  },
+  {
+    slug: "photonpay",
+    name: "PhotonPay",
+    tagline: "Global financial infrastructure for multi-currency accounts and cross-border collections.",
+    description: "Empowering global trade and e-commerce with local collection accounts across 60+ countries, fast B2B supplier payouts, competitive foreign exchange, and multi-currency virtual corporate cards.",
+    features: [],
+    requirements: REQ_BOTH,
+    setupPrice: "£50",
+    metaTitle: "PhotonPay Global Business Account | Digiformation Ltd",
+    metaDescription: "Apply for PhotonPay global multi-currency business account with Digiformation. Cross-border collections, local accounts in 60+ countries, and virtual corporate cards.",
+    keywords: "PhotonPay business account, cross border collections, global trade payments, multi-currency account, virtual corporate cards",
+  },
 ];
 
 // ---- Category + tag decoration (single source of truth for the hub page) ----
@@ -267,6 +293,8 @@ const PROVIDER_META: Record<string, { category: BankingCategory; tag?: BankingPr
   wallester:        { category: "Business Accounts" },
   zyla:             { category: "Business Accounts" },
   airwallex:        { category: "Business Accounts",      tag: "Popular" },
+  wirex:            { category: "Business Accounts",      tag: "New" },
+  photonpay:        { category: "Business Accounts",      tag: "New" },
   payoneer:         { category: "International Transfers", tag: "Popular" },
   worldfirst:       { category: "International Transfers" },
   wise:             { category: "International Transfers", tag: "Recommended" },
@@ -293,6 +321,8 @@ export const BANKING_LOGOS: Record<string, string> = {
   airwallex: airwallexLogo,
   mollie: mollieLogo,
   wallester: wallesterLogo,
+  wirex: wirexLogo,
+  photonpay: photonpayLogo,
 };
 
 // Optical sizing calibrations: Tide is the gold standard benchmark (~h-5 to h-5.5, ~90-100px width).
@@ -307,6 +337,8 @@ const PROVIDER_LOGO_STYLES: Record<string, { logoClass: string; heroClass: strin
   mollie:           { logoClass: "h-3.5 max-w-[85px]", heroClass: "h-4.5 max-w-[105px]" },
   zyla:             { logoClass: "h-4.5 max-w-[95px]", heroClass: "h-5.5 max-w-[115px]" },
   wallester:        { logoClass: "h-4 max-w-[100px]",  heroClass: "h-5 max-w-[125px]" },
+  wirex:            { logoClass: "h-4.5 max-w-[95px]",  heroClass: "h-5.5 max-w-[115px]" },
+  photonpay:        { logoClass: "h-4.5 max-w-[105px]", heroClass: "h-5.5 max-w-[125px]" },
   // High aspect ratio (wide horizontal) logos:
   sunrate:          { logoClass: "h-4 max-w-[105px]",  heroClass: "h-5 max-w-[130px]" },
   worldfirst:       { logoClass: "h-4 max-w-[105px]",  heroClass: "h-5 max-w-[130px]" },
