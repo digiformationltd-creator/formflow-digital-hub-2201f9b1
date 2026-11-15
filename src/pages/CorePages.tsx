@@ -39,6 +39,7 @@ import {
 import SimplePage from "@/components/SimplePage";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { isPackageEligible } from "@/data/promotions";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -1028,39 +1029,48 @@ const colsClass = (n: 2 | 3 | 4 = 3) =>
     ? "grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
     : "grid sm:grid-cols-2 gap-6";
 
-const PackageCard = ({ p }: { p: DetailPkg }) => (
-  <div
-    className={`relative glass rounded-3xl p-7 ring-1 ${p.ring} bg-gradient-to-b ${p.tone} flex flex-col`}
-  >
-    {p.badge && (
-      <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-brand text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
-        {p.badge}
-      </div>
-    )}
-    {p.logo && (
-      <div className="h-10 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center w-fit mb-3">
-        <img src={p.logo} alt={`${p.name} official logo`} className="h-6 max-w-[110px] w-auto object-contain" loading="lazy" />
-      </div>
-    )}
-    <h3 className="text-xl font-bold mb-2 leading-snug">{p.name}</h3>
-    <div className="mb-1 text-[10px] opacity-70 uppercase tracking-widest">Starting from</div>
-    <div className="text-4xl font-bold text-gradient mb-1">{p.price}</div>
-    {p.note && <div className="text-xs opacity-70 mb-4">{p.note}</div>}
-    <ul className="space-y-2.5 mb-6 mt-3 flex-1">
-      {p.features.map((f) => (
-        <li key={f} className="flex gap-2.5 text-sm">
-          <CheckCircle2 className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
-          <span className="opacity-90 leading-snug">{f}</span>
-        </li>
-      ))}
-    </ul>
-    <Button asChild variant="hero" className="rounded-full w-full mt-auto">
-      <Link to={p.link ?? "/contact"}>
-        Get Started <ArrowRight className="w-4 h-4" />
-      </Link>
-    </Button>
-  </div>
-);
+const PackageCard = ({ p }: { p: DetailPkg }) => {
+  const isEligible = isPackageEligible("ukLtd", p.name) || isPackageEligible("usaLlc", p.name);
+  return (
+    <div
+      className={`relative glass rounded-3xl p-7 ring-1 ${p.ring} bg-gradient-to-b ${p.tone} flex flex-col`}
+    >
+      {p.badge && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-gradient-brand text-[10px] font-bold uppercase tracking-widest whitespace-nowrap">
+          {p.badge}
+        </div>
+      )}
+      {p.logo && (
+        <div className="h-10 px-3.5 py-1.5 rounded-xl bg-white/95 border border-white/20 shadow-sm flex items-center justify-center w-fit mb-3">
+          <img src={p.logo} alt={`${p.name} official logo`} className="h-6 max-w-[110px] w-auto object-contain" loading="lazy" />
+        </div>
+      )}
+      <h3 className="text-xl font-bold mb-2 leading-snug">{p.name}</h3>
+      <div className="mb-1 text-[10px] opacity-70 uppercase tracking-widest">Starting from</div>
+      <div className="text-4xl font-bold text-gradient mb-1">{p.price}</div>
+      {isEligible && (
+        <div className="mt-1 mb-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 tracking-wide w-fit">
+          <Sparkles className="w-3 h-3 text-emerald-400" />
+          FREE BUSINESS WEBSITE INCLUDED
+        </div>
+      )}
+      {p.note && <div className="text-xs opacity-70 mb-4">{p.note}</div>}
+      <ul className="space-y-2.5 mb-6 mt-3 flex-1">
+        {p.features.map((f) => (
+          <li key={f} className="flex gap-2.5 text-sm">
+            <CheckCircle2 className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+            <span className="opacity-90 leading-snug">{f}</span>
+          </li>
+        ))}
+      </ul>
+      <Button asChild variant="hero" className="rounded-full w-full mt-auto">
+        <Link to={p.link ?? "/contact"}>
+          Get Started <ArrowRight className="w-4 h-4" />
+        </Link>
+      </Button>
+    </div>
+  );
+};
 
 export const Pricing = () => {
   useEffect(() => {

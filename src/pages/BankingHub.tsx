@@ -4,6 +4,7 @@ import Layout from "@/components/layout/Layout";
 import { useSeo } from "@/lib/seo";
 import { bankingProviders, BANKING_CATEGORIES, type BankingCategory } from "@/data/banking";
 import { ArrowRight, Sparkles, Building2, Globe2, CreditCard } from "lucide-react";
+import { isPackageEligible } from "@/data/promotions";
 
 const CATEGORY_ICON: Record<BankingCategory, import("lucide-react").LucideIcon> = {
   "Payment Gateways": CreditCard,
@@ -97,7 +98,7 @@ const BankingHub = () => {
       </section>
 
       {/* Pricing grid */}
-      <section className="py-12">
+      <section id="providers" className="py-12 scroll-mt-24">
         <div className="container mx-auto px-4">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map((p) => (
@@ -146,6 +147,13 @@ const BankingHub = () => {
                   <span className="text-5xl font-bold text-gradient leading-none">{p.setupPrice}</span>
                   <span className="text-sm opacity-60">one-off setup</span>
                 </div>
+
+                {isPackageEligible("banking", p.slug) && (
+                  <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 tracking-wide w-fit">
+                    <Sparkles className="w-3 h-3 text-emerald-400" />
+                    FREE BUSINESS WEBSITE INCLUDED
+                  </div>
+                )}
 
                 <div className="mt-6 flex flex-col gap-2">
                   <Link

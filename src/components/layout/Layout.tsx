@@ -2,6 +2,7 @@ import DigiNav from "@/components/DigiNav";
 import DigiFooter from "@/components/DigiFooter";
 import UserDrawer from "@/components/UserDrawer";
 import PageTransition from "@/components/PageTransition";
+import FreeWebsiteOfferModal from "@/components/promotions/FreeWebsiteOfferModal";
 
 const Layout = ({ children }: { children: React.ReactNode }) => (
   <div className="min-h-screen flex flex-col bg-background overflow-x-hidden">
@@ -12,6 +13,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
     </main>
     <DigiFooter />
     <UserDrawer />
+    <FreeWebsiteOfferModal />
   </div>
 );
 

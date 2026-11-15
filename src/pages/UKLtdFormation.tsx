@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, ShieldCheck, Building2, FileCheck, Lock, Users, Star, Globe2, HelpCircle, FileText, BadgeCheck, AlertCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Building2, FileCheck, Lock, Users, Star, Globe2, HelpCircle, FileText, BadgeCheck, AlertCircle, Sparkles } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import UKLtdHero from "@/components/hero-animations/UKLtdHero";
@@ -8,6 +8,7 @@ import ServiceFAQ from "@/components/seo/ServiceFAQ";
 import RelatedServices from "@/components/seo/RelatedServices";
 import RecommendedGuides from "@/components/seo/RecommendedGuides";
 import { useSeo } from "@/lib/seo";
+import { isPackageEligible } from "@/data/promotions";
 
 const rotatingHeadlines = [
   { lead: "Register Your UK Limited Company in", accent: "Days" },
@@ -334,6 +335,12 @@ const UKLtdFormation = () => {
                 <div className="mt-3 flex items-baseline gap-1">
                   <span className="font-display text-5xl font-bold">{p.price}</span>
                 </div>
+                {isPackageEligible("ukLtd", p.name) && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 tracking-wide w-fit">
+                    <Sparkles className="w-3 h-3 text-emerald-400" />
+                    FREE BUSINESS WEBSITE INCLUDED
+                  </div>
+                )}
                 {p.processing && (
                   <p className="mt-1 text-xs opacity-70">Processing: {p.processing}</p>
                 )}

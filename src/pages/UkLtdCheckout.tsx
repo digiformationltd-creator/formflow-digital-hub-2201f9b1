@@ -2,6 +2,7 @@ import { useSeo } from "@/lib/seo";
 import { Navigate, useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import CheckoutFlow, { CheckoutItem } from "@/components/checkout/CheckoutFlow";
+import { isPackageEligible } from "@/data/promotions";
 
 const JURISDICTIONS: Record<string, string> = {
   EW: "England & Wales",
@@ -42,12 +43,24 @@ const UkLtdCheckout = () => {
   const jurName = JURISDICTIONS[jurCode];
   if (!jurCode || !jurName) return <Navigate to="/uk-services/uk-ltd-formation/choose-jurisdiction" replace />;
 
+  const isEligible = isPackageEligible("ukLtd", packageName);
+
   const items: CheckoutItem[] = PACKAGES.map((p) => ({
     id: p,
     name: `${p} Package`,
     description: PACKAGE_DESCRIPTIONS[p],
     price: PACKAGE_PRICES[p],
   }));
+
+  if (isEligible) {
+    items.push({
+      id: "free-website-launch-offer",
+      name: "Complimentary Business Website (4-Page Setup)",
+      description: `DigiFormation 2026 Promotional Launch Offer — £0.00 development fee included with your ${packageName} Package`,
+      price: 0,
+      fixed: true,
+    });
+  }
 
   return (
     <Layout>
@@ -56,7 +69,7 @@ const UkLtdCheckout = () => {
         serviceCode="LTD"
         currency="GBP"
         items={items}
-        defaultSelectedIds={[packageName]}
+        defaultSelectedIds={isEligible ? [packageName, "free-website-launch-offer"] : [packageName]}
         multiSelect={false}
         contextLabel={`Jurisdiction: ${jurName}`}
         backHref="/uk-services/uk-ltd-formation/choose-jurisdiction"

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import CheckoutFlow, { CheckoutItem } from "@/components/checkout/CheckoutFlow";
 import { getUsLlcPricingByCode, UsLlcStatePricing } from "@/data/usLlcPricing";
+import { isPackageEligible } from "@/data/promotions";
 
 type StatePricing = {
   state_code: string;
@@ -88,11 +89,23 @@ const UsaLlcCheckout = () => {
     );
   }
 
+  const isEligible = isPackageEligible("usaLlc", packageName);
+
   const items: CheckoutItem[] = [
     { id: "Starter", name: "Starter Package", description: DESCRIPTIONS.Starter, price: Number(pricing.starter_price_usd) },
     { id: "Silver", name: "Silver Package", description: DESCRIPTIONS.Silver, price: Number(pricing.silver_price_usd) },
     { id: "Gold", name: "Gold Package", description: DESCRIPTIONS.Gold, price: Number(pricing.gold_price_usd) },
   ];
+
+  if (isEligible) {
+    items.push({
+      id: "free-website-launch-offer",
+      name: "Complimentary Business Website (4-Page Setup)",
+      description: `DigiFormation 2026 Promotional Launch Offer — $0.00 development fee included with your ${packageName} Package`,
+      price: 0,
+      fixed: true,
+    });
+  }
 
   return (
     <Layout>
@@ -101,7 +114,7 @@ const UsaLlcCheckout = () => {
         serviceCode="LLC"
         currency="USD"
         items={items}
-        defaultSelectedIds={[packageName]}
+        defaultSelectedIds={isEligible ? [packageName, "free-website-launch-offer"] : [packageName]}
         multiSelect={false}
         contextLabel={`State: ${pricing.state_name} (${pricing.state_code})`}
         backHref="/usa-services/us-llc-formation/choose-state"

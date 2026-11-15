@@ -3,6 +3,7 @@ import Layout from "@/components/layout/Layout";
 import CheckoutFlow, { CheckoutItem } from "@/components/checkout/CheckoutFlow";
 import { bankingProviders } from "@/data/banking";
 import { useSeo } from "@/lib/seo";
+import { isPackageEligible } from "@/data/promotions";
 
 const deriveRegion = (requirements: string[]): "uk" | "usa" | "both" => {
   const line = requirements.find((r) => /Number$/.test(r)) || "";
@@ -34,6 +35,8 @@ const BankingCheckout = () => {
   const priceNum = Number(provider.setupPrice.replace(/[^0-9.]/g, "")) || 0;
   const region = deriveRegion(provider.requirements);
 
+  const isEligible = isPackageEligible("banking", provider.slug);
+
   const items: CheckoutItem[] = [
     {
       id: `bank-${provider.slug}`,
@@ -44,6 +47,16 @@ const BankingCheckout = () => {
     },
   ];
 
+  if (isEligible) {
+    items.push({
+      id: "free-website-launch-offer",
+      name: "Complimentary Business Website (4-Page Setup)",
+      description: `DigiFormation 2026 Promotional Launch Offer — £0.00 development fee included with your ${provider.name} setup`,
+      price: 0,
+      fixed: true,
+    });
+  }
+
   return (
     <Layout>
       <CheckoutFlow
@@ -51,7 +64,7 @@ const BankingCheckout = () => {
         serviceCode="BNK"
         currency="GBP"
         items={items}
-        defaultSelectedIds={[`bank-${provider.slug}`]}
+        defaultSelectedIds={isEligible ? [`bank-${provider.slug}`, "free-website-launch-offer"] : [`bank-${provider.slug}`]}
         lockSelection
         contextLabel={`Service: ${provider.name} Account Setup`}
         backHref={`/banks-payment-solutions/${provider.slug}`}
