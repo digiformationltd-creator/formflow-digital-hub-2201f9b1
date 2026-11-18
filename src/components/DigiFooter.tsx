@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { Mail, Clock, MapPin, Facebook, Instagram, Youtube, Linkedin, Building2, Handshake, UserCircle2 } from "lucide-react";
+import { Mail, Clock, MapPin, Phone, ShieldCheck, Facebook, Instagram, Youtube, Linkedin, Building2, Handshake, UserCircle2 } from "lucide-react";
 import logo from "@/assets/digiformation-logo-official.webp";
+import founderImg from "@/assets/founder-haroon.webp";
 import { trackWhatsAppClick } from "@/lib/analytics";
 
 
@@ -233,6 +234,73 @@ const DigiFooter = () => {
           </ul>
         </div>
 
+      </div>
+
+      {/* Founder & Account Holder Information */}
+      <div className="border-t border-border/60 bg-background/30">
+        <div className="container mx-auto px-4 py-7">
+          <div className="glass rounded-2xl border border-border/60 p-5 sm:p-6 flex flex-col md:flex-row items-center md:items-start gap-5 sm:gap-6">
+            <div className="shrink-0">
+              <img
+                src={founderImg}
+                alt="Muhammad Haroon — Founder & Account Holder of DigiFormation Ltd"
+                width={96}
+                height={96}
+                loading="lazy"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover object-top border border-primary/30 shadow-md"
+              />
+            </div>
+
+            <div className="flex-1 text-center md:text-left min-w-0">
+              <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] font-semibold text-primary mb-2">
+                <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0" />
+                <span>Founder &amp; Account Holder Information</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2.5 text-sm mt-2">
+                <div>
+                  <span className="text-xs text-muted-foreground block">Full Name</span>
+                  <span className="font-semibold text-foreground">Muhammad Haroon</span>
+                </div>
+
+                <div>
+                  <span className="text-xs text-muted-foreground block">Company Name</span>
+                  <span className="font-semibold text-foreground">DigiFormation Ltd</span>
+                </div>
+
+                <div>
+                  <span className="text-xs text-muted-foreground block">Personal Contact Number</span>
+                  <a
+                    href="tel:+923034226759"
+                    className="font-medium text-foreground hover:text-primary transition inline-flex items-center gap-1.5"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                    <span>+92 303 4226759</span>
+                  </a>
+                </div>
+
+                <div>
+                  <span className="text-xs text-muted-foreground block">Email Address</span>
+                  <a
+                    href="mailto:info@digiformation.co.uk"
+                    className="font-medium text-foreground hover:text-primary transition inline-flex items-center gap-1.5 break-all"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                    <span>info@digiformation.co.uk</span>
+                  </a>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <span className="text-xs text-muted-foreground block">Residential Address</span>
+                  <span className="font-medium text-foreground inline-flex items-start justify-center md:justify-start gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                    <span>House 247, Street No. 5, Haji Park, Bedian Road, Lahore, Pakistan 48000</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Bottom bar */}
