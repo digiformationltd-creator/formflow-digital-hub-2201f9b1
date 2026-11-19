@@ -236,14 +236,14 @@ const DigiFooter = () => {
 
       </div>
 
-      {/* Founder & Account Holder Information */}
+      {/* Founder Information */}
       <div className="border-t border-border/60 bg-background/30">
         <div className="container mx-auto px-4 py-7">
           <div className="glass rounded-2xl border border-border/60 p-5 sm:p-6 flex flex-col md:flex-row items-center md:items-start gap-5 sm:gap-6">
             <div className="shrink-0">
               <img
                 src={founderImg}
-                alt="Muhammad Haroon — Founder & Account Holder of DigiFormation Ltd"
+                alt="Muhammad Haroon — Founder of DigiFormation Ltd"
                 width={96}
                 height={96}
                 loading="lazy"
@@ -254,7 +254,7 @@ const DigiFooter = () => {
             <div className="flex-1 text-center md:text-left min-w-0">
               <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] font-semibold text-primary mb-2">
                 <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>Founder &amp; Account Holder Information</span>
+                <span>Founder</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2.5 text-sm mt-2">
