@@ -282,11 +282,11 @@ const DigiFooter = () => {
                 <div>
                   <span className="text-xs text-muted-foreground block">Email Address</span>
                   <a
-                    href="mailto:info@digiformation.co.uk"
+                    href="mailto:biz.muhammadharoon@gmail.com"
                     className="font-medium text-foreground hover:text-primary transition inline-flex items-center gap-1.5 break-all"
                   >
                     <Mail className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                    <span>info@digiformation.co.uk</span>
+                    <span>biz.muhammadharoon@gmail.com</span>
                   </a>
                 </div>
 
