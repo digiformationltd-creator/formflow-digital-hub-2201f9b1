@@ -186,7 +186,7 @@ export default function SoftwareDevelopment() {
       offers: [
         {
           "@type": "Offer",
-          name: "3-Day Free Trial",
+          name: "30-Day Free Trial",
           price: "0",
           priceCurrency: "GBP",
           url: DIGI_BIZ_OS_PRICING_URL,
@@ -195,13 +195,6 @@ export default function SoftwareDevelopment() {
           "@type": "Offer",
           name: "Lifetime Access",
           price: DIGI_BIZ_OS_PRICING.lifetime.replace("£", ""),
-          priceCurrency: "GBP",
-          url: DIGI_BIZ_OS_PRICING_URL,
-        },
-        {
-          "@type": "Offer",
-          name: "Software Setup & Customization",
-          price: DIGI_BIZ_OS_PRICING.setup.replace("£", ""),
           priceCurrency: "GBP",
           url: DIGI_BIZ_OS_PRICING_URL,
         },
@@ -1183,15 +1176,15 @@ export default function SoftwareDevelopment() {
                     Path A — Ready-Made Software
                   </div>
                   <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 rounded-full">
-                    3-Day Free Trial Available
+                    30-Day Free Trial Available
                   </span>
                 </div>
                 <h3 className="text-2xl font-bold mb-2">Get Digi Biz OS</h3>
                 <p className="text-sm opacity-85 leading-relaxed mb-5">
-                  Deploy our autonomous AI desktop operating system on your Windows machine today. Universal voice control, built-in CRM, multi-agent workflows, and zero monthly SaaS fees.
+                  Deploy our autonomous AI desktop operating system on your Windows machine today. Universal voice control, built-in CRM, multi-agent workflows, and zero recurring subscription fees.
                 </p>
 
-                {/* 4 Packages breakdown synced with digibizos.co.uk */}
+                {/* 3 Packages breakdown synced with digibizos.co.uk */}
                 <div className="space-y-2.5 mb-6">
                   {DIGI_BIZ_OS_PACKAGES.map((pkg) => (
                     <a
@@ -1329,7 +1322,7 @@ const faqs = [
   },
   {
     q: "What is the difference between Digi Biz OS and Custom CRM / Software Development?",
-    a: `Digi Biz OS is a ready-made, desktop AI business operating system for Windows available on digibizos.co.uk in four transparent tiers: a 3-Day Free Trial, a ${DIGI_BIZ_OS_PRICING.lifetime} Lifetime Single-PC Licence (was ${DIGI_BIZ_OS_PRICING.lifetimeOriginal}), Done-For-You Setup & Custom Workflows for ${DIGI_BIZ_OS_PRICING.setup} (was ${DIGI_BIZ_OS_PRICING.setupOriginal}), and a full Source Code Licence for ${DIGI_BIZ_OS_PRICING.sourceCode} (was ${DIGI_BIZ_OS_PRICING.sourceCodeOriginal}). Custom Software Development is our bespoke engineering service where DigiFormation builds tailored web applications, CRMs, ERPs, or custom AI agents specifically designed around your company's proprietary workflow.`,
+    a: `Digi Biz OS is a ready-made, desktop AI business operating system for Windows available on digibizos.co.uk in three transparent tiers: a 30-Day Free Trial, a ${DIGI_BIZ_OS_PRICING.lifetime} Lifetime Single-PC Licence (was ${DIGI_BIZ_OS_PRICING.lifetimeOriginal}), and a full Source Code Licence for ${DIGI_BIZ_OS_PRICING.sourceCode} (was ${DIGI_BIZ_OS_PRICING.sourceCodeOriginal}). Custom Software Development is our bespoke engineering service where DigiFormation builds tailored web applications, CRMs, ERPs, or custom AI agents specifically designed around your company's proprietary workflow.`,
   },
   {
     q: "How does a WhatsApp AI Agent work and what can it automate for my business?",

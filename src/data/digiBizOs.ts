@@ -1,21 +1,17 @@
-// Advertised prices rechecked at https://www.digibizos.co.uk/pricing on 2026-10-31.
-// This verifies published tiers, not payment, fulfilment or software capabilities.
+// Advertised prices for Digi Biz OS on digiformation.co.uk and digibizos.co.uk.
 // Keep this source of truth isolated from company formation and banking pricing.
 export const DIGI_BIZ_OS_URL = "https://www.digibizos.co.uk/";
 export const DIGI_BIZ_OS_PRICING_URL = "https://www.digibizos.co.uk/pricing";
 
 export const DIGI_BIZ_OS_PRICING = {
   freeTrial: "Free",
-  freeTrialPeriod: "3 Days",
-  lifetime: "£29",
+  freeTrialPeriod: "30 Days",
+  lifetime: "£19.99",
   lifetimeOriginal: "£49",
-  lifetimeDiscount: "Save 41%",
-  setup: "£129",
-  setupOriginal: "£179",
-  setupDiscount: "Save 28%",
-  sourceCode: "£199",
+  lifetimeDiscount: "Save 59%",
+  sourceCode: "£100",
   sourceCodeOriginal: "£279",
-  sourceCodeDiscount: "Save 29%",
+  sourceCodeDiscount: "Save 64%",
 } as const;
 
 export interface DigiBizOsPackage {
@@ -33,67 +29,48 @@ export interface DigiBizOsPackage {
 
 export const DIGI_BIZ_OS_PACKAGES: DigiBizOsPackage[] = [
   {
-    name: "3-Day Free Trial",
+    name: "30-Day Free Trial",
     badge: "Risk Free",
     price: "Free",
-    period: "/ 3 Days",
-    description: "Full desktop access to test-drive all 12 local engines, voice AI assistant, and business automation workflows risk-free on your PC.",
+    period: "/ 30 Days",
+    description: "Full desktop access to test-drive all 12 local engines, voice AI assistant, and business automation workflows risk-free on your PC for 30 full days.",
     features: [
-      "3 Days (72 Hours) full desktop software access",
+      "30 Days full desktop software access",
       "All 12 local AI engines included",
       "Voice AI & JARVIS navigation active",
-      "Direct WhatsApp verification key",
+      "Direct WhatsApp trial key delivery",
       "Windows 10 & 11 native deployment",
-      "No credit card or payment required",
+      "Zero monthly bills · No card required",
     ],
-    ctaText: "Get Free Trial",
-    ctaUrl: "https://www.digibizos.co.uk/pricing",
+    ctaText: "Get 30-Day Free Trial",
+    ctaUrl: "https://wa.me/923164467464?text=Hello%20DigiFormation%2C%20I%20would%20like%20to%20get%20my%2030-Day%20Free%20Trial%20key%20for%20Digi%20Biz%20OS.",
   },
   {
     name: "Lifetime Access",
     badge: "Most Popular",
-    price: "£29",
+    price: "£19.99",
     period: "one-time",
     originalPrice: "£49",
-    discount: "Save 41%",
-    description: "Pay once. Own DIGI BIZ OS for life. 100% offline sovereignty with zero monthly fees.",
+    discount: "Save 59%",
+    description: "Pay once. Own DIGI BIZ OS for life. 100% offline sovereignty with zero monthly fees or recurring bills.",
     features: [
-      "One-time payment — no monthly software lock-in",
+      "One-time £19.99 payment — zero recurring bills",
       "Lifetime access to DIGI BIZ OS Gen 2",
       "Single-PC licence — activates on 1 PC",
       "Connect your own AI API keys (OpenAI, Groq, DeepSeek, Claude)",
       "90%+ modules with integrated AI brain & voice assistant",
       "Windows 10 & 11 native desktop app",
     ],
-    ctaText: "Get Lifetime Access",
-    ctaUrl: "https://www.digibizos.co.uk/pricing",
-  },
-  {
-    name: "Software Setup & Customization",
-    badge: "Done-For-You",
-    price: "£129",
-    period: "one-time",
-    originalPrice: "£179",
-    discount: "Save 28%",
-    description: "Done-for-you software installation, API configuration, WhatsApp AI sales agent, and 5 custom automated business workflows.",
-    features: [
-      "Everything in Lifetime Access",
-      "Full software installation & desktop environment setup on your PC",
-      "5 custom business workflows custom-built specifically for your operations",
-      "Complete AI API keys configuration & live connection testing",
-      "WhatsApp AI Sales Agent setup & business prompt tuning",
-      "1-on-1 walkthrough & handover session with our team",
-    ],
-    ctaText: "Order Software Setup",
-    ctaUrl: "https://www.digibizos.co.uk/pricing",
+    ctaText: "Get Lifetime Access (£19.99)",
+    ctaUrl: "https://wa.me/923164467464?text=Hello%20DigiFormation%2C%20I%20would%20like%20to%20purchase%20Lifetime%20Access%20to%20Digi%20Biz%20OS%20for%20%C2%A319.99.",
   },
   {
     name: "Source Code Licence",
     badge: "Full Ownership",
-    price: "£199",
+    price: "£100",
     period: "one-time",
     originalPrice: "£279",
-    discount: "Save 29%",
+    discount: "Save 64%",
     description: "Buy the complete source code and rebuild DIGI BIZ OS around your business with full commercial and resale rights.",
     features: [
       "Everything in Lifetime Access",
@@ -103,7 +80,7 @@ export const DIGI_BIZ_OS_PACKAGES: DigiBizOsPackage[] = [
       "Full commercial / resale rights",
       "12 months of update pulls & developer walkthrough",
     ],
-    ctaText: "Buy Source Code",
-    ctaUrl: "https://www.digibizos.co.uk/pricing",
+    ctaText: "Buy Source Code (£100)",
+    ctaUrl: "https://wa.me/923164467464?text=Hello%20DigiFormation%2C%20I%20would%20like%20to%20purchase%20the%20Digi%20Biz%20OS%20Source%20Code%20Licence%20for%20%C2%A3100.",
   },
 ];
