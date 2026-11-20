@@ -24,7 +24,7 @@ export const FREE_WEBSITE_PROMO: PromotionConfig = {
   id: "free-website-2026",
   name: "Free Business Website Launch Offer",
   headline: "Register Your Business. Get Your Website FREE.",
-  badgeText: "FREE BUSINESS WEBSITE INCLUDED",
+  badgeText: "FREE BUSINESS WEBSITE (DOMAIN NOT INCLUDED)",
   isActive: true,
   eligiblePackages: {
     ukLtd: ["Silver", "Gold", "Platinum"],
@@ -41,15 +41,15 @@ export const FREE_WEBSITE_PROMO: PromotionConfig = {
     ],
   },
   terms: {
-    title: "Free Business Website Promotion — Terms & Conditions",
+    title: "Free Business Website & Software Promotion — Terms & Conditions",
     sections: [
       {
         heading: "1. Eligible Packages",
         details: [
-          "UK Limited Company Formation: Silver (£160), Gold (£170), and Platinum (£190) packages.",
-          "USA LLC Formation: Silver ($299) and Gold ($499) packages across all 50 states.",
-          "Banking & Payment Solutions: Eligible business accounts and payment gateways (Stripe, Wise, Tide, Airwallex, Wirex, PhotonPay, Payoneer, WorldFirst).",
-          "Important: Entry-level Starter packages (incorporation only without registered address or compliance) are not eligible for this complimentary promotion.",
+          "UK Limited Company Formation: Silver (£160), Gold (£170), and Platinum (£190) packages include a complimentary 4-page business website (Domain Not Included) + 30-Day DigiBusiness Software Free Trial.",
+          "USA LLC Formation: Silver ($299) and Gold ($499) packages include a complimentary 4-page business website (Domain Not Included) + 30-Day DigiBusiness Software Free Trial.",
+          "Banking & Payment Solutions: Eligible business accounts and payment gateways (Stripe, Wise, Tide, Airwallex, Wirex, PhotonPay, Payoneer, WorldFirst) include a complimentary 4-page business website (Domain Not Included) + 30-Day DigiBusiness Software Free Trial.",
+          "Universal Bonus: The 30-Day DigiBusiness Software Free Trial is complimentary across ALL company formation, banking, and business service packages on DigiFormation.",
         ],
       },
       {
@@ -64,10 +64,11 @@ export const FREE_WEBSITE_PROMO: PromotionConfig = {
         ],
       },
       {
-        heading: "3. Domain Registration & Renewal",
+        heading: "3. Domain Registration & Renewal (Domain Not Included)",
         details: [
-          "Domain names (.com, .co.uk, etc.) must be purchased directly by the client through their chosen registrar (e.g. Namecheap, Cloudflare, GoDaddy).",
-          "DigiFormation provides complimentary DNS pointing, nameserver configuration, and SSL binding.",
+          "Domain names (.com, .co.uk, .org, etc.) are strictly NOT included in the free website offer.",
+          "The domain name must be purchased directly by the client through their chosen registrar (e.g. Namecheap, Cloudflare, GoDaddy).",
+          "DigiFormation provides complimentary DNS pointing, nameserver configuration, and SSL binding for your chosen domain.",
           "Annual domain renewal charges remain the sole responsibility of the domain owner.",
         ],
       },
@@ -115,9 +116,27 @@ export const FREE_WEBSITE_PROMO: PromotionConfig = {
           "Fraudulent payment disputes or chargebacks immediately revoke website hosting, intellectual property transfer, and company filings.",
         ],
       },
+      {
+        heading: "10. 30-Day DigiBusiness Software Complimentary Trial",
+        details: [
+          "Complimentary 30-day full desktop license key for DigiBusiness Software (Digi Biz OS Gen 2).",
+          "Includes all 12 local AI engines, voice AI navigation, CRM, document vault, and automation tools.",
+          "100% risk-free: no credit card required, zero automatic billing at the end of 30 days.",
+          "Delivery via WhatsApp / email upon order verification.",
+        ],
+      },
     ],
   },
 };
+
+export const SOFTWARE_TRIAL_PROMO = {
+  id: "digibiz-software-trial-30d",
+  name: "30-Day DigiBusiness Software Free Trial",
+  badgeText: "FREE: 30-DAY DIGIBUSINESS SOFTWARE TRIAL",
+  description: "30-Day complimentary license key for DigiBusiness Software (Digi Biz OS Gen 2) with 12 AI engines included (£0.00).",
+  days: 30,
+  isUniversal: true,
+} as const;
 
 /**
  * Checks whether a package or banking service qualifies for the Free Website offer.

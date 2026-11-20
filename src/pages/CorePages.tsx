@@ -501,6 +501,7 @@ const ukLtdPackages: DetailPkg[] = [
       "Digital Copy of All Documents (PDF)",
       "Digital Shares Certificate",
       "ID Verification (Personal Code in 1 Hour)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
       "12/6 Phone & WhatsApp Support",
     ],
   },
@@ -521,6 +522,8 @@ const ukLtdPackages: DetailPkg[] = [
       "UTR Number",
       "Digital Shares Certificate",
       "ID Verification (Personal Code in 1 Hour)",
+      "FREE: 4-Page Business Website (Domain Not Included)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
     ],
   },
   {
@@ -540,6 +543,8 @@ const ukLtdPackages: DetailPkg[] = [
       "Digital Shares Certificate",
       "ID Verification (Personal Code in 1 Hour)",
       "Director Service Address",
+      "FREE: 4-Page Business Website (Domain Not Included)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
     ],
   },
   {
@@ -559,6 +564,8 @@ const ukLtdPackages: DetailPkg[] = [
       "Digital Shares Certificate",
       "ID Verification (Personal Code in 1 Hour)",
       "Director Service Address",
+      "FREE: 4-Page Business Website (Domain Not Included)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
     ],
   },
 ];
@@ -579,6 +586,7 @@ const usaLlcPackages: DetailPkg[] = [
       "Employer Identification Number (EIN)",
       "Digital Company Documents (PDF)",
       "Certificate of Formation (Digital)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
       "24/7 Support",
     ],
   },
@@ -596,6 +604,8 @@ const usaLlcPackages: DetailPkg[] = [
       "Employer Identification Number (EIN)",
       "Digital Company Documents (PDF)",
       "Certificate of Formation (Digital)",
+      "FREE: 4-Page Business Website (Domain Not Included)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
       "24/7 Support",
     ],
   },
@@ -613,6 +623,8 @@ const usaLlcPackages: DetailPkg[] = [
       "Individual Taxpayer Identification Number (ITIN) included",
       "Digital Company Documents (PDF)",
       "Certificate of Formation (Digital)",
+      "FREE: 4-Page Business Website (Domain Not Included)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
       "24/7 Support",
     ],
   },
@@ -1030,6 +1042,8 @@ const colsClass = (n: 2 | 3 | 4 = 3) =>
 
 const PackageCard = ({ p }: { p: DetailPkg }) => {
   const isEligible = isPackageEligible("ukLtd", p.name) || isPackageEligible("usaLlc", p.name);
+  const isTrialEligible = !p.name.includes("Free Trial") && !p.name.includes("Web Development") && !p.name.includes("React");
+
   return (
     <div
       className={`relative glass rounded-3xl p-7 ring-1 ${p.ring} bg-gradient-to-b ${p.tone} flex flex-col`}
@@ -1048,19 +1062,56 @@ const PackageCard = ({ p }: { p: DetailPkg }) => {
       <div className="mb-1 text-[10px] opacity-70 uppercase tracking-widest">Starting from</div>
       <div className="text-4xl font-bold text-gradient mb-1">{p.price}</div>
       {isEligible && (
-        <div className="mt-1 mb-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 tracking-wide w-fit">
+        <div className="mt-1 mb-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 tracking-wide w-fit">
           <Sparkles className="w-3 h-3 text-emerald-400" />
-          FREE BUSINESS WEBSITE INCLUDED
+          FREE BUSINESS WEBSITE (DOMAIN NOT INCLUDED)
+        </div>
+      )}
+      {isTrialEligible && (
+        <div className="mt-1 mb-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-[10px] font-bold text-cyan-400 tracking-wide w-fit">
+          <Sparkles className="w-3 h-3 text-cyan-400" />
+          FREE: 30-DAY DIGIBUSINESS SOFTWARE TRIAL
         </div>
       )}
       {p.note && <div className="text-xs opacity-70 mb-4">{p.note}</div>}
       <ul className="space-y-2.5 mb-6 mt-3 flex-1">
-        {p.features.map((f) => (
-          <li key={f} className="flex gap-2.5 text-sm">
-            <CheckCircle2 className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
-            <span className="opacity-90 leading-snug">{f}</span>
-          </li>
-        ))}
+        {p.features.map((f) => {
+          const isFree = f.startsWith("FREE:");
+          const isWebsite = isFree && f.toLowerCase().includes("website");
+          const isSoftware = isFree && (f.toLowerCase().includes("software") || f.toLowerCase().includes("digibusiness"));
+
+          if (isFree) {
+            return (
+              <li
+                key={f}
+                className={`p-2 rounded-xl text-sm font-semibold flex items-start gap-2.5 transition-all ${
+                  isWebsite
+                    ? "bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 shadow-sm shadow-emerald-500/10"
+                    : "bg-cyan-500/15 border border-cyan-500/35 text-cyan-300 shadow-sm shadow-cyan-500/10"
+                }`}
+              >
+                <Sparkles className={`w-4 h-4 flex-shrink-0 mt-0.5 ${isWebsite ? "text-emerald-400" : "text-cyan-400"}`} />
+                <div className="leading-snug">
+                  <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider mr-1.5 ${
+                    isWebsite
+                      ? "bg-emerald-400 text-slate-950 font-extrabold"
+                      : "bg-cyan-400 text-slate-950 font-extrabold"
+                  }`}>
+                    FREE
+                  </span>
+                  <span>{f.replace(/^FREE:\s*/, "")}</span>
+                </div>
+              </li>
+            );
+          }
+
+          return (
+            <li key={f} className="flex gap-2.5 text-sm">
+              <CheckCircle2 className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+              <span className="opacity-90 leading-snug">{f}</span>
+            </li>
+          );
+        })}
       </ul>
       <Button asChild variant="hero" className="rounded-full w-full mt-auto">
         <Link to={p.link ?? "/contact"}>

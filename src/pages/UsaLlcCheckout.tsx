@@ -100,11 +100,25 @@ const UsaLlcCheckout = () => {
   if (isEligible) {
     items.push({
       id: "free-website-launch-offer",
-      name: "Complimentary Business Website (4-Page Setup)",
-      description: `DigiFormation 2026 Promotional Launch Offer — $0.00 development fee included with your ${packageName} Package`,
+      name: "Complimentary Business Website (Domain Not Included)",
+      description: `DigiFormation 2026 Promotional Launch Offer — 4-page modern React website included ($0.00). Domain name not included.`,
       price: 0,
       fixed: true,
     });
+  }
+
+  // Universal bonus: 30-Day DigiBusiness Software Free Trial included with all packages
+  items.push({
+    id: "free-software-trial-30d",
+    name: "30-Day DigiBusiness Software Free Trial",
+    description: "DigiBusiness Software (Digi Biz OS Gen 2) full desktop license key with 12 AI engines — 30 days completely free ($0.00)",
+    price: 0,
+    fixed: true,
+  });
+
+  const defaultIds = [packageName, "free-software-trial-30d"];
+  if (isEligible) {
+    defaultIds.push("free-website-launch-offer");
   }
 
   return (
@@ -114,7 +128,7 @@ const UsaLlcCheckout = () => {
         serviceCode="LLC"
         currency="USD"
         items={items}
-        defaultSelectedIds={isEligible ? [packageName, "free-website-launch-offer"] : [packageName]}
+        defaultSelectedIds={defaultIds}
         multiSelect={false}
         contextLabel={`State: ${pricing.state_name} (${pricing.state_code})`}
         backHref="/usa-services/us-llc-formation/choose-state"

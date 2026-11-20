@@ -1,8 +1,9 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowRight, Wallet } from "lucide-react";
+import { ArrowRight, Wallet, Sparkles } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { bankingProviders } from "@/data/banking";
+import { isPackageEligible } from "@/data/promotions";
 import heroBanking from "@/assets/card-hero-banking.webp";
 import heroPayments from "@/assets/card-hero-payments.webp";
 import { useSeo } from "@/lib/seo";
@@ -150,7 +151,22 @@ const BankingProviderPage = () => {
       <section id="apply" className="py-10 bg-muted/20 border-t border-border/60">
         <div className="container mx-auto px-4 max-w-3xl text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Apply for {provider.name}</h2>
-          <p className="opacity-80 mb-8">Setup fee <span className="text-gradient font-bold">{provider.setupPrice}</span> — we handle the application end-to-end and keep you updated.</p>
+          <p className="opacity-80 mb-6">Setup fee <span className="text-gradient font-bold">{provider.setupPrice}</span> — we handle the application end-to-end and keep you updated.</p>
+
+          {/* Complimentary Promotional Bonuses */}
+          <div className="mb-8 p-4 rounded-2xl glass border border-primary/30 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-3 text-left">
+            {isPackageEligible("banking", provider.slug) && (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/35 text-xs font-bold text-emerald-300">
+                <Sparkles className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <span>FREE Business Website (Domain Not Included)</span>
+              </div>
+            )}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-cyan-500/15 border border-cyan-500/35 text-xs font-bold text-cyan-300">
+              <Sparkles className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+              <span>FREE 30-Day DigiBusiness Software Trial</span>
+            </div>
+          </div>
+
           <Button asChild variant="hero" size="lg" className="rounded-full">
             <Link to={`/banks-payment-solutions/${provider.slug}/checkout`}>Apply for {provider.name} <ArrowRight className="w-4 h-4" /></Link>
           </Button>

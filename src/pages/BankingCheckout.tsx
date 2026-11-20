@@ -50,11 +50,25 @@ const BankingCheckout = () => {
   if (isEligible) {
     items.push({
       id: "free-website-launch-offer",
-      name: "Complimentary Business Website (4-Page Setup)",
-      description: `DigiFormation 2026 Promotional Launch Offer — £0.00 development fee included with your ${provider.name} setup`,
+      name: "Complimentary Business Website (Domain Not Included)",
+      description: `DigiFormation 2026 Promotional Launch Offer — 4-page modern React website included (£0.00). Domain name not included.`,
       price: 0,
       fixed: true,
     });
+  }
+
+  // Universal bonus: 30-Day DigiBusiness Software Free Trial included with all banking services
+  items.push({
+    id: "free-software-trial-30d",
+    name: "30-Day DigiBusiness Software Free Trial",
+    description: "DigiBusiness Software (Digi Biz OS Gen 2) full desktop license key with 12 AI engines — 30 days completely free (£0.00)",
+    price: 0,
+    fixed: true,
+  });
+
+  const defaultIds = [`bank-${provider.slug}`, "free-software-trial-30d"];
+  if (isEligible) {
+    defaultIds.push("free-website-launch-offer");
   }
 
   return (
@@ -64,7 +78,7 @@ const BankingCheckout = () => {
         serviceCode="BNK"
         currency="GBP"
         items={items}
-        defaultSelectedIds={isEligible ? [`bank-${provider.slug}`, "free-website-launch-offer"] : [`bank-${provider.slug}`]}
+        defaultSelectedIds={defaultIds}
         lockSelection
         contextLabel={`Service: ${provider.name} Account Setup`}
         backHref={`/banks-payment-solutions/${provider.slug}`}

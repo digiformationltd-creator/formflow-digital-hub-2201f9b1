@@ -136,6 +136,7 @@ const packages: Pkg[] = [
       "Certificate of Formation (Digital PDF)",
       "Employer Identification Number (EIN)",
       "Shared Business Address",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
       "Client Portal Access",
       "24/7 Dedicated Support",
     ],
@@ -155,6 +156,8 @@ const packages: Pkg[] = [
       "Registered Agent Service (1 Year)",
       "Unique Business Address (Mail Support)",
       "Custom Operating Agreement",
+      "FREE: 4-Page Business Website (Domain Not Included)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
       "Client Portal Access & 24/7 Support",
     ],
     cta: "Select Silver",
@@ -173,6 +176,8 @@ const packages: Pkg[] = [
       "Custom Operating Agreement",
       "ITIN (Individual Tax ID) Application Included",
       "BOI FinCEN Report Submission",
+      "FREE: 4-Page Business Website (Domain Not Included)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
       "Priority VIP Support",
     ],
     cta: "Select Gold",
@@ -424,19 +429,54 @@ const UsaLlcFormation = () => {
                 {isPackageEligible("usaLlc", p.name) && (
                   <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 tracking-wide w-fit">
                     <Sparkles className="w-3 h-3 text-emerald-400" />
-                    FREE BUSINESS WEBSITE INCLUDED
+                    FREE BUSINESS WEBSITE (DOMAIN NOT INCLUDED)
                   </div>
                 )}
+                <div className="mt-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-[10px] font-bold text-cyan-400 tracking-wide w-fit">
+                  <Sparkles className="w-3 h-3 text-cyan-400" />
+                  FREE: 30-DAY DIGIBUSINESS SOFTWARE TRIAL
+                </div>
                 {p.processing && (
                   <p className="mt-1 text-xs opacity-70">Processing: {p.processing}</p>
                 )}
-                <ul className="mt-6 space-y-3 flex-1">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm">
-                      <FileCheck className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
-                      <span className="opacity-90">{f}</span>
-                    </li>
-                  ))}
+                <ul className="mt-6 space-y-2.5 flex-1">
+                  {p.features.map((f) => {
+                    const isFree = f.startsWith("FREE:");
+                    const isWebsite = isFree && f.toLowerCase().includes("website");
+                    const isSoftware = isFree && (f.toLowerCase().includes("software") || f.toLowerCase().includes("digibusiness"));
+
+                    if (isFree) {
+                      return (
+                        <li
+                          key={f}
+                          className={`p-2 rounded-xl text-sm font-semibold flex items-start gap-2.5 transition-all ${
+                            isWebsite
+                              ? "bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 shadow-sm shadow-emerald-500/10"
+                              : "bg-cyan-500/15 border border-cyan-500/35 text-cyan-300 shadow-sm shadow-cyan-500/10"
+                          }`}
+                        >
+                          <Sparkles className={`w-4 h-4 flex-shrink-0 mt-0.5 ${isWebsite ? "text-emerald-400" : "text-cyan-400"}`} />
+                          <div className="leading-snug">
+                            <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider mr-1.5 ${
+                              isWebsite
+                                ? "bg-emerald-400 text-slate-950 font-extrabold"
+                                : "bg-cyan-400 text-slate-950 font-extrabold"
+                            }`}>
+                              FREE
+                            </span>
+                            <span>{f.replace(/^FREE:\s*/, "")}</span>
+                          </div>
+                        </li>
+                      );
+                    }
+
+                    return (
+                      <li key={f} className="flex items-start gap-2 text-sm">
+                        <FileCheck className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
+                        <span className="opacity-90">{f}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
                 <Button asChild variant={p.badge ? "hero" : "ghostGlow"} className="rounded-full mt-7 w-full">
                   <Link to={`/usa-services/us-llc-formation/choose-state?package=${p.name}`}>{p.cta} <ArrowRight className="w-4 h-4" /></Link>

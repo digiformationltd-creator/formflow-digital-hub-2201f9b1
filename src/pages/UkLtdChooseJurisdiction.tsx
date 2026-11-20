@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSeo } from "@/lib/seo";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowRight, MapPin, CheckCircle2, FileCheck } from "lucide-react";
+import { ArrowRight, MapPin, CheckCircle2, FileCheck, Sparkles } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { isPackageEligible } from "@/data/promotions";
 import {
   Select,
   SelectContent,
@@ -60,6 +61,7 @@ const packages: Pkg[] = [
       "Digital Copy of All Documents (PDF)",
       "Digital Shares Certificate",
       "ID Verification Included",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
       "12/6 Phone & WhatsApp Support",
     ],
   },
@@ -79,6 +81,8 @@ const packages: Pkg[] = [
       "UTR Number",
       "Digital Shares Certificate",
       "ID Verification Included",
+      "FREE: 4-Page Business Website (Domain Not Included)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
     ],
   },
   {
@@ -97,6 +101,8 @@ const packages: Pkg[] = [
       "Digital Shares Certificate",
       "ID Verification Included",
       "Director Service Address",
+      "FREE: 4-Page Business Website (Domain Not Included)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
     ],
   },
   {
@@ -115,6 +121,8 @@ const packages: Pkg[] = [
       "Digital Shares Certificate",
       "ID Verification Included",
       "Director Service Address",
+      "FREE: 4-Page Business Website (Domain Not Included)",
+      "FREE: 30-Day DigiBusiness Software Free Trial",
     ],
   },
 ];
@@ -254,16 +262,57 @@ const UkLtdChooseJurisdiction = () => {
                   <div className="mt-3 flex items-baseline gap-1">
                     <span className="font-display text-5xl font-bold">{p.price}</span>
                   </div>
+                  {isPackageEligible("ukLtd", p.name) && (
+                    <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 tracking-wide w-fit">
+                      <Sparkles className="w-3 h-3 text-emerald-400" />
+                      FREE BUSINESS WEBSITE (DOMAIN NOT INCLUDED)
+                    </div>
+                  )}
+                  <div className="mt-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-[10px] font-bold text-cyan-400 tracking-wide w-fit">
+                    <Sparkles className="w-3 h-3 text-cyan-400" />
+                    FREE: 30-DAY DIGIBUSINESS SOFTWARE TRIAL
+                  </div>
                   {p.processing && (
                     <p className="mt-1 text-xs opacity-70">Processing: {p.processing}</p>
                   )}
-                  <ul className="mt-6 space-y-3 flex-1">
-                    {p.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
-                        <span className="opacity-90">{f}</span>
-                      </li>
-                    ))}
+                  <ul className="mt-6 space-y-2.5 flex-1">
+                    {p.features.map((f) => {
+                      const isFree = f.startsWith("FREE:");
+                      const isWebsite = isFree && f.toLowerCase().includes("website");
+                      const isSoftware = isFree && (f.toLowerCase().includes("software") || f.toLowerCase().includes("digibusiness"));
+
+                      if (isFree) {
+                        return (
+                          <li
+                            key={f}
+                            className={`p-2 rounded-xl text-sm font-semibold flex items-start gap-2.5 transition-all ${
+                              isWebsite
+                                ? "bg-emerald-500/15 border border-emerald-500/35 text-emerald-300 shadow-sm shadow-emerald-500/10"
+                                : "bg-cyan-500/15 border border-cyan-500/35 text-cyan-300 shadow-sm shadow-cyan-500/10"
+                            }`}
+                          >
+                            <Sparkles className={`w-4 h-4 flex-shrink-0 mt-0.5 ${isWebsite ? "text-emerald-400" : "text-cyan-400"}`} />
+                            <div className="leading-snug">
+                              <span className={`inline-block px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider mr-1.5 ${
+                                isWebsite
+                                  ? "bg-emerald-400 text-slate-950 font-extrabold"
+                                  : "bg-cyan-400 text-slate-950 font-extrabold"
+                              }`}>
+                                FREE
+                              </span>
+                              <span>{f.replace(/^FREE:\s*/, "")}</span>
+                            </div>
+                          </li>
+                        );
+                      }
+
+                      return (
+                        <li key={f} className="flex items-start gap-2 text-sm">
+                          <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
+                          <span className="opacity-90">{f}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
                   <Button asChild variant={p.badge ? "hero" : "ghostGlow"} className="rounded-full mt-7 w-full">
                     <Link to={`/uk-services/uk-ltd-formation/checkout?jurisdiction=${selected.code}&package=${p.name}`}>

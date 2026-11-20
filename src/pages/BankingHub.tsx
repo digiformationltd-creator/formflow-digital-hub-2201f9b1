@@ -151,9 +151,13 @@ const BankingHub = () => {
                 {isPackageEligible("banking", p.slug) && (
                   <div className="mt-2.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-[10px] font-bold text-emerald-400 tracking-wide w-fit">
                     <Sparkles className="w-3 h-3 text-emerald-400" />
-                    FREE BUSINESS WEBSITE INCLUDED
+                    FREE BUSINESS WEBSITE (DOMAIN NOT INCLUDED)
                   </div>
                 )}
+                <div className="mt-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-[10px] font-bold text-cyan-400 tracking-wide w-fit">
+                  <Sparkles className="w-3 h-3 text-cyan-400" />
+                  FREE: 30-DAY DIGIBUSINESS SOFTWARE TRIAL
+                </div>
 
                 <div className="mt-6 flex flex-col gap-2">
                   <Link

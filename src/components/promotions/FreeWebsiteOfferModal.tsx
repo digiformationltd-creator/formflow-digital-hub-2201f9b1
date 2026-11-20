@@ -73,7 +73,7 @@ const ELIGIBILITY_OPTIONS: EligibilityOption[] = [
     id: "uk-ltd",
     title: "UK LTD Company Formation",
     shortDesc: "Get a UK limited company registered through our services.",
-    eligibleScope: "Silver (£160), Gold (£170), or Platinum (£190) packages",
+    eligibleScope: "Silver, Gold, or Platinum — Free Website (Domain Not Included) + 30-Day Software Trial",
     icon: Building2,
     path: "/uk-services/uk-ltd-formation",
     ctaExplore: "View UK LTD Packages",
@@ -83,7 +83,7 @@ const ELIGIBILITY_OPTIONS: EligibilityOption[] = [
     id: "us-llc",
     title: "USA LLC Company Formation",
     shortDesc: "Start your US business with our LLC formation services.",
-    eligibleScope: "Silver ($299) or Gold ($449) packages (Wyoming / NM)",
+    eligibleScope: "Silver ($299) or Gold ($449) — Free Website (Domain Not Included) + 30-Day Software Trial",
     icon: Landmark,
     path: "/usa-services/us-llc-formation",
     ctaExplore: "View US LLC Packages",
@@ -93,7 +93,7 @@ const ELIGIBILITY_OPTIONS: EligibilityOption[] = [
     id: "banking",
     title: "Business Banking Services",
     shortDesc: "Apply for any one eligible business banking service through us.",
-    eligibleScope: "Wise, Tide, Stripe, Airwallex, PayPal, Payoneer & more",
+    eligibleScope: "Wise, Tide, Stripe, Airwallex, PayPal & more — Free Website (Domain Not Included) + 30-Day Software Trial",
     icon: CreditCard,
     path: "/banks-payment-solutions",
     ctaExplore: "View Banking Options",
@@ -261,7 +261,7 @@ export const FreeWebsiteOfferModal: React.FC = () => {
 
             {/* Supporting Text — STRICTLY REQUIRED */}
             <p className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Get a professionally designed business website FREE when you choose any of our eligible business services.
+              Get a professionally designed business website FREE (Domain Not Included) + 30-Day DigiBusiness Software Free Trial when you choose any eligible service.
             </p>
 
             {/* Micro feature pills */}
@@ -270,10 +270,10 @@ export const FreeWebsiteOfferModal: React.FC = () => {
                 <Check className="w-3 h-3 text-emerald-400" /> 4-Page React
               </span>
               <span className="flex items-center gap-1">
-                <Check className="w-3 h-3 text-emerald-400" /> Responsive
+                <Check className="w-3 h-3 text-amber-400" /> Domain Not Included
               </span>
               <span className="flex items-center gap-1">
-                <Check className="w-3 h-3 text-emerald-400" /> Free Hosting
+                <Check className="w-3 h-3 text-cyan-400" /> 30-Day DigiBiz Trial
               </span>
             </div>
 
@@ -415,7 +415,7 @@ export const FreeWebsiteOfferModal: React.FC = () => {
                   Congratulations! You may qualify for a FREE business website.
                 </h5>
                 <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                  Your selection (<strong>{selectedOption.title}</strong>) is eligible for a complimentary 4-page responsive business website. Final eligibility is confirmed upon order verification.
+                  Your selection (<strong>{selectedOption.title}</strong>) is eligible for a complimentary 4-page responsive business website (Domain Not Included) plus a 30-Day DigiBusiness Software full desktop license trial. Final eligibility is confirmed upon order verification.
                 </p>
               </div>
             </div>
