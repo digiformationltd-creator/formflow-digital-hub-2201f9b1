@@ -574,7 +574,7 @@ const ukLtdPackages: DetailPkg[] = [
 const usaLlcPackages: DetailPkg[] = [
   {
     name: "Starter",
-    price: "£150",
+    price: "$150",
     note: "Base price — state surcharge may apply",
     tone: "from-emerald-500/20 to-emerald-500/5",
     ring: "ring-emerald-500/40",
@@ -592,7 +592,7 @@ const usaLlcPackages: DetailPkg[] = [
   },
   {
     name: "Silver",
-    price: "£200",
+    price: "$200",
     badge: "Most Popular",
     tone: "from-sky-500/25 to-sky-500/5",
     ring: "ring-sky-400/60",
@@ -611,7 +611,7 @@ const usaLlcPackages: DetailPkg[] = [
   },
   {
     name: "Gold",
-    price: "£400",
+    price: "$400",
     tone: "from-amber-400/25 to-amber-400/5",
     ring: "ring-amber-400/50",
     link: "/usa-services/us-llc-formation/choose-state?package=Gold",

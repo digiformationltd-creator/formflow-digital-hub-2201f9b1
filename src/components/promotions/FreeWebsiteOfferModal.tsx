@@ -83,7 +83,7 @@ const ELIGIBILITY_OPTIONS: EligibilityOption[] = [
     id: "us-llc",
     title: "USA LLC Company Formation",
     shortDesc: "Start your US business with our LLC formation services.",
-    eligibleScope: "Silver ($299) or Gold ($449) — Free Website (Domain Not Included) + 30-Day Software Trial",
+    eligibleScope: "Silver or Gold — Free Website (Domain Not Included) + 30-Day Software Trial",
     icon: Landmark,
     path: "/usa-services/us-llc-formation",
     ctaExplore: "View US LLC Packages",
